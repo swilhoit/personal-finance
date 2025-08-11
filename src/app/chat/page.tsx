@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { redirect } from "next/navigation";
+import ChatDebugPanel from "@/components/ChatDebugPanel";
 
 type TextPart = { type: "text"; text: string };
 type ToolCallPart = { type: "tool-call"; toolName: string; args: unknown };
@@ -41,6 +42,9 @@ const quickPrompts = [
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  
+  console.log("[Chat Page] Initializing useChat hook...");
+  
   const { 
     messages, 
     sendMessage,
@@ -48,7 +52,8 @@ export default function ChatPage() {
     status
   } = useChat({
     onError: (err) => {
-      console.error("Chat error details:", err);
+      console.error("[Chat Page] Chat error details:", err);
+      console.error("[Chat Page] Error stack:", err.stack);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
         setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
       } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
@@ -58,6 +63,24 @@ export default function ChatPage() {
       }
     }
   });
+  
+  console.log("[Chat Page] Current status:", status);
+  console.log("[Chat Page] Messages count:", messages.length);
+  console.log("[Chat Page] SendMessage type:", typeof sendMessage);
+  console.log("[Chat Page] Messages:", messages);
+  
+  // Log every status change
+  useEffect(() => {
+    console.log("[Chat Page] Status changed to:", status);
+  }, [status]);
+  
+  // Log every messages change
+  useEffect(() => {
+    console.log("[Chat Page] Messages updated, count:", messages.length);
+    if (messages.length > 0) {
+      console.log("[Chat Page] Latest message:", messages[messages.length - 1]);
+    }
+  }, [messages]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -82,25 +105,44 @@ export default function ChatPage() {
   }, []);
 
   const handleQuickPrompt = async (prompt: string) => {
-    await sendMessage({
-      role: "user",
-      parts: [{ type: "text", text: prompt }]
-    });
+    console.log("[Chat Page] Quick prompt clicked:", prompt);
+    console.log("[Chat Page] Calling sendMessage with prompt...");
+    try {
+      const result = await sendMessage({
+        role: "user",
+        parts: [{ type: "text", text: prompt }]
+      });
+      console.log("[Chat Page] SendMessage result:", result);
+    } catch (err) {
+      console.error("[Chat Page] SendMessage failed:", err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim().length === 0) return;
+    console.log("[Chat Page] Form submitted with input:", input);
+    if (input.trim().length === 0) {
+      console.log("[Chat Page] Input is empty, returning");
+      return;
+    }
     const message = input;
     setInput("");
-    await sendMessage({
-      role: "user",
-      parts: [{ type: "text", text: message }]
-    });
+    console.log("[Chat Page] Calling sendMessage with message:", message);
+    try {
+      const result = await sendMessage({
+        role: "user",
+        parts: [{ type: "text", text: message }]
+      });
+      console.log("[Chat Page] SendMessage result:", result);
+    } catch (err) {
+      console.error("[Chat Page] SendMessage failed:", err);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#faf8f5] dark:bg-black flex flex-col">
+      {/* Debug Panel - Only in development */}
+      {process.env.NODE_ENV === "development" && <ChatDebugPanel />}
       {/* Header */}
       <div className="bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

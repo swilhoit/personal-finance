@@ -22,6 +22,9 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  
+  console.log("[ChatWidget] Initializing useChat hook...");
+  
   const { 
     messages, 
     sendMessage,
@@ -29,6 +32,8 @@ export default function ChatWidget() {
     status
   } = useChat({
     onError: (err) => {
+      console.error("[ChatWidget] Chat error:", err);
+      console.error("[ChatWidget] Error stack:", err.stack);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
         setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
       } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
@@ -38,6 +43,24 @@ export default function ChatWidget() {
       }
     },
   });
+  
+  console.log("[ChatWidget] Current status:", status);
+  console.log("[ChatWidget] Messages count:", messages.length);
+  console.log("[ChatWidget] SendMessage type:", typeof sendMessage);
+  
+  // Log status changes
+  useEffect(() => {
+    console.log("[ChatWidget] Status changed to:", status);
+  }, [status]);
+  
+  // Log messages changes
+  useEffect(() => {
+    console.log("[ChatWidget] Messages updated, count:", messages.length);
+    if (messages.length > 0) {
+      console.log("[ChatWidget] Latest message:", messages[messages.length - 1]);
+    }
+  }, [messages]);
+  
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -54,21 +77,38 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = async (action: string) => {
-    await sendMessage({
-      role: "user",
-      parts: [{ type: "text", text: action }]
-    });
+    console.log("[ChatWidget] Quick action clicked:", action);
+    console.log("[ChatWidget] Calling sendMessage...");
+    try {
+      const result = await sendMessage({
+        role: "user",
+        parts: [{ type: "text", text: action }]
+      });
+      console.log("[ChatWidget] SendMessage result:", result);
+    } catch (err) {
+      console.error("[ChatWidget] SendMessage failed:", err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim().length === 0) return;
+    console.log("[ChatWidget] Form submitted with input:", input);
+    if (input.trim().length === 0) {
+      console.log("[ChatWidget] Input is empty, returning");
+      return;
+    }
     const message = input;
     setInput("");
-    await sendMessage({
-      role: "user",
-      parts: [{ type: "text", text: message }]
-    });
+    console.log("[ChatWidget] Calling sendMessage with message:", message);
+    try {
+      const result = await sendMessage({
+        role: "user",
+        parts: [{ type: "text", text: message }]
+      });
+      console.log("[ChatWidget] SendMessage result:", result);
+    } catch (err) {
+      console.error("[ChatWidget] SendMessage failed:", err);
+    }
   };
 
   return (

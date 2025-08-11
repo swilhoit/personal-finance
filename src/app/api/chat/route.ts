@@ -47,10 +47,14 @@ type RecurringRow = {
 };
 
 export async function POST(req: Request) {
+  console.log("[Chat API] Request received");
+  console.log("[Chat API] Headers:", Object.fromEntries(req.headers.entries()));
+  
   try {
     // Check if OpenAI API key is configured
+    console.log("[Chat API] Checking OpenAI API key...");
     if (!process.env.OPENAI_API_KEY) {
-      console.error("OPENAI_API_KEY is not configured");
+      console.error("[Chat API] OPENAI_API_KEY is not configured");
       return new Response(
         JSON.stringify({ 
           error: "AI chat is not configured. Please add OPENAI_API_KEY to your environment variables." 
@@ -61,13 +65,16 @@ export async function POST(req: Request) {
         }
       );
     }
+    console.log("[Chat API] OpenAI API key found");
 
+    console.log("[Chat API] Checking authentication...");
     const supabase = createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      console.error("User not authenticated");
+      console.error("[Chat API] User not authenticated");
       return new Response("Unauthorized", { status: 401 });
     }
+    console.log("[Chat API] User authenticated:", user.id);
 
   const getRecentTransactions = tool<{ limit?: number }, RecentTransactionRow[]>({
     description: "Get the user's most recent transactions",
@@ -199,24 +206,57 @@ export async function POST(req: Request) {
     },
   });
 
-  const body = await req.json();
+  console.log("[Chat API] Parsing request body...");
+  let body: any;
+  try {
+    const text = await req.text();
+    console.log("[Chat API] Raw request text:", text);
+    body = JSON.parse(text);
+  } catch (parseError) {
+    console.error("[Chat API] Failed to parse request body:", parseError);
+    return new Response(
+      JSON.stringify({ error: "Invalid request body" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
   
   // Log the request for debugging
-  console.log("Chat API Request Body:", JSON.stringify(body, null, 2));
+  console.log("[Chat API] Request Body:", JSON.stringify(body, null, 2));
+  console.log("[Chat API] Messages count:", body.messages?.length || 0);
+  if (body.messages && body.messages.length > 0) {
+    console.log("[Chat API] First message:", JSON.stringify(body.messages[0], null, 2));
+    console.log("[Chat API] Last message:", JSON.stringify(body.messages[body.messages.length - 1], null, 2));
+  }
 
-  const result = await streamText({
-    model: openai("gpt-4o-mini"),
-    messages: body.messages ?? [],
-    system: `You are a helpful personal finance analyst. Use the available tools to fetch the user's data as needed. Be concise and include simple bullet points and totals where helpful. If data is missing, say what to do next (like connect an account or sync).`,
-    tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight },
-  });
+  console.log("[Chat API] Creating streamText with OpenAI...");
+  console.log("[Chat API] Messages to send:", JSON.stringify(body.messages, null, 2));
+  
+  try {
+    const result = await streamText({
+      model: openai("gpt-4o-mini"),
+      messages: body.messages ?? [],
+      system: `You are a helpful personal finance analyst. Use the available tools to fetch the user's data as needed. Be concise and include simple bullet points and totals where helpful. If data is missing, say what to do next (like connect an account or sync).`,
+      tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight },
+    });
 
-  return result.toTextStreamResponse();
+    console.log("[Chat API] Streaming response created successfully");
+    const response = result.toTextStreamResponse();
+    console.log("[Chat API] Response headers:", Object.fromEntries(response.headers.entries()));
+    return response;
+  } catch (streamError) {
+    console.error("[Chat API] Failed to create stream:", streamError);
+    throw streamError;
+  }
   } catch (error) {
-    console.error("Chat API error:", error);
+    console.error("[Chat API] Error caught in main handler:", error);
+    console.error("[Chat API] Error stack:", error instanceof Error ? error.stack : "No stack");
+    console.error("[Chat API] Error type:", typeof error);
+    console.error("[Chat API] Error details:", JSON.stringify(error, null, 2));
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "An unexpected error occurred" 
+        error: error instanceof Error ? error.message : "An unexpected error occurred",
+        details: process.env.NODE_ENV === "development" ? String(error) : undefined
       }), 
       { 
         status: 500,
