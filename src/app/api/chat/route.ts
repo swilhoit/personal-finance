@@ -240,7 +240,8 @@ export async function POST(req: Request) {
     });
 
     console.log("[Chat API] Streaming response created successfully");
-    const response = result.toTextStreamResponse();
+    // Return a data stream compatible with @ai-sdk/react useChat
+    const response = result.toDataStreamResponse();
     console.log("[Chat API] Response headers:", Object.fromEntries(response.headers.entries()));
     return response;
   } catch (streamError) {
