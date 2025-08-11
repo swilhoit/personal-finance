@@ -306,7 +306,7 @@ export default async function SettingsPage() {
                         {r.categories?.name ?? "Category"}
                       </div>
                       <div className="text-xs text-[#9b826f] dark:text-zinc-400">
-                        When {r.matcher_type} contains "{r.matcher_value}" · Priority {r.priority}
+                        When {r.matcher_type} contains &ldquo;{r.matcher_value}&rdquo; · Priority {r.priority}
                       </div>
                     </div>
                     <form action={deleteRule}>
