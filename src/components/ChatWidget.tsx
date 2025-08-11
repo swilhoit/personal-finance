@@ -38,10 +38,7 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = (action: string) => {
-    sendMessage({
-      role: "user",
-      content: action
-    });
+    sendMessage({ text: action });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,10 +46,7 @@ export default function ChatWidget() {
     if (input.trim().length === 0) return;
     const message = input;
     setInput("");
-    await sendMessage({
-      role: "user",
-      content: message
-    });
+    await sendMessage({ text: message });
   };
 
   return (

@@ -75,10 +75,7 @@ export default function ChatPage() {
   }, []);
 
   const handleQuickPrompt = (prompt: string) => {
-    sendMessage({
-      role: "user",
-      content: prompt
-    });
+    sendMessage({ text: prompt });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,10 +83,7 @@ export default function ChatPage() {
     if (input.trim().length === 0) return;
     const message = input;
     setInput("");
-    await sendMessage({
-      role: "user",
-      content: message
-    });
+    await sendMessage({ text: message });
   };
 
   return (
