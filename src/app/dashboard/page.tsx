@@ -1,5 +1,6 @@
 import PlaidLinkButton from "@/components/PlaidLinkButton";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import ChatQuickActions from "@/components/ChatQuickActions";
 
 export default async function DashboardPage() {
   const supabase = createSupabaseServerClient();
@@ -16,6 +17,9 @@ export default async function DashboardPage() {
           <form action={async () => { await fetch("/api/plaid/sync-transactions", { method: "POST" }); }}>
             <button className="rounded-md px-4 py-2 border">Sync last 30 days</button>
           </form>
+          <div className="pt-2">
+            <ChatQuickActions />
+          </div>
         </div>
       )}
     </div>

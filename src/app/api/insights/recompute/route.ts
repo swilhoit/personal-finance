@@ -41,7 +41,7 @@ export async function POST() {
       groups.set(m, g);
     }
     const recurring = Array.from(groups.entries())
-      .filter(([_, g]) => g.count >= 3)
+      .filter(([, g]) => g.count >= 3)
       .map(([merchant_name, g]) => ({
         merchant_name,
         avg_amount: g.total / g.count,
