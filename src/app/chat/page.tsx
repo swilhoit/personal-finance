@@ -39,8 +39,9 @@ const quickPrompts = [
 ];
 
 export default function ChatPage() {
+  const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { messages, append, reload, stop, isLoading, input, setInput, handleInputChange, handleSubmit: handleChatSubmit } = useChat({
+  const { messages, sendMessage, stop, status } = useChat({
     onError: (err) => {
       console.error("Chat error:", err);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
@@ -74,16 +75,21 @@ export default function ChatPage() {
   }, []);
 
   const handleQuickPrompt = (prompt: string) => {
-    append({
+    sendMessage({
       role: "user",
       content: prompt
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    handleChatSubmit(e);
+    const message = input;
+    setInput("");
+    await sendMessage({
+      role: "user",
+      content: message
+    });
   };
 
   return (
@@ -238,12 +244,12 @@ export default function ChatPage() {
             <input
               ref={inputRef}
               value={input}
-              onChange={handleInputChange}
-              placeholder={isLoading ? "AI is responding..." : "Ask about your finances..."}
-              disabled={isLoading}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={status === "streaming" ? "AI is responding..." : "Ask about your finances..."}
+              disabled={status === "streaming"}
               className="flex-1 px-4 py-3 rounded-xl border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
             />
-            {isLoading ? (
+            {status === "streaming" ? (
               <button
                 type="button"
                 onClick={stop}
