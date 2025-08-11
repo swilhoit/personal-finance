@@ -39,16 +39,13 @@ const quickPrompts = [
 ];
 
 export default function ChatPage() {
+  const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { 
     messages, 
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
     stop,
-    append,
-    setInput
+    status
   } = useChat({
     onError: (err) => {
       console.error("Chat error details:", err);
@@ -85,12 +82,21 @@ export default function ChatPage() {
   }, []);
 
   const handleQuickPrompt = async (prompt: string) => {
-    if (append) {
-      await append({
-        role: "user",
-        content: prompt
-      });
-    }
+    await sendMessage({
+      role: "user",
+      content: prompt
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim().length === 0) return;
+    const message = input;
+    setInput("");
+    await sendMessage({
+      role: "user",
+      content: message
+    });
   };
 
   return (
@@ -245,12 +251,12 @@ export default function ChatPage() {
             <input
               ref={inputRef}
               value={input}
-              onChange={handleInputChange}
-              placeholder={isLoading ? "AI is responding..." : "Ask about your finances..."}
-              disabled={isLoading}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={status === "streaming" ? "AI is responding..." : "Ask about your finances..."}
+              disabled={status === "streaming"}
               className="flex-1 px-4 py-3 rounded-xl border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
             />
-            {isLoading ? (
+            {status === "streaming" ? (
               <button
                 type="button"
                 onClick={stop}

@@ -20,16 +20,13 @@ const quickActions = [
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { 
     messages, 
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
     stop,
-    append,
-    setInput
+    status
   } = useChat({
     onError: (err) => {
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
@@ -57,12 +54,21 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = async (action: string) => {
-    if (append) {
-      await append({
-        role: "user",
-        content: action
-      });
-    }
+    await sendMessage({
+      role: "user",
+      content: action
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim().length === 0) return;
+    const message = input;
+    setInput("");
+    await sendMessage({
+      role: "user",
+      content: message
+    });
   };
 
   return (
@@ -189,12 +195,12 @@ export default function ChatWidget() {
               <input
                 ref={inputRef}
                 value={input}
-                onChange={handleInputChange}
-                placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
-                disabled={isLoading}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={status === "streaming" ? "AI is thinking..." : "Ask me anything..."}
+                disabled={status === "streaming"}
                 className="flex-1 px-3 py-2 text-sm rounded-full border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
               />
-              {isLoading ? (
+              {status === "streaming" ? (
                 <button
                   type="button"
                   onClick={stop}

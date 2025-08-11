@@ -9,14 +9,10 @@ export default function ChatTestPage() {
   // Try with default configuration first
   const {
     messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
     error,
-    append,
-    reload,
-    stop,
+    status,
+    stop
   } = useChat({
     api: "/api/chat",  // Use the real chat endpoint
     onError: (err) => {
@@ -24,21 +20,22 @@ export default function ChatTestPage() {
     }
   });
 
-  const handleManualAppend = async () => {
-    console.log("Using append with:", manualInput);
+  const handleManualSend = async () => {
+    console.log("Using sendMessage with:", manualInput);
     try {
-      if (append) {
-        await append({
-          role: "user",
-          content: manualInput
-        });
-        console.log("Append successful");
-      } else {
-        console.error("Append method not available");
-      }
+      await sendMessage({
+        role: "user",
+        content: manualInput
+      });
+      console.log("sendMessage successful");
     } catch (err) {
-      console.error("Error with append:", err);
+      console.error("Error with sendMessage:", err);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleManualSend();
   };
 
   const handleDirectApiCall = async () => {
@@ -63,41 +60,28 @@ export default function ChatTestPage() {
       <h1 className="text-2xl font-bold mb-4">Chat Test Page</h1>
       
       <div className="mb-4 p-4 bg-gray-100 rounded">
-        <p>isLoading: {String(isLoading)}</p>
+        <p>Status: {status}</p>
         <p>Error: {error?.message || "None"}</p>
         <p>Messages count: {messages.length}</p>
-        <p>Append available: {append ? "Yes" : "No"}</p>
+        <p>sendMessage available: {sendMessage ? "Yes" : "No"}</p>
       </div>
 
       <div className="mb-4">
-        <h3 className="font-bold mb-2">Test with built-in form:</h3>
+        <h3 className="font-bold mb-2">Test sendMessage:</h3>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
-            value={input}
-            onChange={handleInputChange}
+            value={manualInput}
+            onChange={(e) => setManualInput(e.target.value)}
             placeholder="Type message and press Enter"
             className="px-3 py-2 border rounded flex-1"
           />
           <button type="submit" className="px-4 py-2 bg-purple-500 text-white rounded">
-            Send (built-in)
+            Send Message
           </button>
         </form>
       </div>
 
       <div className="mb-4">
-        <h3 className="font-bold mb-2">Test with manual methods:</h3>
-        <input
-          value={manualInput}
-          onChange={(e) => setManualInput(e.target.value)}
-          placeholder="Enter test message"
-          className="px-3 py-2 border rounded mr-2"
-        />
-        <button
-          onClick={handleManualAppend}
-          className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
-        >
-          Try Append
-        </button>
         <button
           onClick={handleDirectApiCall}
           className="px-4 py-2 bg-green-500 text-white rounded"
