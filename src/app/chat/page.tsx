@@ -76,14 +76,14 @@ export default function ChatPage() {
 
   const handleQuickPrompt = (prompt: string) => {
     setInput(prompt);
-    // @ts-ignore - sendMessage expects a different format
+    // @ts-expect-error - sendMessage expects a different format
     sendMessage({ text: prompt });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    // @ts-ignore - sendMessage expects a different format
+    // @ts-expect-error - sendMessage expects a different format
     sendMessage({ text: input });
     setInput("");
   };
