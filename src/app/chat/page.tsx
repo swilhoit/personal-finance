@@ -43,11 +43,13 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const { messages, sendMessage, stop, status } = useChat({
     onError: (err) => {
-      console.error("Chat error:", err);
+      console.error("Chat error details:", err);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
         setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
+      } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
+        setError("You need to be logged in to use the AI chat.");
       } else {
-        setError("Failed to connect to AI service. Please try again later.");
+        setError(`Chat error: ${err.message || "Failed to connect to AI service"}`);
       }
     }
   });

@@ -47,22 +47,27 @@ type RecurringRow = {
 };
 
 export async function POST(req: Request) {
-  // Check if OpenAI API key is configured
-  if (!process.env.OPENAI_API_KEY) {
-    return new Response(
-      JSON.stringify({ 
-        error: "AI chat is not configured. Please add OPENAI_API_KEY to your environment variables." 
-      }), 
-      { 
-        status: 503,
-        headers: { "Content-Type": "application/json" }
-      }
-    );
-  }
+  try {
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("OPENAI_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ 
+          error: "AI chat is not configured. Please add OPENAI_API_KEY to your environment variables." 
+        }), 
+        { 
+          status: 503,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    }
 
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.error("User not authenticated");
+      return new Response("Unauthorized", { status: 401 });
+    }
 
   const getRecentTransactions = tool<{ limit?: number }, RecentTransactionRow[]>({
     description: "Get the user's most recent transactions",
@@ -195,6 +200,9 @@ export async function POST(req: Request) {
   });
 
   const body = await req.json();
+  
+  // Log the request for debugging
+  console.log("Chat API Request Body:", JSON.stringify(body, null, 2));
 
   const result = await streamText({
     model: openai("gpt-4o-mini"),
@@ -204,4 +212,16 @@ export async function POST(req: Request) {
   });
 
   return result.toTextStreamResponse();
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return new Response(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : "An unexpected error occurred" 
+      }), 
+      { 
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+  }
 }
