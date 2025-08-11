@@ -39,13 +39,13 @@ export default function ChatWidget() {
 
   const handleQuickAction = (action: string) => {
     setInput(action);
-    sendMessage(action);
+    sendMessage({ content: action, role: "user" });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    sendMessage(input);
+    sendMessage({ content: input, role: "user" });
     setInput("");
   };
 

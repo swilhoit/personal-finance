@@ -76,13 +76,13 @@ export default function ChatPage() {
 
   const handleQuickPrompt = (prompt: string) => {
     setInput(prompt);
-    sendMessage(prompt);
+    sendMessage({ content: prompt, role: "user" });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    sendMessage(input);
+    sendMessage({ content: input, role: "user" });
     setInput("");
   };
 
