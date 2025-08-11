@@ -7,13 +7,6 @@ import QuickStats from "@/components/QuickStats";
 import RecentTransactionsList from "@/components/RecentTransactionsList";
 import SpendingOverview from "@/components/SpendingOverview";
 
-function LoadingCard() {
-  return (
-    <div className="animate-pulse">
-      <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
-    </div>
-  );
-}
 
 export default async function DashboardPage() {
   const supabase = createSupabaseServerClient();
@@ -41,7 +34,7 @@ export default async function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold">Welcome back!</h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                Here's your financial overview
+                Here&apos;s your financial overview
               </p>
             </div>
             <div className="flex items-center gap-3">
