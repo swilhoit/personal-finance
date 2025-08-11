@@ -7,37 +7,47 @@ export default function ChatDebugPanel() {
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  // Intercept console logs
+  // Intercept console logs (with delay to avoid render issues)
   useEffect(() => {
-    const originalLog = console.log;
-    const originalError = console.error;
+    const timer = setTimeout(() => {
+      const originalLog = console.log;
+      const originalError = console.error;
 
-    console.log = (...args) => {
-      originalLog(...args);
-      const message = args.map(arg => 
-        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(" ");
-      
-      if (message.includes("[Chat") || message.includes("[chat") || message.includes("sendMessage")) {
-        setLogs(prev => [...prev.slice(-19), `[${new Date().toLocaleTimeString()}] ${message}`]);
-      }
-    };
+      console.log = (...args) => {
+        originalLog(...args);
+        const message = args.map(arg => 
+          typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(" ");
+        
+        if (message.includes("[Chat") || message.includes("[chat") || message.includes("sendMessage")) {
+          // Use setTimeout to avoid state updates during render
+          setTimeout(() => {
+            setLogs(prev => [...prev.slice(-19), `[${new Date().toLocaleTimeString()}] ${message}`]);
+          }, 0);
+        }
+      };
 
-    console.error = (...args) => {
-      originalError(...args);
-      const message = args.map(arg => 
-        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(" ");
-      
-      if (message.includes("[Chat") || message.includes("[chat") || message.includes("sendMessage")) {
-        setLogs(prev => [...prev.slice(-19), `[ERROR ${new Date().toLocaleTimeString()}] ${message}`]);
-      }
-    };
+      console.error = (...args) => {
+        originalError(...args);
+        const message = args.map(arg => 
+          typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(" ");
+        
+        if (message.includes("[Chat") || message.includes("[chat") || message.includes("sendMessage")) {
+          // Use setTimeout to avoid state updates during render
+          setTimeout(() => {
+            setLogs(prev => [...prev.slice(-19), `[ERROR ${new Date().toLocaleTimeString()}] ${message}`]);
+          }, 0);
+        }
+      };
 
-    return () => {
-      console.log = originalLog;
-      console.error = originalError;
-    };
+      return () => {
+        console.log = originalLog;
+        console.error = originalError;
+      };
+    }, 100); // Small delay to let initial renders complete
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Check health endpoint

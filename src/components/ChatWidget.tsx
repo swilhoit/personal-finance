@@ -23,8 +23,6 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  console.log("[ChatWidget] Initializing useChat hook...");
-  
   const { 
     messages, 
     sendMessage,
@@ -44,9 +42,11 @@ export default function ChatWidget() {
     },
   });
   
-  console.log("[ChatWidget] Current status:", status);
-  console.log("[ChatWidget] Messages count:", messages.length);
-  console.log("[ChatWidget] SendMessage type:", typeof sendMessage);
+  // Log initialization after first render
+  useEffect(() => {
+    console.log("[ChatWidget] Initialized - Status:", status);
+    console.log("[ChatWidget] SendMessage type:", typeof sendMessage);
+  }, []);
   
   // Log status changes
   useEffect(() => {

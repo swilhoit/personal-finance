@@ -43,8 +43,6 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  console.log("[Chat Page] Initializing useChat hook...");
-  
   const { 
     messages, 
     sendMessage,
@@ -64,10 +62,11 @@ export default function ChatPage() {
     }
   });
   
-  console.log("[Chat Page] Current status:", status);
-  console.log("[Chat Page] Messages count:", messages.length);
-  console.log("[Chat Page] SendMessage type:", typeof sendMessage);
-  console.log("[Chat Page] Messages:", messages);
+  // Log initialization after first render
+  useEffect(() => {
+    console.log("[Chat Page] Initialized - Status:", status);
+    console.log("[Chat Page] SendMessage type:", typeof sendMessage);
+  }, []);
   
   // Log every status change
   useEffect(() => {
