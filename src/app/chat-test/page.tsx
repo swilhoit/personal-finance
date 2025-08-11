@@ -62,7 +62,7 @@ export default function ChatTestPage() {
         <p>Status: {status}</p>
         <p>Error: {error?.message || "None"}</p>
         <p>Messages count: {messages.length}</p>
-        <p>sendMessage available: {sendMessage ? "Yes" : "No"}</p>
+        <p>sendMessage type: {typeof sendMessage}</p>
       </div>
 
       <div className="mb-4">
