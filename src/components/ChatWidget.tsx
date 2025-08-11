@@ -21,7 +21,18 @@ const quickActions = [
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const { messages, sendMessage, stop, status } = useChat();
+  const [error, setError] = useState<string | null>(null);
+  const { messages, sendMessage, stop, status } = useChat({
+    onError: (err) => {
+      if (err.message?.includes("503") || err.message?.includes("not configured")) {
+        setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
+      } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
+        setError("You need to be logged in to use the AI chat.");
+      } else {
+        setError(`Chat error: ${err.message || "Failed to connect to AI service"}`);
+      }
+    },
+  });
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -102,6 +113,12 @@ export default function ChatWidget() {
               </button>
             </div>
           </div>
+
+          {error && (
+            <div className="px-4 py-2 bg-[#c17767]/10 text-[#7d6754] border-b border-[#c17767]/30 text-xs">
+              {error}
+            </div>
+          )}
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
