@@ -40,9 +40,7 @@ const quickPrompts = [
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat({
-    api: "/api/chat"
-  });
+  const { messages, sendMessage, status, stop } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 

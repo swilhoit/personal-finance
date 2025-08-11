@@ -21,9 +21,7 @@ const quickActions = [
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat({
-    api: "/api/chat"
-  });
+  const { messages, sendMessage, status, stop } = useChat();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
