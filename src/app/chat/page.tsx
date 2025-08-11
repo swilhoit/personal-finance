@@ -41,7 +41,7 @@ const quickPrompts = [
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { messages, sendMessage, status, stop, error: chatError } = useChat({
+  const { messages, sendMessage, status, stop } = useChat({
     onError: (err) => {
       console.error("Chat error:", err);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {

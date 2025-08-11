@@ -23,7 +23,7 @@ export default function NotificationCenter() {
     
     // Set up real-time subscription with error handling
     const supabase = createSupabaseClient();
-    let subscription: any = null;
+    let subscription: ReturnType<typeof supabase.channel> | null = null;
     
     // Only set up subscription if we have a valid connection
     const setupSubscription = async () => {
