@@ -11,10 +11,9 @@ export default function ChatTestPage() {
     messages,
     sendMessage,
     error,
-    status,
-    stop
+    status
   } = useChat({
-    api: "/api/chat",  // Use the real chat endpoint
+    // The useChat hook should use /api/chat by default
     onError: (err) => {
       console.error("Chat error full details:", err);
     }
