@@ -75,13 +75,14 @@ export default function ChatPage() {
   }, []);
 
   const handleQuickPrompt = (prompt: string) => {
-    sendMessage({ text: prompt });
+    setInput(prompt);
+    sendMessage(prompt);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    sendMessage({ text: input });
+    sendMessage(input);
     setInput("");
   };
 
