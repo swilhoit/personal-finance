@@ -101,9 +101,9 @@ export type Database = {
         Relationships: []
       }
     }
-    Functions: {}
-    Enums: { [_ in never]: never }
-    CompositeTypes: { [_ in never]: never }
+    Functions: unknown
+    Enums: unknown
+    CompositeTypes: unknown
   }
 }
 

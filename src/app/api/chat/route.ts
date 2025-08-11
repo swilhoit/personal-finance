@@ -29,6 +29,23 @@ type AccountBalanceRow = {
   iso_currency_code: string | null;
 };
 
+type BudgetRow = { category_id: string; month: string; amount: number; categories?: { name?: string } | null };
+
+type BudgetStatus = {
+  category_id: string;
+  category_name: string;
+  month: string;
+  budget_amount: number;
+  spent_amount: number;
+  remaining_amount: number;
+};
+
+type RecurringRow = {
+  merchant_name: string;
+  avg_amount: number | null;
+  last_seen: string | null;
+};
+
 export async function POST(req: Request) {
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -84,13 +101,93 @@ export async function POST(req: Request) {
     },
   });
 
+  const getBudgetStatus = tool<Record<string, never>, BudgetStatus[]>({
+    description: "Get current month's budgets with spent and remaining amounts",
+    inputSchema: z.object({}),
+    execute: async () => {
+      const start = new Date();
+      start.setDate(1);
+      const startStr = start.toISOString().slice(0, 10);
+      const next = new Date(start);
+      next.setMonth(next.getMonth() + 1);
+      const nextStr = next.toISOString().slice(0, 10);
+
+      const [{ data: budgets }, { data: agg }] = await Promise.all([
+        supabase
+          .from("budgets")
+          .select("category_id, month, amount, categories(name)")
+          .eq("user_id", user.id)
+          .gte("month", startStr)
+          .lte("month", startStr),
+        supabase
+          .from("transactions")
+          .select("amount, category_id")
+          .eq("user_id", user.id)
+          .gte("date", startStr)
+          .lt("date", nextStr),
+      ]);
+
+      const spentByCat = new Map<string, number>();
+      for (const t of (agg as { amount: number; category_id: string | null }[]) ?? []) {
+        if (!t.category_id) continue;
+        spentByCat.set(t.category_id, (spentByCat.get(t.category_id) ?? 0) + Number(t.amount));
+      }
+
+      const out: BudgetStatus[] = [];
+      for (const b of (budgets as BudgetRow[]) ?? []) {
+        const category_id = b.category_id;
+        const budget_amount = Number(b.amount) || 0;
+        const spent_amount = spentByCat.get(category_id) ?? 0;
+        out.push({
+          category_id,
+          category_name: b.categories?.name ?? "Category",
+          month: startStr,
+          budget_amount,
+          spent_amount,
+          remaining_amount: budget_amount - spent_amount,
+        });
+      }
+      return out;
+    },
+  });
+
+  const getRecurringMerchants = tool<Record<string, never>, RecurringRow[]>({
+    description: "List detected recurring merchants with average amount and last seen date",
+    inputSchema: z.object({}),
+    execute: async () => {
+      const { data, error } = await supabase
+        .from("recurring_merchants")
+        .select("merchant_name, avg_amount, last_seen")
+        .eq("user_id", user.id)
+        .order("merchant_name");
+      if (error) throw new Error(error.message);
+      return (data as RecurringRow[]) ?? [];
+    },
+  });
+
+  const getCachedInsight = tool<{ key: string }, { key: string; value: unknown; computed_at: string } | null>({
+    description: "Fetch a cached insight by key for the user",
+    inputSchema: z.object({ key: z.string() }),
+    execute: async ({ key }) => {
+      const { data, error } = await supabase
+        .from("insight_cache")
+        .select("value, computed_at")
+        .eq("user_id", user.id)
+        .eq("cache_key", key)
+        .single();
+      if (error && error.code !== "PGRST116") throw new Error(error.message);
+      if (!data) return null;
+      return { key, value: data.value as unknown, computed_at: data.computed_at };
+    },
+  });
+
   const body = await req.json();
 
   const result = await streamText({
     model: openai("gpt-4o-mini"),
     messages: body.messages ?? [],
     system: `You are a helpful personal finance analyst. Use the available tools to fetch the user's data as needed. Be concise and include simple bullet points and totals where helpful. If data is missing, say what to do next (like connect an account or sync).`,
-    tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances },
+    tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight },
   });
 
   return result.toTextStreamResponse();
