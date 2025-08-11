@@ -7,3 +7,6 @@ export function createSupabaseBrowserClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
+
+// Alias for consistency with naming
+export const createSupabaseClient = createSupabaseBrowserClient;

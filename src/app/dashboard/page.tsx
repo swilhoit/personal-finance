@@ -6,6 +6,7 @@ import DashboardCard from "@/components/DashboardCard";
 import QuickStats from "@/components/QuickStats";
 import RecentTransactionsList from "@/components/RecentTransactionsList";
 import SpendingOverview from "@/components/SpendingOverview";
+import UserMenu from "@/components/UserMenu";
 
 
 export default async function DashboardPage() {
@@ -46,6 +47,7 @@ export default async function DashboardPage() {
                 </form>
               )}
               <PlaidLinkButton />
+              <UserMenu userEmail={user.email} />
             </div>
           </div>
         </div>
