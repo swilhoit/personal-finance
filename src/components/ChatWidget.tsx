@@ -56,7 +56,7 @@ export default function ChatWidget() {
   const handleQuickAction = async (action: string) => {
     await sendMessage({
       role: "user",
-      content: action
+      parts: [{ type: "text", text: action }]
     });
   };
 
@@ -67,7 +67,7 @@ export default function ChatWidget() {
     setInput("");
     await sendMessage({
       role: "user",
-      content: message
+      parts: [{ type: "text", text: message }]
     });
   };
 

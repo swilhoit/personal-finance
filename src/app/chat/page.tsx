@@ -84,7 +84,7 @@ export default function ChatPage() {
   const handleQuickPrompt = async (prompt: string) => {
     await sendMessage({
       role: "user",
-      content: prompt
+      parts: [{ type: "text", text: prompt }]
     });
   };
 
@@ -95,7 +95,7 @@ export default function ChatPage() {
     setInput("");
     await sendMessage({
       role: "user",
-      content: message
+      parts: [{ type: "text", text: message }]
     });
   };
 

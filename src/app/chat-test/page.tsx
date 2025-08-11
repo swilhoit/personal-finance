@@ -24,7 +24,7 @@ export default function ChatTestPage() {
     try {
       await sendMessage({
         role: "user",
-        content: manualInput
+        parts: [{ type: "text", text: manualInput }]
       });
       console.log("sendMessage successful");
     } catch (err) {
