@@ -20,8 +20,7 @@ const quickActions = [
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat();
+  const { messages, append, stop, isLoading, input, setInput, handleInputChange, handleSubmit: handleChatSubmit } = useChat();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -38,15 +37,16 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = (action: string) => {
-    setInput(action);
-    sendMessage({ text: action });
+    append({
+      role: "user",
+      content: action
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    sendMessage({ text: input });
-    setInput("");
+    handleChatSubmit(e);
   };
 
   return (
@@ -167,12 +167,12 @@ export default function ChatWidget() {
               <input
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={status === "streaming" ? "AI is thinking..." : "Ask me anything..."}
-                disabled={status === "streaming"}
+                onChange={handleInputChange}
+                placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
+                disabled={isLoading}
                 className="flex-1 px-3 py-2 text-sm rounded-full border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
               />
-              {status === "streaming" ? (
+              {isLoading ? (
                 <button
                   type="button"
                   onClick={stop}
