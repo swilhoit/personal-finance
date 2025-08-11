@@ -47,6 +47,19 @@ type RecurringRow = {
 };
 
 export async function POST(req: Request) {
+  // Check if OpenAI API key is configured
+  if (!process.env.OPENAI_API_KEY) {
+    return new Response(
+      JSON.stringify({ 
+        error: "AI chat is not configured. Please add OPENAI_API_KEY to your environment variables." 
+      }), 
+      { 
+        status: 503,
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+  }
+
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });

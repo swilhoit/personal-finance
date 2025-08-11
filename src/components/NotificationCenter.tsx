@@ -21,22 +21,39 @@ export default function NotificationCenter() {
   useEffect(() => {
     loadNotifications();
     
-    // Set up real-time subscription
+    // Set up real-time subscription with error handling
     const supabase = createSupabaseClient();
-    const subscription = supabase
-      .channel('notifications')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications' 
-      }, (payload) => {
-        setNotifications(prev => [payload.new as Notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
-      })
-      .subscribe();
+    let subscription: any = null;
+    
+    // Only set up subscription if we have a valid connection
+    const setupSubscription = async () => {
+      try {
+        subscription = supabase
+          .channel('notifications')
+          .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'notifications' 
+          }, (payload) => {
+            setNotifications(prev => [payload.new as Notification, ...prev]);
+            setUnreadCount(prev => prev + 1);
+          })
+          .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR') {
+              console.warn('NotificationCenter: Realtime subscription error - this is expected if the notifications table does not exist');
+            }
+          });
+      } catch (error) {
+        console.warn('NotificationCenter: Could not establish realtime connection', error);
+      }
+    };
+    
+    setupSubscription();
 
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 

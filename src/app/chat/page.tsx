@@ -40,7 +40,17 @@ const quickPrompts = [
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat();
+  const [error, setError] = useState<string | null>(null);
+  const { messages, sendMessage, status, stop, error: chatError } = useChat({
+    onError: (err) => {
+      console.error("Chat error:", err);
+      if (err.message?.includes("503") || err.message?.includes("not configured")) {
+        setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
+      } else {
+        setError("Failed to connect to AI service. Please try again later.");
+      }
+    }
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -99,6 +109,24 @@ export default function ChatPage() {
 
       {/* Main Chat Area */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 p-4 bg-[#c17767]/10 border border-[#c17767]/30 rounded-lg">
+            <div className="flex gap-3">
+              <svg className="w-5 h-5 text-[#c17767] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[#c17767]">Configuration Required</p>
+                <p className="text-xs text-[#7d6754] dark:text-zinc-400 mt-1">{error}</p>
+                <p className="text-xs text-[#7d6754] dark:text-zinc-400 mt-2">
+                  To enable AI chat, add the OPENAI_API_KEY environment variable in your Vercel project settings.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto mb-4 space-y-4">
           {messages.length === 0 ? (
