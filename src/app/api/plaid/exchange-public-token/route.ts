@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPlaidClient } from "@/lib/plaid";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { CountryCode } from "plaid";
 
 export async function POST(req: NextRequest) {
   const supabase = createSupabaseServerClient();
@@ -17,10 +18,23 @@ export async function POST(req: NextRequest) {
   const access_token = exchange.data.access_token;
   const item_id = exchange.data.item_id;
 
+  let institution_id: string | null = null;
+  let institution_name: string | null = null;
+  try {
+    const itemResp = await plaid.itemGet({ access_token });
+    institution_id = itemResp.data.item.institution_id ?? null;
+    if (institution_id) {
+      const inst = await plaid.institutionsGetById({ institution_id, country_codes: [CountryCode.Us] });
+      institution_name = inst.data.institution.name ?? null;
+    }
+  } catch {}
+
   await admin.from("plaid_items").upsert({
     user_id: user.id,
     item_id,
     access_token,
+    institution_id,
+    institution_name,
   }, { onConflict: "item_id" });
 
   const accountsResp = await plaid.accountsGet({ access_token });

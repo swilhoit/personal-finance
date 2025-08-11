@@ -41,6 +41,7 @@ export async function POST(req: Request) {
       const { data, error } = await supabase
         .from("transactions")
         .select("date, name, merchant_name, amount, iso_currency_code, category")
+        .eq("user_id", user.id)
         .order("date", { ascending: false })
         .limit(limit);
       if (error) throw new Error(error.message);
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
       const { data, error } = await supabase
         .from("transactions")
         .select("category, amount, date")
+        .eq("user_id", user.id)
         .gte("date", since.toISOString().slice(0, 10));
       if (error) throw new Error(error.message);
       const totals = new Map<string, number>();
@@ -74,7 +76,9 @@ export async function POST(req: Request) {
     execute: async () => {
       const { data, error } = await supabase
         .from("plaid_accounts")
-        .select("name, official_name, current_balance, available_balance, iso_currency_code");
+        .select("name, official_name, current_balance, available_balance, iso_currency_code")
+        .eq("user_id", user.id)
+        .limit(100);
       if (error) throw new Error(error.message);
       return (data as AccountBalanceRow[]) ?? [];
     },
