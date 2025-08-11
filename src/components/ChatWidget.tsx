@@ -20,9 +20,17 @@ const quickActions = [
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { messages, sendMessage, stop, status } = useChat({
+  const { 
+    messages, 
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+    append,
+    setInput
+  } = useChat({
     onError: (err) => {
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
         setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
@@ -48,16 +56,13 @@ export default function ChatWidget() {
     }
   }, [open]);
 
-  const handleQuickAction = (action: string) => {
-    sendMessage({ text: action });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim().length === 0) return;
-    const message = input;
-    setInput("");
-    await sendMessage({ text: message });
+  const handleQuickAction = async (action: string) => {
+    if (append) {
+      await append({
+        role: "user",
+        content: action
+      });
+    }
   };
 
   return (
@@ -184,12 +189,12 @@ export default function ChatWidget() {
               <input
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={status === "streaming" ? "AI is thinking..." : "Ask me anything..."}
-                disabled={status === "streaming"}
+                onChange={handleInputChange}
+                placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
+                disabled={isLoading}
                 className="flex-1 px-3 py-2 text-sm rounded-full border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
               />
-              {status === "streaming" ? (
+              {isLoading ? (
                 <button
                   type="button"
                   onClick={stop}
