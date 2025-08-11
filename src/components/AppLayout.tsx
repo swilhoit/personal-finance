@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import AppHeader from "./AppHeader";
 import MobileNav from "./MobileNav";
+import ClientOnlyWrapper from "./ClientOnlyWrapper";
 import ChatWidget from "./ChatWidget";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -16,7 +17,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {user && (
         <>
           <MobileNav />
-          <ChatWidget />
+          <ClientOnlyWrapper>
+            <ChatWidget />
+          </ClientOnlyWrapper>
         </>
       )}
     </>
