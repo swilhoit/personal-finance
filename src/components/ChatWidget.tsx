@@ -39,14 +39,12 @@ export default function ChatWidget() {
 
   const handleQuickAction = (action: string) => {
     setInput(action);
-    // @ts-expect-error - sendMessage expects a different format
     sendMessage({ text: action });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim().length === 0) return;
-    // @ts-expect-error - sendMessage expects a different format
     sendMessage({ text: input });
     setInput("");
   };
