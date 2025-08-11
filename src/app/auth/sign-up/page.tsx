@@ -58,8 +58,8 @@ export default function SignUpPage() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (error: any) {
-      setError(error.message || "An error occurred during sign up");
+    } catch (error) {
+      setError((error as Error).message || "An error occurred during sign up");
     } finally {
       setLoading(false);
     }

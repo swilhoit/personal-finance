@@ -24,8 +24,8 @@ export default function ResetPasswordPage() {
       if (error) throw error;
 
       setSuccess(true);
-    } catch (error: any) {
-      setError(error.message || "An error occurred sending reset email");
+    } catch (error) {
+      setError((error as Error).message || "An error occurred sending reset email");
     } finally {
       setLoading(false);
     }
