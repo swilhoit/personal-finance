@@ -16,11 +16,11 @@ export default function DashboardCard({
   className = "" 
 }: DashboardCardProps) {
   return (
-    <div className={`bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 ${className}`}>
+    <div className={`bg-[#f5f0e8] dark:bg-zinc-900 rounded-xl border border-[#e8dfd2] dark:border-zinc-800 p-6 ${className}`}>
       <div className="flex items-start justify-between mb-4">
-        <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{title}</h3>
+        <h3 className="text-sm font-medium text-[#7d6754] dark:text-zinc-400">{title}</h3>
         {icon && (
-          <div className="text-zinc-400 dark:text-zinc-600">
+          <div className="text-[#9b826f] dark:text-zinc-600">
             {icon}
           </div>
         )}
@@ -29,7 +29,7 @@ export default function DashboardCard({
         <div className="space-y-1">
           <p className="text-2xl font-bold">{value}</p>
           {subtitle && (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+            <p className="text-sm text-[#7d6754] dark:text-zinc-400">{subtitle}</p>
           )}
         </div>
       )}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import UserMenu from "./UserMenu";
+import NotificationCenter from "./NotificationCenter";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
@@ -26,13 +27,13 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
   }
 
   return (
-    <header className="hidden lg:block bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+    <header className="hidden lg:block bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#7a95a7] to-[#9b826f] rounded-lg flex items-center justify-center text-white font-bold text-sm">
                 PF
               </div>
               <span className="font-semibold text-lg">Personal Finance</span>
@@ -51,8 +52,8 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
                   href={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
-                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
+                      ? "bg-[#e8dfd2] dark:bg-zinc-800 text-[#3d3028] dark:text-white"
+                      : "text-[#7d6754] dark:text-zinc-400 hover:bg-[#faf8f5] dark:hover:bg-zinc-800 hover:text-[#3d3028] dark:hover:text-white"
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,12 +67,9 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
 
           {/* User Menu */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
+            <div className="relative">
+              <NotificationCenter />
+            </div>
             {userEmail && <UserMenu userEmail={userEmail} />}
           </div>
         </div>

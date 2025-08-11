@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Earth tone palette for light mode */
+  --background: #faf8f5; /* Warm off-white */
+  --foreground: #3d3028; /* Deep earth brown */
+  
+  /* Natural earth tones */
+  --stone-50: #faf8f5;
+  --stone-100: #f5f0e8;
+  --stone-200: #e8dfd2;
+  --stone-300: #d4c4b0;
+  --stone-400: #b8a08c;
+  --stone-500: #9b826f;
+  --stone-600: #7d6754;
+  --stone-700: #665343;
+  --stone-800: #524337;
+  --stone-900: #3d3028;
+  
+  /* Accent colors - muted earth tones */
+  --sage-green: #87a878;
+  --terracotta: #c17767;
+  --sand: #d4a574;
+  --clay-blue: #7a95a7;
 }
 
 @theme inline {
@@ -24,3 +43,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom utility classes for earth tones */
+.bg-earth-50 { background-color: var(--stone-50); }
+.bg-earth-100 { background-color: var(--stone-100); }
+.bg-earth-200 { background-color: var(--stone-200); }
+.bg-earth-300 { background-color: var(--stone-300); }
+.text-earth-600 { color: var(--stone-600); }
+.text-earth-700 { color: var(--stone-700); }
+.text-earth-800 { color: var(--stone-800); }
+.text-earth-900 { color: var(--stone-900); }
+
+.bg-sage { background-color: var(--sage-green); }
+.bg-terracotta { background-color: var(--terracotta); }
+.bg-sand { background-color: var(--sand); }
+.bg-clay { background-color: var(--clay-blue); }

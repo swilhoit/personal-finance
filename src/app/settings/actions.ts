@@ -68,3 +68,15 @@ export async function createRule(formData: FormData) {
   const { error } = await supabase.from("category_rules").insert({ user_id: user.id, category_id, matcher_type, matcher_value, priority });
   if (error) throw new Error(error.message);
 }
+
+export async function deleteRule(formData: FormData) {
+  const supabase = createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const id = String(formData.get("id") || "");
+  if (!id) throw new Error("Missing id");
+
+  const { error } = await supabase.from("category_rules").delete().eq("id", id).eq("user_id", user.id);
+  if (error) throw new Error(error.message);
+}
