@@ -169,7 +169,7 @@ export default function ChatPage() {
                         </div>
                         {message.role === "assistant" && (
                           <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 px-1">
-                            {new Date(message.createdAt || Date.now()).toLocaleTimeString([], { 
+                            {new Date().toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
