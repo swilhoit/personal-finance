@@ -27,19 +27,19 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header Section */}
-      <div className="bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Welcome back!</h1>
-              <p className="text-sm text-[#7d6754] dark:text-zinc-400 mt-1">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back!</h1>
+              <p className="text-sm text-gray-600 dark:text-zinc-400 mt-1">
                 Here&apos;s your financial overview
               </p>
             </div>
             <div className="flex items-center gap-3">
               {hasAccounts && (
                 <form action="/api/plaid/sync-transactions" method="POST">
-                  <button className="px-4 py-2 text-sm border border-[#d4c4b0] dark:border-zinc-700 rounded-lg hover:bg-[#f5f0e8] dark:hover:bg-zinc-800 transition-colors">
+                  <button className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
                     Sync Transactions
                   </button>
                 </form>
@@ -54,12 +54,12 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!hasAccounts ? (
           /* Empty State */
-          <div className="bg-[#f5f0e8] dark:bg-zinc-900 rounded-xl border border-[#e8dfd2] dark:border-zinc-800 p-12 text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-[#d4c4b0] dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-12 text-center">
+            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            <h2 className="text-xl font-semibold mb-2">Get started by connecting your bank</h2>
-            <p className="text-[#7d6754] dark:text-zinc-400 mb-6 max-w-sm mx-auto">
+            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Get started by connecting your bank</h2>
+            <p className="text-gray-600 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
               Securely connect your accounts to start tracking your finances and getting insights.
             </p>
             <PlaidLinkButton />
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
             <Suspense fallback={
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-24 bg-[#e8dfd2] dark:bg-zinc-800 rounded-xl animate-pulse" />
+                  <div key={i} className="h-24 bg-gray-200 dark:bg-zinc-800 rounded-xl animate-pulse" />
                 ))}
               </div>
             }>
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
                   <Suspense fallback={
                     <div className="space-y-3">
                       {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-12 bg-[#f5f0e8] dark:bg-zinc-800 rounded animate-pulse" />
+                        <div key={i} className="h-12 bg-gray-100 dark:bg-zinc-800 rounded animate-pulse" />
                       ))}
                     </div>
                   }>

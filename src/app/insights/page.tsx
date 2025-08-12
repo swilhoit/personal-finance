@@ -78,8 +78,8 @@ export default async function InsightsPage() {
   
   // Prepare category breakdown with colors
   const categoryColors = [
-    "#7a95a7", "#87a878", "#c17767", "#d4a574", "#9b826f", "#7d6754",
-    "#665343", "#524337", "#3d3028", "#8b7355"
+    "#2563eb", "#16a34a", "#dc2626", "#ea580c", "#6b7280", "#374151",
+    "#1f2937", "#111827", "#030712", "#6b7280"
   ];
   
   const categoryData = topCategories.map((cat, index) => ({
@@ -136,7 +136,7 @@ export default async function InsightsPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#87a878] text-white">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-green-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -165,8 +165,8 @@ export default async function InsightsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {rows.length === 0 ? (
           <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800 p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#7a95a7]/20 to-[#87a878]/20 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-[#7a95a7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-600/20 to-green-600/20 rounded-2xl flex items-center justify-center">
+              <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
@@ -174,7 +174,7 @@ export default async function InsightsPage() {
             <p className="text-gray-600 dark:text-zinc-400 mb-8 max-w-md mx-auto">
               Connect your bank accounts and sync transactions to unlock powerful spending insights and analytics.
             </p>
-            <a href="/accounts" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#87a878] text-white rounded-xl hover:shadow-lg transition-all">
+            <a href="/accounts" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-green-600 text-white rounded-xl hover:shadow-lg transition-all">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -187,8 +187,8 @@ export default async function InsightsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-[#7a95a7]/10 rounded-lg">
-                    <svg className="w-6 h-6 text-[#7a95a7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-2 bg-blue-600/10 rounded-lg">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -202,12 +202,12 @@ export default async function InsightsPage() {
 
               <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-[#87a878]/10 rounded-lg">
-                    <svg className="w-6 h-6 text-[#87a878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-2 bg-green-600/10 rounded-lg">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                   </div>
-                  <span className="text-xs font-medium text-[#87a878]">
+                  <span className="text-xs font-medium text-green-600">
                     {totalTransactions}
                   </span>
                 </div>
@@ -217,12 +217,12 @@ export default async function InsightsPage() {
 
               <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-[#c17767]/10 rounded-lg">
-                    <svg className="w-6 h-6 text-[#c17767]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-2 bg-red-600/10 rounded-lg">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                     </svg>
                   </div>
-                  <span className="text-xs font-medium text-[#c17767]">
+                  <span className="text-xs font-medium text-red-600">
                     {rows.length}
                   </span>
                 </div>
@@ -232,12 +232,12 @@ export default async function InsightsPage() {
 
               <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-[#d4a574]/10 rounded-lg">
-                    <svg className="w-6 h-6 text-[#d4a574]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-2 bg-orange-600/10 rounded-lg">
+                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
-                  <span className="text-xs font-medium text-[#d4a574]">
+                  <span className="text-xs font-medium text-orange-600">
                     Daily
                   </span>
                 </div>
@@ -247,12 +247,12 @@ export default async function InsightsPage() {
 
               <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-[#9b826f]/10 rounded-lg">
-                    <svg className="w-6 h-6 text-[#9b826f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-2 bg-gray-500/10 rounded-lg">
+                    <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
-                  <span className="text-xs font-medium text-[#9b826f]">
+                  <span className="text-xs font-medium text-gray-500">
                     {topMerchants.length}
                   </span>
                 </div>
@@ -283,7 +283,7 @@ export default async function InsightsPage() {
                     max={totalBudget || total * 1.2} 
                     size={160}
                     strokeWidth={12}
-                    color={budgetUsed > 100 ? "#c17767" : budgetUsed > 80 ? "#d4a574" : "#87a878"}
+                    color={budgetUsed > 100 ? "#dc2626" : budgetUsed > 80 ? "#ea580c" : "#16a34a"}
                   />
                   <div className="mt-6 w-full space-y-2">
                     <div className="flex justify-between text-sm">
@@ -309,7 +309,7 @@ export default async function InsightsPage() {
             <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Category Breakdown</h2>
-                <button className="text-sm text-blue-600 dark:text-[#7a95a7] hover:text-blue-700 dark:hover:text-[#87a878] transition-colors">
+                <button className="text-sm text-blue-600 dark:text-blue-600 hover:text-blue-700 dark:hover:text-green-600 transition-colors">
                   View All →
                 </button>
               </div>
@@ -324,7 +324,7 @@ export default async function InsightsPage() {
                   {topMerchants.map(([merchant, amount], index) => (
                     <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#7a95a7]/20 to-[#87a878]/20 flex items-center justify-center text-sm font-bold">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600/20 to-green-600/20 flex items-center justify-center text-sm font-bold">
                           {index + 1}
                         </div>
                         <div>
@@ -350,8 +350,8 @@ export default async function InsightsPage() {
                 <div className="space-y-3">
                   <a href="/budgets" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#7a95a7]/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#7a95a7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                       </div>
@@ -360,15 +360,15 @@ export default async function InsightsPage() {
                         <p className="text-xs text-gray-500 dark:text-zinc-400">Plan next month</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-[#9b826f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </a>
 
                   <a href="/transactions" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#87a878]/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#87a878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                       </div>
@@ -377,15 +377,15 @@ export default async function InsightsPage() {
                         <p className="text-xs text-gray-500 dark:text-zinc-400">Categorize & analyze</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-[#9b826f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </a>
 
                   <a href="/chat" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#c17767]/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#c17767]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-lg bg-red-600/10 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                       </div>
@@ -394,7 +394,7 @@ export default async function InsightsPage() {
                         <p className="text-xs text-gray-500 dark:text-zinc-400">Get personalized tips</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-[#9b826f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </a>

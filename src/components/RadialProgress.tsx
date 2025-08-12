@@ -17,7 +17,7 @@ export default function RadialProgress({
   strokeWidth = 8,
   label,
   sublabel,
-  color = "#7a95a7"
+  color = "#2563eb"
 }: RadialProgressProps) {
   const percentage = Math.min((value / max) * 100, 100);
   const radius = (size - strokeWidth) / 2;

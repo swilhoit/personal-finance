@@ -42,7 +42,7 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
 function renderToolResultByName(toolName: string, result: unknown) {
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
     const items = result as Array<{ category: string; total: number }>;
-    if (items.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No spending found.</div>;
+    if (items.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No spending found.</div>;
     return (
       <div className="mt-1.5 text-xs">
         <div className="font-medium mb-0.5">Spending by category:</div>
@@ -56,7 +56,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
   }
   if (toolName === "getRecentTransactions" && Array.isArray(result)) {
     const rows = result as Array<{ date: string; name: string | null; merchant_name: string | null; amount: number; iso_currency_code: string | null; category: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No recent transactions.</div>;
+    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No recent transactions.</div>;
     return (
       <div className="mt-1.5 text-xs">
         <div className="font-medium mb-0.5">Recent transactions:</div>
@@ -70,7 +70,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
   }
   if (toolName === "getAccountBalances" && Array.isArray(result)) {
     const rows = result as Array<{ name: string | null; official_name: string | null; current_balance: number | null; available_balance: number | null; iso_currency_code: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No accounts.</div>;
+    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No accounts.</div>;
     return (
       <div className="mt-1.5 text-xs">
         <div className="font-medium mb-0.5">Account balances:</div>
@@ -84,7 +84,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
   }
   if (toolName === "getBudgetStatus" && Array.isArray(result)) {
     const rows = result as Array<{ category_name: string; budget_amount: number; spent_amount: number; remaining_amount: number; month: string }>;
-    if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No budgets for this month.</div>;
+    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No budgets for this month.</div>;
     return (
       <div className="mt-1.5 text-xs">
         <div className="font-medium mb-0.5">Budgets ({rows[0]?.month}):</div>
@@ -241,7 +241,7 @@ export default function ChatWidget() {
         aria-label="Open chat"
       >
         <div className="relative">
-          <div className="w-14 h-14 bg-gradient-to-br from-[#7a95a7] to-[#9b826f] rounded-full flex items-center justify-center text-white">
+          <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 rounded-full flex items-center justify-center text-white">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
@@ -260,7 +260,7 @@ export default function ChatWidget() {
       >
         <div className="w-[380px] h-[600px] bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-zinc-800">
           {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#9b826f] text-white flex items-center justify-between">
+          <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="font-semibold">AI Assistant</span>
@@ -285,7 +285,7 @@ export default function ChatWidget() {
           </div>
 
           {error && (
-            <div className="px-4 py-2 bg-[#c17767]/10 text-[#7d6754] border-b border-[#c17767]/30 text-xs">
+            <div className="px-4 py-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border-b border-red-200 dark:border-red-900/30 text-xs">
               {error}
             </div>
           )}
@@ -294,10 +294,10 @@ export default function ChatWidget() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
               <div className="text-center py-8">
-                <svg className="w-12 h-12 mx-auto mb-3 text-[#d4c4b0] dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                <p className="text-sm text-[#7d6754] dark:text-zinc-400 mb-4">
+                <p className="text-sm text-gray-600 dark:text-zinc-400 mb-4">
                   Hi! I can help you understand your finances.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
@@ -305,7 +305,7 @@ export default function ChatWidget() {
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action)}
-                      className="px-3 py-1.5 text-xs bg-[#faf8f5] dark:bg-zinc-800 rounded-full hover:bg-[#e8dfd2] dark:hover:bg-zinc-700 transition-colors"
+                      className="px-3 py-1.5 text-xs bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors text-gray-700 dark:text-gray-300"
                     >
                       {action}
                     </button>
@@ -322,8 +322,8 @@ export default function ChatWidget() {
                     <div
                       className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
                         message.role === "user"
-                          ? "bg-[#7d6754] text-[#faf8f5]"
-                          : "bg-[#faf8f5] dark:bg-zinc-800 text-[#3d3028] dark:text-zinc-100"
+                          ? "bg-blue-600 dark:bg-blue-700 text-white"
+                          : "bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-100"
                       }`}
                     >
                       {message.parts.map((part, i) => {
@@ -332,7 +332,7 @@ export default function ChatWidget() {
                         }
                         if (isToolCallPart(part)) {
                           return (
-                            <div key={i} className="text-[11px] text-[#9b826f] dark:text-zinc-400 italic mt-1">
+                            <div key={i} className="text-[11px] text-gray-500 dark:text-zinc-400 italic mt-1">
                               Fetching {part.toolName.replace(/([A-Z])/g, " $1").toLowerCase()}...
                             </div>
                           );
@@ -354,11 +354,11 @@ export default function ChatWidget() {
                 ))}
                 {status === "streaming" && (
                   <div className="flex justify-start">
-                    <div className="bg-[#faf8f5] dark:bg-zinc-800 rounded-2xl px-3 py-2">
+                    <div className="bg-gray-100 dark:bg-zinc-800 rounded-2xl px-3 py-2">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-[#9b826f] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 bg-[#9b826f] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 bg-[#9b826f] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function ChatWidget() {
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit} className="p-3 border-t border-[#e8dfd2] dark:border-zinc-800">
+          <form onSubmit={handleSubmit} className="p-3 border-t border-gray-200 dark:border-zinc-800">
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -377,13 +377,13 @@ export default function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={status === "streaming" ? "AI is thinking..." : "Ask me anything..."}
                 disabled={status === "streaming"}
-                className="flex-1 px-3 py-2 text-sm rounded-full border border-[#d4c4b0] dark:border-zinc-700 bg-[#faf8f5] dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#7a95a7] disabled:opacity-50"
+                className="flex-1 px-3 py-2 text-sm rounded-full border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50"
               />
               {status === "streaming" ? (
                 <button
                   type="button"
                   onClick={stop}
-                  className="px-4 py-2 text-sm bg-[#c17767] text-white rounded-full hover:bg-[#a85d4d] transition-colors"
+                  className="px-4 py-2 text-sm bg-red-600 dark:bg-red-700 text-white rounded-full hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                 >
                   Stop
                 </button>
@@ -391,7 +391,7 @@ export default function ChatWidget() {
                 <button
                   type="submit"
                   disabled={input.trim().length === 0}
-                  className="px-4 py-2 text-sm bg-[#7a95a7] text-white rounded-full hover:bg-[#6b8599] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Send
                 </button>

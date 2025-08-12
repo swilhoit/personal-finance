@@ -60,11 +60,11 @@ export default function SpendingTrendChart({ data, height = 200 }: SpendingTrend
 
     // Draw trend line
     const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-    gradient.addColorStop(0, "rgba(122, 149, 167, 0.3)");
-    gradient.addColorStop(1, "rgba(122, 149, 167, 0.05)");
+    gradient.addColorStop(0, "rgba(37, 99, 235, 0.3)");
+    gradient.addColorStop(1, "rgba(37, 99, 235, 0.05)");
 
     ctx.beginPath();
-    ctx.strokeStyle = "#7a95a7";
+    ctx.strokeStyle = "#2563eb";
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
 
@@ -112,7 +112,7 @@ export default function SpendingTrendChart({ data, height = 200 }: SpendingTrend
       
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = "#7a95a7";
+      ctx.fillStyle = "#2563eb";
       ctx.fill();
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 2;
@@ -120,7 +120,7 @@ export default function SpendingTrendChart({ data, height = 200 }: SpendingTrend
     });
 
     // Draw labels
-    ctx.fillStyle = isDark ? "#7d6754" : "#6b7280";
+    ctx.fillStyle = isDark ? "#374151" : "#6b7280";
     ctx.font = "11px system-ui";
     ctx.textAlign = "center";
 

@@ -40,7 +40,7 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
           <div className="flex items-center justify-between">
             {/* Logo and Current Page */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#9b826f] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
                 PF
               </div>
               <div>
@@ -60,13 +60,13 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
       </header>
 
       {/* Desktop Header */}
-      <header className="hidden lg:block bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
+      <header className="hidden lg:block bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#7a95a7] to-[#9b826f] rounded-lg flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                 PF
               </div>
               <span className="font-semibold text-lg">Personal Finance</span>
@@ -85,8 +85,8 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
                   href={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-[#e8dfd2] dark:bg-zinc-800 text-[#3d3028] dark:text-white"
-                      : "text-[#7d6754] dark:text-zinc-400 hover:bg-[#faf8f5] dark:hover:bg-zinc-800 hover:text-[#3d3028] dark:hover:text-white"
+                      ? "bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white"
+                      : "text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
