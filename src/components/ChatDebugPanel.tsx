@@ -115,7 +115,7 @@ export default function ChatDebugPanel() {
   };
 
   return (
-    <div className="fixed bottom-20 left-4 z-50 w-96 max-h-96 bg-black/90 text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto">
+    <div className="hidden lg:block fixed bottom-20 left-4 z-50 w-96 max-h-96 bg-black/90 text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto">
       <div className="mb-2 text-yellow-400">🔍 Chat Debug Panel</div>
       
       <div className="mb-3">

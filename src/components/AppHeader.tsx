@@ -27,8 +27,40 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
     return null;
   }
 
+  // Get current page name for mobile
+  const currentPage = navigation.find(item => 
+    pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href))
+  )?.name || "Dashboard";
+
   return (
-    <header className="hidden lg:block bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
+    <>
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-40">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo and Current Page */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#9b826f] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                PF
+              </div>
+              <div>
+                <h1 className="font-semibold text-base">{currentPage}</h1>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">Personal Finance</p>
+              </div>
+            </div>
+            
+            {/* Right Actions */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <NotificationCenter />
+              {userEmail && <UserMenu userEmail={userEmail} />}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Desktop Header */}
+      <header className="hidden lg:block bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
@@ -77,5 +109,6 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
         </div>
       </div>
     </header>
+    </>
   );
 }
