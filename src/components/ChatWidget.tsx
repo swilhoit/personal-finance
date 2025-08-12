@@ -232,10 +232,10 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Hidden on mobile since chat is in nav */}
       <button
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-4 right-4 z-50 rounded-full shadow-lg transition-all ${
+        className={`hidden md:block fixed bottom-4 right-4 z-50 rounded-full shadow-lg transition-all ${
           open ? "scale-0" : "scale-100"
         }`}
         aria-label="Open chat"
@@ -252,15 +252,15 @@ export default function ChatWidget() {
         </div>
       </button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Hidden on mobile since we have dedicated page */}
       <div
-        className={`fixed bottom-4 right-4 z-50 transition-all transform ${
+        className={`hidden md:block fixed bottom-4 right-4 z-50 transition-all transform ${
           open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="w-[380px] h-[600px] bg-[#f5f0e8] dark:bg-zinc-900 shadow-2xl rounded-2xl flex flex-col overflow-hidden border border-[#e8dfd2] dark:border-zinc-800">
+        <div className="w-[380px] h-[600px] bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-zinc-800">
           {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-[#7a95a7] to-[#9b826f] text-white flex items-center justify-between">
+          <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-[#7a95a7] dark:to-[#9b826f] text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="font-semibold">AI Assistant</span>

@@ -40,6 +40,15 @@ export default function MobileNav() {
       )
     },
     {
+      href: "/chat",
+      label: "Chat",
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+      )
+    },
+    {
       href: "/accounts",
       label: "Accounts",
       icon: (
@@ -61,7 +70,7 @@ export default function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 md:hidden z-50 pb-safe">
-      <div className="grid grid-cols-5">
+      <div className="grid grid-cols-6">
         {navItems.map((item) => (
           <Link
             key={item.href}
