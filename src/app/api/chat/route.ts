@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { streamText } from "ai";
+import { streamText, convertToModelMessages, UIMessage } from "ai";
 import { tool } from "@ai-sdk/provider-utils";
 import { openai } from "@ai-sdk/openai";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -68,26 +68,39 @@ export async function POST(req: Request) {
     console.log("[Chat API] OpenAI API key found");
 
     console.log("[Chat API] Checking authentication...");
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       console.error("[Chat API] User not authenticated");
       return new Response("Unauthorized", { status: 401 });
     }
     console.log("[Chat API] User authenticated:", user.id);
+    
+  // Get or create session ID for chat history
+  const sessionId = req.headers.get("x-session-id") || crypto.randomUUID();
+  console.log("[Chat API] Session ID:", sessionId);
 
   const getRecentTransactions = tool<{ limit?: number }, RecentTransactionRow[]>({
     description: "Get the user's most recent transactions",
     inputSchema: z.object({ limit: z.number().min(1).max(100) }).partial(),
     execute: async ({ limit = 20 }) => {
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("date, name, merchant_name, amount, iso_currency_code, category")
-        .eq("user_id", user.id)
-        .order("date", { ascending: false })
-        .limit(limit);
-      if (error) throw new Error(error.message);
-      return (data as RecentTransactionRow[]) ?? [];
+      try {
+        console.log("[Chat API] Tool getRecentTransactions for user", user.id);
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("date, name, merchant_name, amount, iso_currency_code, category")
+          .eq("user_id", user.id)
+          .order("date", { ascending: false })
+          .limit(limit);
+        if (error) {
+          console.error("[Chat API] getRecentTransactions error:", error);
+          return [];
+        }
+        return (data as RecentTransactionRow[]) ?? [];
+      } catch (e) {
+        console.error("[Chat API] getRecentTransactions unexpected error:", e);
+        return [];
+      }
     },
   });
 
@@ -95,20 +108,28 @@ export async function POST(req: Request) {
     description: "Aggregate total spending by category over a recent time window",
     inputSchema: z.object({ days: z.number().min(1).max(365) }).partial(),
     execute: async ({ days = 30 }) => {
-      const since = new Date();
-      since.setDate(since.getDate() - days);
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("category, amount, date")
-        .eq("user_id", user.id)
-        .gte("date", since.toISOString().slice(0, 10));
-      if (error) throw new Error(error.message);
-      const totals = new Map<string, number>();
-      for (const t of (data as SpendingRow[]) ?? []) {
-        const key = t.category ?? "Uncategorized";
-        totals.set(key, (totals.get(key) ?? 0) + Number(t.amount));
+      try {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("category, amount, date")
+          .eq("user_id", user.id)
+          .gte("date", since.toISOString().slice(0, 10));
+        if (error) {
+          console.error("[Chat API] getSpendingByCategory error:", error);
+          return [];
+        }
+        const totals = new Map<string, number>();
+        for (const t of (data as SpendingRow[]) ?? []) {
+          const key = t.category ?? "Uncategorized";
+          totals.set(key, (totals.get(key) ?? 0) + Number(t.amount));
+        }
+        return Array.from(totals.entries()).map(([category, total]) => ({ category, total }));
+      } catch (e) {
+        console.error("[Chat API] getSpendingByCategory unexpected error:", e);
+        return [];
       }
-      return Array.from(totals.entries()).map(([category, total]) => ({ category, total }));
     },
   });
 
@@ -116,13 +137,21 @@ export async function POST(req: Request) {
     description: "List current balances by account",
     inputSchema: z.object({}),
     execute: async () => {
-      const { data, error } = await supabase
-        .from("plaid_accounts")
-        .select("name, official_name, current_balance, available_balance, iso_currency_code")
-        .eq("user_id", user.id)
-        .limit(100);
-      if (error) throw new Error(error.message);
-      return (data as AccountBalanceRow[]) ?? [];
+      try {
+        const { data, error } = await supabase
+          .from("plaid_accounts")
+          .select("name, official_name, current_balance, available_balance, iso_currency_code")
+          .eq("user_id", user.id)
+          .limit(100);
+        if (error) {
+          console.error("[Chat API] getAccountBalances error:", error);
+          return [];
+        }
+        return (data as AccountBalanceRow[]) ?? [];
+      } catch (e) {
+        console.error("[Chat API] getAccountBalances unexpected error:", e);
+        return [];
+      }
     },
   });
 
@@ -132,47 +161,53 @@ export async function POST(req: Request) {
     execute: async () => {
       const start = new Date();
       start.setDate(1);
-      const startStr = start.toISOString().slice(0, 10);
+      const startStr = start.toISOString().slice(0, 10); // YYYY-MM-DD (first day)
+      const monthKey = start.toISOString().slice(0, 7);  // YYYY-MM (matches budgets.month)
       const next = new Date(start);
       next.setMonth(next.getMonth() + 1);
       const nextStr = next.toISOString().slice(0, 10);
 
-      const [{ data: budgets }, { data: agg }] = await Promise.all([
-        supabase
-          .from("budgets")
-          .select("category_id, month, amount, categories(name)")
-          .eq("user_id", user.id)
-          .gte("month", startStr)
-          .lte("month", startStr),
-        supabase
-          .from("transactions")
-          .select("amount, category_id")
-          .eq("user_id", user.id)
-          .gte("date", startStr)
-          .lt("date", nextStr),
-      ]);
-
-      const spentByCat = new Map<string, number>();
-      for (const t of (agg as { amount: number; category_id: string | null }[]) ?? []) {
-        if (!t.category_id) continue;
-        spentByCat.set(t.category_id, (spentByCat.get(t.category_id) ?? 0) + Number(t.amount));
+      try {
+        const [{ data: budgets }, { data: agg, error: aggError }] = await Promise.all([
+          supabase
+            .from("budgets")
+            .select("category_id, month, amount, categories(name)")
+            .eq("user_id", user.id)
+            .eq("month", monthKey),
+          supabase
+            .from("transactions")
+            .select("amount, category_id")
+            .eq("user_id", user.id)
+            .gte("date", startStr)
+            .lt("date", nextStr),
+        ]);
+        if (aggError) {
+          console.error("[Chat API] getBudgetStatus transactions error:", aggError);
+        }
+        const spentByCat = new Map<string, number>();
+        for (const t of (agg as { amount: number; category_id: string | null }[]) ?? []) {
+          if (!t.category_id) continue;
+          spentByCat.set(t.category_id, (spentByCat.get(t.category_id) ?? 0) + Number(t.amount));
+        }
+        const out: BudgetStatus[] = [];
+        for (const b of (budgets as BudgetRow[]) ?? []) {
+          const category_id = b.category_id;
+          const budget_amount = Number(b.amount) || 0;
+          const spent_amount = spentByCat.get(category_id) ?? 0;
+          out.push({
+            category_id,
+            category_name: b.categories?.name ?? "Category",
+            month: monthKey,
+            budget_amount,
+            spent_amount,
+            remaining_amount: budget_amount - spent_amount,
+          });
+        }
+        return out;
+      } catch (e) {
+        console.error("[Chat API] getBudgetStatus unexpected error:", e);
+        return [];
       }
-
-      const out: BudgetStatus[] = [];
-      for (const b of (budgets as BudgetRow[]) ?? []) {
-        const category_id = b.category_id;
-        const budget_amount = Number(b.amount) || 0;
-        const spent_amount = spentByCat.get(category_id) ?? 0;
-        out.push({
-          category_id,
-          category_name: b.categories?.name ?? "Category",
-          month: startStr,
-          budget_amount,
-          spent_amount,
-          remaining_amount: budget_amount - spent_amount,
-        });
-      }
-      return out;
     },
   });
 
@@ -180,13 +215,21 @@ export async function POST(req: Request) {
     description: "List detected recurring merchants with average amount and last seen date",
     inputSchema: z.object({}),
     execute: async () => {
-      const { data, error } = await supabase
-        .from("recurring_merchants")
-        .select("merchant_name, avg_amount, last_seen")
-        .eq("user_id", user.id)
-        .order("merchant_name");
-      if (error) throw new Error(error.message);
-      return (data as RecurringRow[]) ?? [];
+      try {
+        const { data, error } = await supabase
+          .from("recurring_merchants")
+          .select("merchant_name, avg_amount, last_seen")
+          .eq("user_id", user.id)
+          .order("merchant_name");
+        if (error) {
+          console.error("[Chat API] getRecurringMerchants error:", error);
+          return [];
+        }
+        return (data as RecurringRow[]) ?? [];
+      } catch (e) {
+        console.error("[Chat API] getRecurringMerchants unexpected error:", e);
+        return [];
+      }
     },
   });
 
@@ -194,56 +237,121 @@ export async function POST(req: Request) {
     description: "Fetch a cached insight by key for the user",
     inputSchema: z.object({ key: z.string() }),
     execute: async ({ key }) => {
-      const { data, error } = await supabase
-        .from("insight_cache")
-        .select("value, computed_at")
-        .eq("user_id", user.id)
-        .eq("cache_key", key)
-        .single();
-      if (error && error.code !== "PGRST116") throw new Error(error.message);
-      if (!data) return null;
-      return { key, value: data.value as unknown, computed_at: data.computed_at };
+      try {
+        const { data, error } = await supabase
+          .from("insight_cache")
+          .select("value, computed_at")
+          .eq("user_id", user.id)
+          .eq("cache_key", key)
+          .single();
+        if (error && error.code !== "PGRST116") {
+          console.error("[Chat API] getCachedInsight error:", error);
+          return null;
+        }
+        if (!data) return null;
+        return { key, value: data.value as unknown, computed_at: data.computed_at };
+      } catch (e) {
+        console.error("[Chat API] getCachedInsight unexpected error:", e);
+        return null;
+      }
     },
   });
 
   console.log("[Chat API] Parsing request body...");
-  let body: any;
-  try {
-    const text = await req.text();
-    console.log("[Chat API] Raw request text:", text);
-    body = JSON.parse(text);
-  } catch (parseError) {
-    console.error("[Chat API] Failed to parse request body:", parseError);
-    return new Response(
-      JSON.stringify({ error: "Invalid request body" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
-  }
+  const { messages }: { messages: UIMessage[] } = await req.json();
   
   // Log the request for debugging
-  console.log("[Chat API] Request Body:", JSON.stringify(body, null, 2));
-  console.log("[Chat API] Messages count:", body.messages?.length || 0);
-  if (body.messages && body.messages.length > 0) {
-    console.log("[Chat API] First message:", JSON.stringify(body.messages[0], null, 2));
-    console.log("[Chat API] Last message:", JSON.stringify(body.messages[body.messages.length - 1], null, 2));
+  console.log("[Chat API] Messages count:", messages?.length || 0);
+  if (messages && messages.length > 0) {
+    console.log("[Chat API] First message:", JSON.stringify(messages[0], null, 2));
+    console.log("[Chat API] Last message:", JSON.stringify(messages[messages.length - 1], null, 2));
   }
 
   console.log("[Chat API] Creating streamText with OpenAI...");
-  console.log("[Chat API] Messages to send:", JSON.stringify(body.messages, null, 2));
+  
+  // Save user message to chat history
+  if (messages && messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.role === 'user') {
+      // Support both legacy `content` and v5 `parts` formats
+      let userContent: string | undefined = undefined;
+      // @ts-expect-error content may exist on legacy payloads
+      if (typeof (lastMessage as any).content === 'string') {
+        // @ts-expect-error legacy content
+        userContent = (lastMessage as any).content as string;
+      } else if (Array.isArray((lastMessage as any).parts)) {
+        const parts = (lastMessage as any).parts as Array<{ type: string; text?: string }>;
+        userContent = parts.filter(p => p && p.type === 'text' && typeof p.text === 'string').map(p => p.text as string).join("\n\n");
+      }
+
+      if (userContent && userContent.length > 0) {
+        const { error: saveError } = await supabase
+          .from('chat_history')
+          .insert({
+            user_id: user.id,
+            session_id: sessionId,
+            role: 'user',
+            content: userContent,
+            metadata: {}
+          });
+        if (saveError) {
+          console.error("[Chat API] Failed to save user message:", saveError);
+        } else {
+          console.log("[Chat API] User message saved to history");
+        }
+      } else {
+        console.warn("[Chat API] Skipped saving user message: empty content");
+      }
+    }
+  }
   
   try {
-    const result = await streamText({
+    // Convert UIMessages to model messages format
+    const modelMessages = convertToModelMessages(messages);
+    
+    // IMPORTANT: Do NOT await streamText when using streaming response methods
+    const result = streamText({
       model: openai("gpt-4o-mini"),
-      messages: body.messages ?? [],
-      system: `You are a helpful personal finance analyst. Use the available tools to fetch the user's data as needed. Be concise and include simple bullet points and totals where helpful. If data is missing, say what to do next (like connect an account or sync).`,
+      messages: modelMessages,
+      system: `You are a helpful personal finance analyst.
+Use the available tools to fetch the user's actual data (transactions, balances, budgets, recurring merchants, cached insights).
+Never output the words "undefined" or "null". If a value is missing, say "no data" or explain the next step.
+Prefer concise bullet points and totals; include currency codes when possible.`,
       tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight },
+      toolChoice: 'auto',
+      onFinish: async ({ text, usage, finishReason }) => {
+        // Save assistant's response to chat history
+        if (text) {
+          const { error: saveError } = await supabase
+            .from('chat_history')
+            .insert({
+              user_id: user.id,
+              session_id: sessionId,
+              role: 'assistant',
+              content: text,
+              metadata: { usage, finishReason }
+            });
+          
+          if (saveError) {
+            console.error("[Chat API] Failed to save assistant message:", saveError);
+          } else {
+            console.log("[Chat API] Assistant message saved to history");
+          }
+        }
+      },
+      onError: (err) => {
+        console.error("[Chat API] streamText error:", err);
+      }
     });
 
     console.log("[Chat API] Streaming response created successfully");
-    // Return a data stream compatible with @ai-sdk/react useChat
-    const response = result.toDataStreamResponse();
-    console.log("[Chat API] Response headers:", Object.fromEntries(response.headers.entries()));
-    return response;
+    
+    // Return the UI message stream response - works with useChat hook
+    return result.toUIMessageStreamResponse({
+      headers: {
+        'x-session-id': sessionId
+      }
+    });
   } catch (streamError) {
     console.error("[Chat API] Failed to create stream:", streamError);
     throw streamError;

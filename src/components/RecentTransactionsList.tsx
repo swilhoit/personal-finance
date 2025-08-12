@@ -2,7 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 export default async function RecentTransactionsList() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) return null;

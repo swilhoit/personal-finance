@@ -26,7 +26,7 @@ type Rule = {
 };
 
 export default async function SettingsPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {

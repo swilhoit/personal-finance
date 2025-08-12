@@ -37,7 +37,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] dark:bg-black">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

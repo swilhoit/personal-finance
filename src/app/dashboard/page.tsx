@@ -8,7 +8,7 @@ import RecentTransactionsList from "@/components/RecentTransactionsList";
 import SpendingOverview from "@/components/SpendingOverview";
 
 export default async function DashboardPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -25,7 +25,7 @@ export default async function DashboardPage() {
   const hasAccounts = accounts && accounts.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] dark:bg-black">
+    <div className="min-h-screen bg-background">
       {/* Header Section */}
       <div className="bg-[#f5f0e8] dark:bg-zinc-900 border-b border-[#e8dfd2] dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

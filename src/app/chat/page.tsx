@@ -9,6 +9,14 @@ import ChatDebugPanel from "@/components/ChatDebugPanel";
 type TextPart = { type: "text"; text: string };
 type ToolCallPart = { type: "tool-call"; toolName: string; args: unknown };
 type ToolResultPart = { type: "tool-result"; result: unknown; toolCallId: string; toolName: string };
+type DynamicToolUIPart = {
+  type: string; // e.g. "tool-getSpendingByCategory"
+  toolCallId: string;
+  state?: string; // e.g. "output-available"
+  input?: unknown;
+  output?: unknown;
+  callProviderMetadata?: unknown;
+};
 
 function isTextPart(part: unknown): part is TextPart {
   if (typeof part !== "object" || part === null) return false;
@@ -28,6 +36,86 @@ function isToolResultPart(part: unknown): part is ToolResultPart {
   return maybe.type === "tool-result";
 }
 
+function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
+  if (typeof part !== "object" || part === null) return false;
+  const maybe = part as { type?: unknown };
+  return typeof maybe.type === "string" && (maybe.type as string).startsWith("tool-");
+}
+
+  function renderToolResultByName(toolName: string, result: unknown) {
+    if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
+      const items = result as Array<{ category: string; total: number }>;
+      if (items.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No spending found.</div>;
+      return (
+        <div className="mt-2 text-sm">
+          <div className="font-semibold mb-1">Spending by category (last 30 days):</div>
+          <ul className="list-disc ml-5 space-y-0.5">
+            {items.map((it, idx) => (
+              <li key={idx}>{it.category || "Uncategorized"}: ${it.total.toFixed(2)}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    if (toolName === "getRecentTransactions" && Array.isArray(result)) {
+      const rows = result as Array<{ date: string; name: string | null; merchant_name: string | null; amount: number; iso_currency_code: string | null; category: string | null }>;
+      if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No recent transactions.</div>;
+      return (
+        <div className="mt-2 text-sm">
+          <div className="font-semibold mb-1">Recent transactions:</div>
+          <ul className="list-disc ml-5 space-y-0.5">
+            {rows.slice(0, 10).map((t, idx) => (
+              <li key={idx}>{t.date}: {(t.merchant_name || t.name || "Transaction")} — ${Number(t.amount).toFixed(2)} {t.iso_currency_code || ""} {t.category ? `(${t.category})` : ""}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    if (toolName === "getAccountBalances" && Array.isArray(result)) {
+      const rows = result as Array<{ name: string | null; official_name: string | null; current_balance: number | null; available_balance: number | null; iso_currency_code: string | null }>;
+      if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No accounts.</div>;
+      return (
+        <div className="mt-2 text-sm">
+          <div className="font-semibold mb-1">Account balances:</div>
+          <ul className="list-disc ml-5 space-y-0.5">
+            {rows.map((a, idx) => (
+              <li key={idx}>{a.name || a.official_name || "Account"}: ${Number(a.current_balance ?? 0).toFixed(2)} {a.iso_currency_code || ""}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    if (toolName === "getBudgetStatus" && Array.isArray(result)) {
+      const rows = result as Array<{ category_name: string; budget_amount: number; spent_amount: number; remaining_amount: number; month: string }>;
+      if (rows.length === 0) return <div className="text-xs italic text-[#9b826f] dark:text-zinc-400">No budgets for this month.</div>;
+      return (
+        <div className="mt-2 text-sm">
+          <div className="font-semibold mb-1">Budgets ({rows[0]?.month}):</div>
+          <ul className="list-disc ml-5 space-y-0.5">
+            {rows.map((b, idx) => (
+              <li key={idx}>{b.category_name}: Budget ${b.budget_amount.toFixed(2)}, Spent ${b.spent_amount.toFixed(2)}, Remaining ${b.remaining_amount.toFixed(2)}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    // Default: don't render unknown tool results
+    return null;
+  }
+
+  function renderToolResult(part: ToolResultPart) {
+    return renderToolResultByName(part.toolName, part.result);
+  }
+
+  function renderDynamicToolUIPart(part: DynamicToolUIPart) {
+    const type = part.type; // e.g. tool-getSpendingByCategory
+    const name = type.replace(/^tool-/, "");
+    if (part.state === "output-available") {
+      return renderToolResultByName(name, part.output);
+    }
+    return null;
+  }
+
 const quickPrompts = [
   "What's my current balance?",
   "How much did I spend this month?",
@@ -42,6 +130,7 @@ const quickPrompts = [
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   
   const { 
     messages, 
@@ -49,6 +138,8 @@ export default function ChatPage() {
     stop,
     status
   } = useChat({
+    api: "/api/chat",
+    credentials: "include",
     onError: (err) => {
       console.error("[Chat Page] Chat error details:", err);
       console.error("[Chat Page] Error stack:", err.stack);
@@ -61,6 +152,23 @@ export default function ChatPage() {
       }
     }
   });
+
+  // Ensure a stable session id for chat history threading
+  useEffect(() => {
+    try {
+      const key = "chat_session_id";
+      const existing = typeof window !== "undefined" ? localStorage.getItem(key) : null;
+      if (existing) {
+        setSessionId(existing);
+      } else {
+        const newId = crypto.randomUUID();
+        if (typeof window !== "undefined") localStorage.setItem(key, newId);
+        setSessionId(newId);
+      }
+    } catch (_) {
+      // ignore storage errors
+    }
+  }, []);
   
   // Log initialization after first render
   useEffect(() => {
@@ -107,10 +215,16 @@ export default function ChatPage() {
     console.log("[Chat Page] Quick prompt clicked:", prompt);
     console.log("[Chat Page] Calling sendMessage with prompt...");
     try {
+      const sid = sessionId ?? (() => {
+        const id = crypto.randomUUID();
+        try { if (typeof window !== "undefined") localStorage.setItem("chat_session_id", id); } catch {}
+        setSessionId(id);
+        return id;
+      })();
       const result = await sendMessage({
         role: "user",
         parts: [{ type: "text", text: prompt }]
-      });
+      }, { headers: { "x-session-id": sid } });
       console.log("[Chat Page] SendMessage result:", result);
     } catch (err) {
       console.error("[Chat Page] SendMessage failed:", err);
@@ -128,10 +242,16 @@ export default function ChatPage() {
     setInput("");
     console.log("[Chat Page] Calling sendMessage with message:", message);
     try {
+      const sid = sessionId ?? (() => {
+        const id = crypto.randomUUID();
+        try { if (typeof window !== "undefined") localStorage.setItem("chat_session_id", id); } catch {}
+        setSessionId(id);
+        return id;
+      })();
       const result = await sendMessage({
         role: "user",
         parts: [{ type: "text", text: message }]
-      });
+      }, { headers: { "x-session-id": sid } });
       console.log("[Chat Page] SendMessage result:", result);
     } catch (err) {
       console.error("[Chat Page] SendMessage failed:", err);
@@ -139,7 +259,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] dark:bg-black flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Debug Panel - Only in development */}
       {process.env.NODE_ENV === "development" && <ChatDebugPanel />}
       {/* Header */}
@@ -245,7 +365,10 @@ export default function ChatPage() {
                               );
                             }
                             if (isToolResultPart(part)) {
-                              return null; // Tool results are processed internally
+                              return <div key={partIndex}>{renderToolResult(part)}</div>;
+                            }
+                            if (isDynamicToolUIPart(part)) {
+                              return <div key={partIndex}>{renderDynamicToolUIPart(part)}</div>;
                             }
                             return null;
                           })}

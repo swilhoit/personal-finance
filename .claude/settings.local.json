@@ -10,7 +10,17 @@
       "Bash(grep:*)",
       "WebFetch(domain:sdk.vercel.ai)",
       "WebFetch(domain:ai-sdk.dev)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(open:*)",
+      "Bash(lsof:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(rm:*)",
+      "Bash(cat:*)",
+      "Bash(npx supabase migration:*)",
+      "Bash(npx supabase db push:*)"
     ],
     "deny": []
   }

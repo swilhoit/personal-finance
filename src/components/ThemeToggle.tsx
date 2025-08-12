@@ -1,9 +1,50 @@
 "use client";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useState, useEffect } from "react";
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Get theme from localStorage or default to light
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const initialTheme = savedTheme || "light";
+    setTheme(initialTheme);
+    
+    // Apply theme to document
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  // Prevent flash of incorrect icon
+  if (!mounted) {
+    return (
+      <button
+        className="p-2 rounded-lg bg-[#f5f0e8] dark:bg-zinc-800 hover:bg-[#e8dfd2] dark:hover:bg-zinc-700 transition-colors"
+        aria-label="Toggle theme"
+      >
+        <div className="w-5 h-5" />
+      </button>
+    );
+  }
 
   return (
     <button

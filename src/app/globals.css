@@ -31,11 +31,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark mode colors when dark class is applied */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  
+  /* Update stone colors for dark mode */
+  --stone-50: #18181b;
+  --stone-100: #27272a;
+  --stone-200: #3f3f46;
+  --stone-300: #52525b;
+  --stone-400: #71717a;
+  --stone-500: #a1a1aa;
+  --stone-600: #d4d4d8;
+  --stone-700: #e4e4e7;
+  --stone-800: #f4f4f5;
+  --stone-900: #fafafa;
 }
 
 body {

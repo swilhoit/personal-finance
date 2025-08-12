@@ -2,24 +2,29 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr/dist/module/types";
 
-export function createSupabaseServerClient() {
-  const cookieStorePromise = cookies();
+export async function createSupabaseServerClient(readOnly = false) {
+  const cookieStore = await cookies();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      async get(name: string) {
-        const store = await cookieStorePromise;
-        return store.get(name)?.value;
+      get(name: string) {
+        return cookieStore.get(name)?.value;
       },
-      async set(name: string, value: string, options: CookieOptions) {
-        const store = await cookieStorePromise;
-        store.set({ name, value, ...options });
+      set(name: string, value: string, options: CookieOptions) {
+        if (readOnly) {
+          // Skip setting cookies in read-only mode (for Server Components)
+          return;
+        }
+        cookieStore.set({ name, value, ...options });
       },
-      async remove(name: string, options: CookieOptions) {
-        const store = await cookieStorePromise;
-        store.set({ name, value: "", ...options, maxAge: 0 });
+      remove(name: string, options: CookieOptions) {
+        if (readOnly) {
+          // Skip removing cookies in read-only mode (for Server Components)
+          return;
+        }
+        cookieStore.set({ name, value: "", ...options, maxAge: 0 });
       },
     },
   });

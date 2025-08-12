@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function SpendingOverview() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) return null;
