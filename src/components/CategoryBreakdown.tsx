@@ -10,10 +10,9 @@ interface Category {
 
 interface CategoryBreakdownProps {
   categories: Category[];
-  total: number;
 }
 
-export default function CategoryBreakdown({ categories, total }: CategoryBreakdownProps) {
+export default function CategoryBreakdown({ categories }: CategoryBreakdownProps) {
   const getCategoryIcon = (name: string) => {
     const icons: Record<string, string> = {
       "Food & Dining": "M3 3h18v18H3zM12 7.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z",

@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 
 export default function ChatDebugPanel() {
-  const [healthStatus, setHealthStatus] = useState<any>(null);
+  const [healthStatus, setHealthStatus] = useState<{
+    status: string;
+    openai_configured: boolean;
+    timestamp: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 

@@ -275,12 +275,12 @@ export async function POST(req: Request) {
     if (lastMessage.role === 'user') {
       // Support both legacy `content` and v5 `parts` formats
       let userContent: string | undefined = undefined;
-      // @ts-expect-error content may exist on legacy payloads
-      if (typeof (lastMessage as any).content === 'string') {
-        // @ts-expect-error legacy content
-        userContent = (lastMessage as any).content as string;
-      } else if (Array.isArray((lastMessage as any).parts)) {
-        const parts = (lastMessage as any).parts as Array<{ type: string; text?: string }>;
+      // Handle legacy content format
+      const messageWithContent = lastMessage as { content?: string };
+      if (typeof messageWithContent.content === 'string') {
+        userContent = messageWithContent.content;
+      } else if (Array.isArray((lastMessage as { parts?: unknown }).parts)) {
+        const parts = (lastMessage as { parts: Array<{ type: string; text?: string }> }).parts;
         userContent = parts.filter(p => p && p.type === 'text' && typeof p.text === 'string').map(p => p.text as string).join("\n\n");
       }
 

@@ -138,8 +138,6 @@ export default function ChatPage() {
     stop,
     status
   } = useChat({
-    api: "/api/chat",
-    credentials: "include",
     onError: (err) => {
       console.error("[Chat Page] Chat error details:", err);
       console.error("[Chat Page] Error stack:", err.stack);
@@ -174,7 +172,7 @@ export default function ChatPage() {
   useEffect(() => {
     console.log("[Chat Page] Initialized - Status:", status);
     console.log("[Chat Page] SendMessage type:", typeof sendMessage);
-  }, []);
+  }, [status, sendMessage]);
   
   // Log every status change
   useEffect(() => {

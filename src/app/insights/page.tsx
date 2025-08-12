@@ -63,7 +63,7 @@ export default async function InsightsPage() {
 
   const rows: MonthSpendRow[] = (monthByCat as MonthSpendRow[]) ?? [];
   const transactions: Transaction[] = (recentTxs as Transaction[]) ?? [];
-  const monthlyBudgets: Budget[] = (budgets as Budget[]) ?? [];
+  const monthlyBudgets: Budget[] = (budgets as unknown as Budget[]) ?? [];
   
   // Calculate metrics
   const total = rows.reduce((sum, x) => sum + Number(x.total_amount || 0), 0);
@@ -94,7 +94,7 @@ export default async function InsightsPage() {
   const last30Days = new Date();
   last30Days.setDate(last30Days.getDate() - 30);
   
-  (allTransactions as any[] ?? []).forEach(tx => {
+  (allTransactions as Transaction[] ?? []).forEach(tx => {
     const date = tx.date.slice(0, 10);
     dailySpending.set(date, (dailySpending.get(date) || 0) + tx.amount);
   });
@@ -313,7 +313,7 @@ export default async function InsightsPage() {
                   View All →
                 </button>
               </div>
-              <CategoryBreakdown categories={categoryData} total={total} />
+              <CategoryBreakdown categories={categoryData} />
             </div>
 
             {/* Top Merchants and Insights */}

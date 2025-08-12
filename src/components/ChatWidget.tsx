@@ -118,8 +118,6 @@ export default function ChatWidget() {
     stop,
     status
   } = useChat({
-    api: "/api/chat",
-    credentials: "include",
     onError: (err) => {
       console.error("[ChatWidget] Chat error:", err);
       console.error("[ChatWidget] Error stack:", err.stack);
@@ -154,7 +152,7 @@ export default function ChatWidget() {
   useEffect(() => {
     console.log("[ChatWidget] Initialized - Status:", status);
     console.log("[ChatWidget] SendMessage type:", typeof sendMessage);
-  }, []);
+  }, [status, sendMessage]);
   
   // Log status changes
   useEffect(() => {
