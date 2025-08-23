@@ -20,7 +20,17 @@
       "Bash(rm:*)",
       "Bash(cat:*)",
       "Bash(npx supabase migration:*)",
-      "Bash(npx supabase db push:*)"
+      "Bash(npx supabase db push:*)",
+      "Bash(cd:*)",
+      "Bash(gem list:*)",
+      "Bash(sudo gem install:*)",
+      "Bash(bundle install:*)",
+      "Bash(bundle config set:*)",
+      "Bash(brew install:*)",
+      "Bash(fastlane:*)",
+      "Bash(chmod:*)",
+      "Bash(sed:*)",
+      "Bash(./deploy-testflight.sh:*)"
     ],
     "deny": []
   }
