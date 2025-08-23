@@ -1,0 +1,26 @@
+# For more information about the Matchfile, see:
+# https://docs.fastlane.tools/actions/match/
+
+# The URL of the git repo containing all your certificates
+git_url ENV["MATCH_GIT_URL"] || "https://github.com/your-username/certificates"
+
+# The default type of provisioning profile
+type "development"
+
+# Your app identifier(s)
+app_identifier ["com.yourcompany.personalfinance"]
+
+# Your Apple Developer Portal username
+username ENV["APPLE_ID"] || "your-apple-id@example.com"
+
+# Team ID
+team_id ENV["TEAM_ID"] || ""
+
+# Storage mode (git, google_cloud, s3)
+storage_mode "git"
+
+# The branch to use
+git_branch "main"
+
+# Generate Apple App Store Connect API Key for CI
+# api_key_path "./fastlane/AuthKey.p8"
