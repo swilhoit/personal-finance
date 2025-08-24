@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Rubik_Mono_One, Bungee } from "next/font/google";
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
 import ThemeScript from "@/components/ThemeScript";
@@ -14,9 +14,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const rubikMono = Rubik_Mono_One({
+  variable: "--font-rubik-mono",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const bungee = Bungee({
+  variable: "--font-bungee",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Personal Finance Tracker",
-  description: "AI-powered personal finance management app",
+  title: "MAMA - Money Made Fun",
+  description: "Your AI financial advisor that turns budgeting into a game",
 };
 
 export default function RootLayout({
@@ -29,7 +41,7 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${rubikMono.variable} ${bungee.variable} antialiased`}>
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

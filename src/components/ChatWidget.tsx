@@ -7,9 +7,9 @@ type TextPart = { type: "text"; text: string };
 type ToolCallPart = { type: "tool-call"; toolName: string; args: unknown };
 type ToolResultPart = { type: "tool-result"; result: unknown; toolCallId: string; toolName: string };
 type DynamicToolUIPart = {
-  type: string; // e.g. "tool-getSpendingByCategory"
+  type: string;
   toolCallId: string;
-  state?: string; // e.g. "output-available"
+  state?: string;
   input?: unknown;
   output?: unknown;
   callProviderMetadata?: unknown;
@@ -42,57 +42,48 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
 function renderToolResultByName(toolName: string, result: unknown) {
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
     const items = result as Array<{ category: string; total: number }>;
-    if (items.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No spending found.</div>;
+    if (items.length === 0) return <div className="text-xs italic text-cyan-600">No data 📊</div>;
     return (
-      <div className="mt-1.5 text-xs">
-        <div className="font-medium mb-0.5">Spending by category:</div>
-        <ul className="list-disc ml-4 space-y-0.5">
-          {items.map((it, idx) => (
-            <li key={idx}>{it.category || "Uncategorized"}: ${it.total.toFixed(2)}</li>
-          ))}
-        </ul>
+      <div className="mt-2 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg p-2 text-xs">
+        <div className="font-['Rubik_Mono_One'] text-cyan-700 dark:text-cyan-300 mb-1">💰 SPENDING</div>
+        {items.slice(0, 5).map((it, idx) => (
+          <div key={idx} className="flex justify-between py-0.5">
+            <span>{it.category || "Other"}</span>
+            <span className="font-['Bungee'] text-cyan-600 dark:text-cyan-400">${it.total.toFixed(0)}</span>
+          </div>
+        ))}
       </div>
     );
   }
   if (toolName === "getRecentTransactions" && Array.isArray(result)) {
-    const rows = result as Array<{ date: string; name: string | null; merchant_name: string | null; amount: number; iso_currency_code: string | null; category: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No recent transactions.</div>;
+    const rows = result as Array<{ date: string; merchant_name: string | null; amount: number }>;
+    if (rows.length === 0) return <div className="text-xs italic text-cyan-600">No transactions 💸</div>;
     return (
-      <div className="mt-1.5 text-xs">
-        <div className="font-medium mb-0.5">Recent transactions:</div>
-        <ul className="list-disc ml-4 space-y-0.5">
-          {rows.slice(0, 10).map((t, idx) => (
-            <li key={idx}>{t.date}: {(t.merchant_name || t.name || "Transaction")} — ${Number(t.amount).toFixed(2)} {t.iso_currency_code || ""} {t.category ? `(${t.category})` : ""}</li>
-          ))}
-        </ul>
+      <div className="mt-2 bg-sky-50 dark:bg-sky-900/20 rounded-lg p-2 text-xs">
+        <div className="font-['Rubik_Mono_One'] text-sky-700 dark:text-sky-300 mb-1">💸 RECENT</div>
+        {rows.slice(0, 5).map((t, idx) => (
+          <div key={idx} className="flex justify-between py-0.5">
+            <span className="truncate flex-1">{t.merchant_name || "Transaction"}</span>
+            <span className="font-['Bungee'] text-sky-600 dark:text-sky-400">${Number(t.amount).toFixed(0)}</span>
+          </div>
+        ))}
       </div>
     );
   }
   if (toolName === "getAccountBalances" && Array.isArray(result)) {
-    const rows = result as Array<{ name: string | null; official_name: string | null; current_balance: number | null; available_balance: number | null; iso_currency_code: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No accounts.</div>;
+    const rows = result as Array<{ name: string | null; current_balance: number | null }>;
+    if (rows.length === 0) return <div className="text-xs italic text-cyan-600">No accounts 🏦</div>;
     return (
-      <div className="mt-1.5 text-xs">
-        <div className="font-medium mb-0.5">Account balances:</div>
-        <ul className="list-disc ml-4 space-y-0.5">
-          {rows.map((a, idx) => (
-            <li key={idx}>{a.name || a.official_name || "Account"}: ${Number(a.current_balance ?? 0).toFixed(2)} {a.iso_currency_code || ""}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-  if (toolName === "getBudgetStatus" && Array.isArray(result)) {
-    const rows = result as Array<{ category_name: string; budget_amount: number; spent_amount: number; remaining_amount: number; month: string }>;
-    if (rows.length === 0) return <div className="text-xs italic text-gray-500 dark:text-zinc-400">No budgets for this month.</div>;
-    return (
-      <div className="mt-1.5 text-xs">
-        <div className="font-medium mb-0.5">Budgets ({rows[0]?.month}):</div>
-        <ul className="list-disc ml-4 space-y-0.5">
-          {rows.map((b, idx) => (
-            <li key={idx}>{b.category_name}: Budget ${b.budget_amount.toFixed(2)}, Spent ${b.spent_amount.toFixed(2)}, Remaining ${b.remaining_amount.toFixed(2)}</li>
-          ))}
-        </ul>
+      <div className="mt-2 bg-teal-50 dark:bg-teal-900/20 rounded-lg p-2 text-xs">
+        <div className="font-['Rubik_Mono_One'] text-teal-700 dark:text-teal-300 mb-1">🏦 BALANCES</div>
+        {rows.map((a, idx) => (
+          <div key={idx} className="py-0.5">
+            <div className="text-gray-600 dark:text-gray-400">{a.name || "Account"}</div>
+            <div className="font-['Bungee'] text-lg text-teal-600 dark:text-teal-400">
+              ${Number(a.current_balance ?? 0).toFixed(0)}
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -100,10 +91,10 @@ function renderToolResultByName(toolName: string, result: unknown) {
 }
 
 const quickActions = [
-  "What's my balance?",
-  "Recent spending",
-  "Monthly summary",
-  "Am I on budget?",
+  { text: "Balance?", emoji: "💰" },
+  { text: "Spending", emoji: "📊" },
+  { text: "Recent", emoji: "💸" },
+  { text: "Budget?", emoji: "🎯" },
 ];
 
 export default function ChatWidget() {
@@ -111,6 +102,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [minimized, setMinimized] = useState(false);
   
   const { 
     messages, 
@@ -120,18 +112,16 @@ export default function ChatWidget() {
   } = useChat({
     onError: (err) => {
       console.error("[ChatWidget] Chat error:", err);
-      console.error("[ChatWidget] Error stack:", err.stack);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
-        setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables on Vercel.");
-      } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("You need to be logged in to use the AI chat.");
+        setError("AI not configured");
+      } else if (err.message?.includes("401")) {
+        setError("Please log in");
       } else {
-        setError(`Chat error: ${err.message || "Failed to connect to AI service"}`);
+        setError("Connection error");
       }
     },
   });
   
-  // Ensure a stable session id for chat history threading
   useEffect(() => {
     try {
       const key = "chat_session_id";
@@ -143,29 +133,8 @@ export default function ChatWidget() {
         if (typeof window !== "undefined") localStorage.setItem(key, newId);
         setSessionId(newId);
       }
-    } catch (_) {
-      // ignore storage errors
-    }
+    } catch (_) {}
   }, []);
-
-  // Log initialization after first render
-  useEffect(() => {
-    console.log("[ChatWidget] Initialized - Status:", status);
-    console.log("[ChatWidget] SendMessage type:", typeof sendMessage);
-  }, [status, sendMessage]);
-  
-  // Log status changes
-  useEffect(() => {
-    console.log("[ChatWidget] Status changed to:", status);
-  }, [status]);
-  
-  // Log messages changes
-  useEffect(() => {
-    console.log("[ChatWidget] Messages updated, count:", messages.length);
-    if (messages.length > 0) {
-      console.log("[ChatWidget] Latest message:", messages[messages.length - 1]);
-    }
-  }, [messages]);
   
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -183,21 +152,17 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = async (action: string) => {
-    console.log("[ChatWidget] Quick action clicked:", action);
-    console.log("[ChatWidget] Calling sendMessage...");
     try {
-      // guarantee we always send a session id
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
         try { if (typeof window !== "undefined") localStorage.setItem("chat_session_id", id); } catch {}
         setSessionId(id);
         return id;
       })();
-      const result = await sendMessage({
+      await sendMessage({
         role: "user",
         parts: [{ type: "text", text: action }]
       }, { headers: { "x-session-id": sid } });
-      console.log("[ChatWidget] SendMessage result:", result);
     } catch (err) {
       console.error("[ChatWidget] SendMessage failed:", err);
     }
@@ -205,14 +170,9 @@ export default function ChatWidget() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[ChatWidget] Form submitted with input:", input);
-    if (input.trim().length === 0) {
-      console.log("[ChatWidget] Input is empty, returning");
-      return;
-    }
+    if (input.trim().length === 0) return;
     const message = input;
     setInput("");
-    console.log("[ChatWidget] Calling sendMessage with message:", message);
     try {
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
@@ -220,11 +180,10 @@ export default function ChatWidget() {
         setSessionId(id);
         return id;
       })();
-      const result = await sendMessage({
+      await sendMessage({
         role: "user",
         parts: [{ type: "text", text: message }]
       }, { headers: { "x-session-id": sid } });
-      console.log("[ChatWidget] SendMessage result:", result);
     } catch (err) {
       console.error("[ChatWidget] SendMessage failed:", err);
     }
@@ -232,174 +191,308 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button - Hidden on mobile since chat is in nav */}
+      {/* Floating Button - Hidden on mobile */}
       <button
         onClick={() => setOpen(!open)}
-        className={`hidden md:block fixed bottom-4 right-4 z-50 rounded-full shadow-lg transition-all ${
-          open ? "scale-0" : "scale-100"
+        className={`hidden md:block fixed bottom-6 right-6 z-50 transition-all transform hover:scale-110 ${
+          open ? "scale-0 opacity-0" : "scale-100 opacity-100"
         }`}
-        aria-label="Open chat"
+        aria-label="Open AI chat"
       >
-        <div className="relative">
-          <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 rounded-full flex items-center justify-center text-white">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
+        <div className="relative group">
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-teal-400 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+          
+          {/* Button */}
+          <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-cyan-400 dark:border-cyan-600">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
+            >
+              <source src="/hero-video.mp4" type="video/mp4" />
+            </video>
           </div>
+          
+          {/* Notification dot */}
           {messages.length > 0 && !open && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <div className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-yellow-500"></span>
+            </div>
           )}
+          
+          {/* Hover text */}
+          <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-['Rubik_Mono_One']">
+            CHAT WITH AI
+          </div>
         </div>
       </button>
 
-      {/* Chat Window - Hidden on mobile since we have dedicated page */}
+      {/* Chat Window - Hidden on mobile */}
       <div
-        className={`hidden md:block fixed bottom-4 right-4 z-50 transition-all transform ${
+        className={`hidden md:block fixed z-50 transition-all transform ${
           open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
+        } ${
+          minimized ? "bottom-6 right-6" : "bottom-6 right-6"
         }`}
       >
-        <div className="w-[380px] h-[600px] bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-zinc-800">
+        <div className={`bg-white dark:bg-gray-900 shadow-2xl rounded-3xl border-4 border-cyan-400 dark:border-cyan-600 overflow-hidden transition-all ${
+          minimized ? "w-[320px] h-[80px]" : "w-[400px] h-[600px]"
+        }`}>
           {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-zinc-700 dark:to-zinc-800 text-white flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="font-semibold">AI Assistant</span>
+          <div className="px-4 py-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 text-white flex items-center justify-between relative">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-20 overflow-hidden">
+              {[
+                { left: '10%', top: '20%', delay: '0s' },
+                { left: '70%', top: '30%', delay: '0.6s' },
+                { left: '30%', top: '60%', delay: '1.2s' },
+                { left: '80%', top: '70%', delay: '1.8s' },
+                { left: '50%', top: '40%', delay: '2.4s' },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="absolute animate-float text-base"
+                  style={{
+                    left: item.left,
+                    top: item.top,
+                    animationDelay: item.delay,
+                  }}
+                >
+                  💰
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
+            
+            <div className="relative flex items-center gap-3">
+              <div className="relative">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
+              </div>
+              <span className="font-['Bungee'] text-lg">AI ADVISOR</span>
+            </div>
+            
+            <div className="relative flex items-center gap-2">
+              <button
+                onClick={() => setMinimized(!minimized)}
+                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
+                aria-label="Minimize chat"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={minimized ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                </svg>
+              </button>
               <a
                 href="/chat"
-                className="text-xs opacity-90 hover:opacity-100 underline"
+                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
+                aria-label="Full chat view"
               >
-                Full View
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                </svg>
               </a>
               <button
                 onClick={() => setOpen(false)}
-                className="hover:bg-white/20 rounded-lg p-1 transition-colors"
+                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
                 aria-label="Close chat"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
 
-          {error && (
-            <div className="px-4 py-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border-b border-red-200 dark:border-red-900/30 text-xs">
-              {error}
-            </div>
-          )}
-
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.length === 0 ? (
-              <div className="text-center py-8">
-                <svg className="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                <p className="text-sm text-gray-600 dark:text-zinc-400 mb-4">
-                  Hi! I can help you understand your finances.
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickAction(action)}
-                      className="px-3 py-1.5 text-xs bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors text-gray-700 dark:text-gray-300"
-                    >
-                      {action}
-                    </button>
-                  ))}
+          {!minimized && (
+            <>
+              {error && (
+                <div className="px-4 py-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-b-2 border-red-400 dark:border-red-600 text-xs font-['Rubik_Mono_One'] flex items-center gap-2">
+                  <span>⚠️</span> {error}
                 </div>
-              </div>
-            ) : (
-              <>
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                        message.role === "user"
-                          ? "bg-blue-600 dark:bg-blue-700 text-white"
-                          : "bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-100"
-                      }`}
-                    >
-                      {message.parts.map((part, i) => {
-                        if (isTextPart(part)) {
-                          return <span key={i} className="whitespace-pre-wrap">{part.text}</span>;
-                        }
-                        if (isToolCallPart(part)) {
-                          return (
-                            <div key={i} className="text-[11px] text-gray-500 dark:text-zinc-400 italic mt-1">
-                              Fetching {part.toolName.replace(/([A-Z])/g, " $1").toLowerCase()}...
+              )}
+
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[calc(100%-140px)]">
+                {messages.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-cyan-400 dark:border-cyan-600 animate-bounce">
+                      <video 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
+                      >
+                        <source src="/hero-video.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                    <p className="font-['Bungee'] text-lg text-cyan-600 dark:text-cyan-400 mb-2">
+                      READY TO HELP!
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 font-['Rubik_Mono_One']">
+                      Ask about your money
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {quickActions.map((action, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleQuickAction(action.text)}
+                          className="px-3 py-2 bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/30 dark:to-teal-900/30 rounded-xl hover:scale-105 transition-all border-2 border-cyan-400 dark:border-cyan-600 font-['Rubik_Mono_One'] text-xs text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2"
+                        >
+                          <span className="text-lg">{action.emoji}</span>
+                          <span>{action.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-slideIn`}
+                      >
+                        <div className={`max-w-[85%] flex items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
+                          {/* Avatar */}
+                          {message.role === "user" ? (
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-yellow-400 to-orange-500">
+                              <span className="text-white text-sm">P1</span>
                             </div>
-                          );
-                        }
-                        if (isToolResultPart(part)) {
-                          return <div key={i}>{renderToolResultByName(part.toolName, part.result)}</div>;
-                        }
-                        if (isDynamicToolUIPart(part)) {
-                          const type = part.type;
-                          const name = type.replace(/^tool-/, "");
-                          if (part.state === "output-available") {
-                            return <div key={i}>{renderToolResultByName(name, part.output)}</div>;
-                          }
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                ))}
-                {status === "streaming" && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 dark:bg-zinc-800 rounded-2xl px-3 py-2">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 bg-gray-500 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                          ) : (
+                            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 border border-cyan-400/50 dark:border-cyan-600/50">
+                              <video 
+                                autoPlay 
+                                loop 
+                                muted 
+                                playsInline
+                                className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
+                              >
+                                <source src="/hero-video.mp4" type="video/mp4" />
+                              </video>
+                            </div>
+                          )}
+                          
+                          {/* Message bubble */}
+                          <div
+                            className={`rounded-2xl px-4 py-3 text-sm ${
+                              message.role === "user"
+                                ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-['Rubik_Mono_One']"
+                                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-cyan-400 dark:border-cyan-600"
+                            }`}
+                          >
+                            {message.parts.map((part, i) => {
+                              if (isTextPart(part)) {
+                                return <span key={i} className="whitespace-pre-wrap block">{part.text}</span>;
+                              }
+                              if (isToolCallPart(part)) {
+                                return (
+                                  <div key={i} className="flex items-center gap-1 text-xs text-cyan-600 dark:text-cyan-400 italic mt-1">
+                                    <span className="animate-spin">⚙️</span>
+                                    <span className="font-['Rubik_Mono_One']">LOADING...</span>
+                                  </div>
+                                );
+                              }
+                              if (isToolResultPart(part)) {
+                                return <div key={i}>{renderToolResultByName(part.toolName, part.result)}</div>;
+                              }
+                              if (isDynamicToolUIPart(part)) {
+                                const type = part.type;
+                                const name = type.replace(/^tool-/, "");
+                                if (part.state === "output-available") {
+                                  return <div key={i}>{renderToolResultByName(name, part.output)}</div>;
+                                }
+                              }
+                              return null;
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    ))}
+                    
+                    {status === "streaming" && (
+                      <div className="flex justify-start animate-slideIn">
+                        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-xl px-3 py-2 border-2 border-cyan-400 dark:border-cyan-600">
+                          <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                          </div>
+                          <span className="text-xs font-['Rubik_Mono_One'] text-cyan-700 dark:text-cyan-300">THINKING...</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
                 <div ref={messagesEndRef} />
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Input Form */}
-          <form onSubmit={handleSubmit} className="p-3 border-t border-gray-200 dark:border-zinc-800">
-            <div className="flex gap-2">
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={status === "streaming" ? "AI is thinking..." : "Ask me anything..."}
-                disabled={status === "streaming"}
-                className="flex-1 px-3 py-2 text-sm rounded-full border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50"
-              />
-              {status === "streaming" ? (
-                <button
-                  type="button"
-                  onClick={stop}
-                  className="px-4 py-2 text-sm bg-red-600 dark:bg-red-700 text-white rounded-full hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
-                >
-                  Stop
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={input.trim().length === 0}
-                  className="px-4 py-2 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Send
-                </button>
-              )}
-            </div>
-          </form>
+              {/* Input Area */}
+              <form onSubmit={handleSubmit} className="border-t-4 border-cyan-400 dark:border-cyan-600 p-3 bg-gray-50 dark:bg-gray-900/50">
+                <div className="flex gap-2">
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={status === "streaming" ? "AI TYPING..." : "ASK SOMETHING..."}
+                    disabled={status === "streaming"}
+                    className="flex-1 px-3 py-2 rounded-xl border-2 border-cyan-400 dark:border-cyan-600 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-xs focus:outline-none focus:ring-2 focus:ring-cyan-300 dark:focus:ring-cyan-700 disabled:opacity-50 placeholder:text-gray-400"
+                  />
+                  {status === "streaming" ? (
+                    <button
+                      type="button"
+                      onClick={stop}
+                      className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all"
+                    >
+                      STOP
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={input.trim().length === 0}
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      SEND
+                    </button>
+                  )}
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-10px) rotate(5deg);
+          }
+        }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-slideIn {
+          animation: slideIn 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 }

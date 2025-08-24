@@ -44,10 +44,10 @@ export default function UserMenu({ userEmail }: UserMenuProps) {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-[60]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-800 z-20">
+          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-800 z-[70]">
             <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
               <p className="text-sm font-medium truncate">{userEmail}</p>
             </div>

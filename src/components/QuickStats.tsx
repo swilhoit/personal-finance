@@ -41,35 +41,61 @@ export default async function QuickStats() {
   const last30Days = (transactionsResult.data ?? [])
     .reduce((sum, t) => sum + Math.abs(t.amount ?? 0), 0);
 
+  const stats = [
+    {
+      label: "Total Balance",
+      value: totalBalance,
+      emoji: "💰",
+      gradient: "from-cyan-400 to-teal-400",
+      darkGradient: "dark:from-cyan-600 dark:to-teal-600",
+    },
+    {
+      label: "This Month",
+      value: monthSpend,
+      emoji: "📊",
+      gradient: "from-sky-400 to-cyan-400",
+      darkGradient: "dark:from-sky-600 dark:to-cyan-600",
+    },
+    {
+      label: "Daily Average",
+      value: avgDaily,
+      emoji: "📈",
+      gradient: "from-teal-400 to-cyan-400",
+      darkGradient: "dark:from-teal-600 dark:to-cyan-600",
+    },
+    {
+      label: "Last 30 Days",
+      value: last30Days,
+      emoji: "📅",
+      gradient: "from-cyan-400 to-sky-400",
+      darkGradient: "dark:from-cyan-600 dark:to-sky-600",
+    }
+  ];
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl p-4">
-        <p className="text-xs text-blue-700 dark:text-blue-300 mb-1">Total Balance</p>
-        <p className="text-xl font-bold text-blue-900 dark:text-blue-100">
-          ${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
-      
-      <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-xl p-4">
-        <p className="text-xs text-purple-700 dark:text-purple-300 mb-1">This Month</p>
-        <p className="text-xl font-bold text-purple-900 dark:text-purple-100">
-          ${monthSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
-      
-      <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-xl p-4">
-        <p className="text-xs text-green-700 dark:text-green-300 mb-1">Daily Average</p>
-        <p className="text-xl font-bold text-green-900 dark:text-green-100">
-          ${avgDaily.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
-      
-      <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-xl p-4">
-        <p className="text-xs text-orange-700 dark:text-orange-300 mb-1">Last 30 Days</p>
-        <p className="text-xl font-bold text-orange-900 dark:text-orange-100">
-          ${last30Days.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
+      {stats.map((stat, index) => (
+        <div 
+          key={stat.label}
+          className="relative group hover:scale-105 transition-transform"
+        >
+          {/* Glow effect */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}></div>
+          
+          {/* Card */}
+          <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl border-2 border-cyan-400 dark:border-cyan-600 p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-2">
+              <p className="font-['Rubik_Mono_One'] text-xs text-cyan-700 dark:text-cyan-300 uppercase">
+                {stat.label}
+              </p>
+              <span className="text-2xl">{stat.emoji}</span>
+            </div>
+            <p className={`text-2xl font-['Bungee'] bg-gradient-to-r ${stat.gradient} ${stat.darkGradient} bg-clip-text text-transparent`}>
+              ${stat.value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

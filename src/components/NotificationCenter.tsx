@@ -163,12 +163,12 @@ export default function NotificationCenter() {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-40" 
+            className="fixed inset-0 z-[60]" 
             onClick={() => setOpen(false)}
           />
           
           {/* Dropdown Panel */}
-          <div className="absolute right-0 top-full mt-2 w-96 bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-50 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-96 bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-[70] overflow-hidden">
             {/* Header */}
             <div className="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
               <h3 className="font-semibold">Notifications</h3>

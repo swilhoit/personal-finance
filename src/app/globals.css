@@ -29,6 +29,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-rubik-mono: var(--font-rubik-mono);
+  --font-bungee: var(--font-bungee);
 }
 
 /* Dark mode colors when dark class is applied */

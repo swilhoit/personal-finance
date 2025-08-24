@@ -16,12 +16,10 @@ export default async function RecentTransactionsList() {
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-        <svg className="w-12 h-12 mx-auto mb-3 text-zinc-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-        <p className="text-sm">No transactions yet</p>
-        <p className="text-xs mt-1">Connect a bank account to get started</p>
+      <div className="text-center py-12">
+        <div className="text-6xl mb-4">💸</div>
+        <p className="font-['Rubik_Mono_One'] text-sm text-gray-600 dark:text-gray-400">No transactions yet</p>
+        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Connect a bank to start</p>
       </div>
     );
   }
@@ -30,8 +28,8 @@ export default async function RecentTransactionsList() {
     const isNegative = amount < 0;
     const absAmount = Math.abs(amount);
     return (
-      <span className={isNegative ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
-        {isNegative ? "-" : "+"}${absAmount.toFixed(2)}
+      <span className={`font-['Bungee'] ${isNegative ? "text-red-500" : "text-green-500"}`}>
+        {isNegative ? "-" : "+"}${absAmount.toFixed(0)}
       </span>
     );
   };
@@ -51,37 +49,61 @@ export default async function RecentTransactionsList() {
     }
   };
 
+  const getCategoryEmoji = (category: string | null) => {
+    const categoryMap: { [key: string]: string } = {
+      "Food and Drink": "🍔",
+      "Travel": "✈️",
+      "Shops": "🛍️",
+      "Transfer": "💸",
+      "Payment": "💳",
+      "Recreation": "🎮",
+      "Service": "🔧",
+      "Transportation": "🚗",
+      "Healthcare": "🏥",
+      "Bank Fees": "🏦"
+    };
+    return categoryMap[category ?? ""] || "💰";
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {transactions.map((t) => (
-        <div key={t.transaction_id} className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800 last:border-0">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-medium">
-                {(t.merchant_name ?? t.name ?? "?")[0].toUpperCase()}
-              </span>
+        <div 
+          key={t.transaction_id} 
+          className="group relative bg-white/50 dark:bg-gray-900/50 rounded-xl p-3 border-2 border-cyan-200 dark:border-cyan-800 hover:border-cyan-400 dark:hover:border-cyan-600 hover:scale-[1.02] transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-teal-400 dark:from-cyan-600 dark:to-teal-600 flex items-center justify-center text-white shadow-md">
+                  <span className="text-lg">{getCategoryEmoji(t.category)}</span>
+                </div>
+                {t.pending && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-['Rubik_Mono_One'] text-sm text-gray-900 dark:text-gray-100 truncate">
+                  {t.merchant_name ?? t.name ?? "Transaction"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500">
+                  {formatDate(t.date)} • {t.category ?? "Other"}
+                  {t.pending && <span className="ml-1 text-yellow-600 dark:text-yellow-400">• Pending</span>}
+                </p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">
-                {t.merchant_name ?? t.name ?? "Transaction"}
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                {formatDate(t.date)} • {t.category ?? "Uncategorized"}
-                {t.pending && " • Pending"}
-              </p>
+            <div className="text-sm font-medium pl-2">
+              {formatAmount(t.amount)}
             </div>
-          </div>
-          <div className="text-sm font-medium pl-2">
-            {formatAmount(t.amount)}
           </div>
         </div>
       ))}
       
       <Link 
         href="/transactions" 
-        className="block text-center py-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+        className="block text-center py-3 mt-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-['Rubik_Mono_One'] text-sm hover:scale-105 transition-all shadow-lg hover:shadow-cyan-500/50"
       >
-        View all transactions →
+        VIEW ALL →
       </Link>
     </div>
   );

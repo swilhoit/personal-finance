@@ -19,13 +19,11 @@ export default function SignUpPage() {
     e.preventDefault();
     setError(null);
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // Validate password strength
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
@@ -48,7 +46,6 @@ export default function SignUpPage() {
 
       setSuccess(true);
       
-      // Auto sign in after successful signup
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -67,11 +64,21 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-sky-50 to-teal-50 dark:from-gray-900 dark:via-cyan-950 dark:to-teal-950 flex items-center justify-center px-4">
         <div className="w-full max-w-md space-y-8 text-center">
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-6 py-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Account created successfully!</h3>
-            <p className="text-sm">Redirecting to dashboard...</p>
+          <div className="text-8xl mb-4 animate-bounce">🎉</div>
+          <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-4 border-green-400 dark:border-green-600 px-8 py-6 rounded-3xl">
+            <h3 className="font-['Bungee'] text-2xl text-green-600 dark:text-green-400 mb-2">
+              LEVEL UP!
+            </h3>
+            <p className="font-['Rubik_Mono_One'] text-sm text-gray-600 dark:text-gray-400">
+              ACCOUNT CREATED SUCCESSFULLY
+            </p>
+            <div className="mt-4 flex justify-center gap-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
           </div>
         </div>
       </div>
@@ -79,101 +86,187 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold">Create your account</h2>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Start managing your finances today
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-sky-50 to-teal-50 dark:from-gray-900 dark:via-cyan-950 dark:to-teal-950 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      {/* Floating icons */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[
+          { left: '12%', top: '18%', delay: '0s', emoji: '🚀' },
+          { left: '85%', top: '25%', delay: '1s', emoji: '⭐' },
+          { left: '20%', top: '75%', delay: '2s', emoji: '🎯' },
+          { left: '75%', top: '85%', delay: '3s', emoji: '🏆' },
+          { left: '45%', top: '35%', delay: '4s', emoji: '💎' },
+          { left: '18%', top: '92%', delay: '1.5s', emoji: '🚀' },
+          { left: '92%', top: '55%', delay: '2.5s', emoji: '⭐' },
+          { left: '35%', top: '8%', delay: '3.5s', emoji: '🎯' },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="absolute animate-float text-5xl opacity-10"
+            style={{
+              left: item.left,
+              top: item.top,
+              animationDelay: item.delay,
+            }}
+          >
+            {item.emoji}
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-10">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl shadow-2xl mb-4 transform hover:scale-110 transition-transform">
+            <span className="text-5xl font-['Bungee'] text-white">M</span>
+          </div>
+          <h1 className="text-4xl font-['Bungee'] bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
+            NEW PLAYER
+          </h1>
+          <p className="font-['Rubik_Mono_One'] text-sm text-gray-600 dark:text-gray-400 mt-2">
+            START YOUR FINANCIAL QUEST
           </p>
         </div>
 
-        <form onSubmit={handleSignUp} className="mt-8 space-y-6">
-          <div className="space-y-4">
+        {/* Sign up form */}
+        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl border-4 border-cyan-400 dark:border-cyan-600 p-8 max-w-md w-full shadow-2xl">
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
-                Email address
+              <label className="font-['Rubik_Mono_One'] text-sm text-cyan-700 dark:text-cyan-300 block mb-2">
+                EMAIL ADDRESS
               </label>
               <input
-                id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-900"
-                placeholder="you@example.com"
+                className="w-full rounded-xl border-2 border-cyan-400 dark:border-cyan-600 px-4 py-3 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-sm focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-700 transition-all"
+                placeholder="newplayer@example.com"
+                required
+                disabled={loading}
               />
             </div>
-
+            
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
-                Password
+              <label className="font-['Rubik_Mono_One'] text-sm text-cyan-700 dark:text-cyan-300 block mb-2">
+                CREATE PASSWORD
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                autoComplete="new-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-900"
+                className="w-full rounded-xl border-2 border-cyan-400 dark:border-cyan-600 px-4 py-3 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-sm focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-700 transition-all"
                 placeholder="••••••••"
+                required
+                disabled={loading}
               />
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                Must be at least 6 characters
+              <p className="mt-1 text-xs font-['Rubik_Mono_One'] text-gray-500 dark:text-gray-500 flex items-center gap-1">
+                <span>⚡</span> MIN 6 CHARACTERS
               </p>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-                Confirm password
+              <label className="font-['Rubik_Mono_One'] text-sm text-cyan-700 dark:text-cyan-300 block mb-2">
+                CONFIRM PASSWORD
               </label>
               <input
-                id="confirmPassword"
-                name="confirmPassword"
                 type="password"
-                autoComplete="new-password"
-                required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-900"
+                className="w-full rounded-xl border-2 border-cyan-400 dark:border-cyan-600 px-4 py-3 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-sm focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-700 transition-all"
                 placeholder="••••••••"
+                required
+                disabled={loading}
               />
             </div>
-          </div>
 
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-100 dark:bg-red-900/20 border-2 border-red-400 dark:border-red-600 rounded-xl">
+                <span className="text-xl">⚠️</span>
+                <span className="font-['Rubik_Mono_One'] text-xs text-red-600 dark:text-red-400">{error}</span>
+              </div>
+            )}
 
-          <div>
-            <button
-              type="submit"
+            <button 
+              type="submit" 
               disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-4 font-['Rubik_Mono_One'] text-lg hover:scale-105 transition-all shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? (
+                <>
+                  <span className="animate-spin">⚙️</span>
+                  <span>CREATING...</span>
+                </>
+              ) : (
+                <>
+                  <span>CREATE ACCOUNT</span>
+                  <span>🚀</span>
+                </>
+              )}
             </button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t-2 border-cyan-300 dark:border-cyan-700"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-4 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-xs text-gray-500">OR</span>
+            </div>
           </div>
 
-          <div className="text-center text-sm">
-            <span className="text-zinc-600 dark:text-zinc-400">
-              Already have an account?{" "}
-            </span>
-            <Link
-              href="/auth/sign-in"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Sign in
-            </Link>
+          <button
+            onClick={async () => {
+              setLoading(true);
+              await supabase.auth.signInWithOAuth({ provider: "google" });
+            }}
+            disabled={loading}
+            className="w-full rounded-xl border-2 border-cyan-400 dark:border-cyan-600 px-6 py-4 font-['Rubik_Mono_One'] hover:bg-cyan-100 dark:hover:bg-cyan-900/30 hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            <span className="text-2xl">🔷</span>
+            <span>SIGN UP WITH GOOGLE</span>
+          </button>
+
+          <div className="mt-6 text-center">
+            <p className="font-['Rubik_Mono_One'] text-xs text-gray-600 dark:text-gray-400">
+              ALREADY A PLAYER?{" "}
+              <Link href="/auth/sign-in" className="text-cyan-600 dark:text-cyan-400 hover:underline">
+                SIGN IN
+              </Link>
+            </p>
           </div>
-        </form>
+        </div>
+
+        {/* Fun footer */}
+        <div className="text-center mt-8">
+          <p className="font-['Rubik_Mono_One'] text-xs text-gray-500 dark:text-gray-500">
+            🎮 FREE TO PLAY • 🏆 NO PAY TO WIN • 🚀 START NOW
+          </p>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-30px) rotate(10deg);
+          }
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .delay-1000 {
+          animation-delay: 1s;
+        }
+      `}</style>
     </div>
   );
 }

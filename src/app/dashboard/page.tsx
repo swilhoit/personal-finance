@@ -25,22 +25,22 @@ export default async function DashboardPage() {
   const hasAccounts = accounts && accounts.length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-sky-50 to-teal-50 dark:from-gray-900 dark:via-cyan-950 dark:to-teal-950">
       {/* Header Section */}
-      <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
+      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b-4 border-cyan-400 dark:border-cyan-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back!</h1>
-              <p className="text-sm text-gray-600 dark:text-zinc-400 mt-1">
-                Here&apos;s your financial overview
+              <h1 className="text-3xl font-['Bungee'] bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">LEVEL UP!</h1>
+              <p className="text-sm font-['Rubik_Mono_One'] text-gray-600 dark:text-gray-400 mt-1">
+                YOUR FINANCIAL QUEST CONTINUES
               </p>
             </div>
             <div className="flex items-center gap-3">
               {hasAccounts && (
                 <form action="/api/plaid/sync-transactions" method="POST">
-                  <button className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
-                    Sync Transactions
+                  <button className="px-6 py-3 text-sm font-['Rubik_Mono_One'] text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/30 border-2 border-cyan-400 dark:border-cyan-600 rounded-xl hover:bg-cyan-200 dark:hover:bg-cyan-900/50 hover:scale-105 transition-all">
+                    🔄 SYNC
                   </button>
                 </form>
               )}
@@ -54,13 +54,11 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!hasAccounts ? (
           /* Empty State */
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-12 text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Get started by connecting your bank</h2>
-            <p className="text-gray-600 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
-              Securely connect your accounts to start tracking your finances and getting insights.
+          <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl border-4 border-cyan-400 dark:border-cyan-600 p-12 text-center shadow-2xl">
+            <div className="text-6xl mb-4 animate-bounce">🎮</div>
+            <h2 className="text-3xl font-['Bungee'] mb-2 bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">NEW GAME</h2>
+            <p className="font-['Rubik_Mono_One'] text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+              CONNECT YOUR BANK TO START YOUR FINANCIAL ADVENTURE!
             </p>
             <PlaidLinkButton />
           </div>
@@ -70,7 +68,7 @@ export default async function DashboardPage() {
             <Suspense fallback={
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-24 bg-gray-200 dark:bg-zinc-800 rounded-xl animate-pulse" />
+                  <div key={i} className="h-24 bg-gradient-to-br from-cyan-200 to-teal-200 dark:from-cyan-800 dark:to-teal-800 rounded-2xl animate-pulse" />
                 ))}
               </div>
             }>
@@ -85,7 +83,7 @@ export default async function DashboardPage() {
                   <Suspense fallback={
                     <div className="space-y-3">
                       {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-12 bg-gray-100 dark:bg-zinc-800 rounded animate-pulse" />
+                        <div key={i} className="h-12 bg-gradient-to-r from-cyan-100 to-teal-100 dark:from-cyan-900 dark:to-teal-900 rounded-xl animate-pulse" />
                       ))}
                     </div>
                   }>
