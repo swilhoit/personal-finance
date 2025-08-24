@@ -20,7 +20,8 @@
       "Bash(rm:*)",
       "Bash(cat:*)",
       "Bash(npx supabase migration:*)",
-      "Bash(npx supabase db push:*)"
+      "Bash(npx supabase db push:*)",
+      "Bash(git reset:*)"
     ],
     "deny": []
   }

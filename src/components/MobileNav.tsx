@@ -46,7 +46,7 @@ export default function MobileNav() {
       pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href))
     );
     if (currentIndex !== -1) setActiveIndex(currentIndex);
-  }, [pathname]);
+  }, [pathname, navItems]);
 
   // Don't show nav on auth pages or landing page
   if (pathname === "/" || pathname?.startsWith("/auth")) return null;
@@ -60,7 +60,7 @@ export default function MobileNav() {
         </div>
 
         <div className="relative grid grid-cols-5">
-          {navItems.map((item, index) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href));
             
             return (

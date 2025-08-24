@@ -210,7 +210,7 @@ export default function ChatPage() {
         if (typeof window !== "undefined") localStorage.setItem(key, newId);
         setSessionId(newId);
       }
-    } catch (_) {}
+    } catch {}
   }, []);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -341,7 +341,7 @@ export default function ChatPage() {
                 START QUEST
               </h2>
               <p className="font-['Rubik_Mono_One'] text-sm text-gray-600 dark:text-gray-400 mb-8 max-w-sm mx-auto">
-                ASK ME ANYTHING ABOUT YOUR MONEY - I'M HERE TO HELP YOU WIN!
+                ASK ME ANYTHING ABOUT YOUR MONEY - I&apos;M HERE TO HELP YOU WIN!
               </p>
               
               {/* Quick Prompts Grid */}

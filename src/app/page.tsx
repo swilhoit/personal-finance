@@ -105,7 +105,7 @@ export default function Home() {
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                   We securely connect to your financial accounts through <span className="font-semibold text-cyan-600 dark:text-cyan-400">Plaid</span>, 
                   a trusted financial technology platform used by thousands of apps. Your data is encrypted and protected with bank-level security. 
-                  By using our service, you consent to Plaid's secure processing of your financial information in accordance with their 
+                  By using our service, you consent to Plaid&apos;s secure processing of your financial information in accordance with their 
                   <a href="https://plaid.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:underline"> privacy policy</a>.
                 </p>
               </div>
@@ -164,7 +164,7 @@ export default function Home() {
                     STEALTH MODE
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-                    Your financial data is protected with bank-level encryption through Plaid's secure platform. We never store your banking credentials - complete privacy protection for your financial quest!
+                    Your financial data is protected with bank-level encryption through Plaid&apos;s secure platform. We never store your banking credentials - complete privacy protection for your financial quest!
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 rounded-full text-sm font-['Rubik_Mono_One']">

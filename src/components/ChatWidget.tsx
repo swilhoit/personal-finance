@@ -133,7 +133,7 @@ export default function ChatWidget() {
         if (typeof window !== "undefined") localStorage.setItem(key, newId);
         setSessionId(newId);
       }
-    } catch (_) {}
+    } catch {}
   }, []);
   
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
