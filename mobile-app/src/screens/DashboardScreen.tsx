@@ -11,6 +11,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../hooks/useAuth';
+import CallService from '../services/CallService';
+import { useNavigation } from '@react-navigation/native';
 
 interface QuickStat {
   label: string;
@@ -31,6 +33,7 @@ interface Transaction {
 
 export default function DashboardScreen() {
   const { user } = useAuth();
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [quickStats, setQuickStats] = useState<QuickStat[]>([]);
@@ -125,6 +128,21 @@ export default function DashboardScreen() {
     fetchDashboardData();
   };
 
+  const testAIFaceTime = () => {
+    // Trigger incoming call for testing
+    const config = {
+      callerName: 'AI Financial Advisor',
+      callerNumber: 'Personal Finance Assistant',
+      callType: 'video' as const,
+    };
+
+    // Use a timeout to make it feel more realistic
+    setTimeout(() => {
+      CallService.startIncomingCall(config);
+      // The CallManager will handle showing the incoming call modal
+    }, 500);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -207,6 +225,10 @@ export default function DashboardScreen() {
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="sync" size={32} color="#3b82f6" />
             <Text style={styles.actionLabel}>Sync</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={testAIFaceTime}>
+            <Ionicons name="videocam" size={32} color="#8b5cf6" />
+            <Text style={styles.actionLabel}>AI FaceTime</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="pie-chart" size={32} color="#f59e0b" />
@@ -347,7 +369,8 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginTop: 16,
   },
   actionButton: {
@@ -355,7 +378,8 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
-    width: '30%',
+    width: '48%',
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,

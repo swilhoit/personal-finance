@@ -13,15 +13,21 @@ export const CallManager: React.FC<CallManagerProps> = ({ children }) => {
   const [callConfig, setCallConfig] = useState<any>(null);
   const navigation = useNavigation();
 
-  // Simulate an incoming call (for demo purposes)
+  // Poll for incoming calls
   useEffect(() => {
-    // Simulate a call after 10 seconds for demo
-    const timer = setTimeout(() => {
-      triggerIncomingCall();
-    }, 10000);
+    const checkForCalls = () => {
+      const activeCall = CallService.getCallConfig();
+      if (activeCall && CallService.isCallActive() && !showIncomingCall) {
+        setCallConfig(activeCall);
+        setShowIncomingCall(true);
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Check every 500ms for incoming calls
+    const interval = setInterval(checkForCalls, 500);
+
+    return () => clearInterval(interval);
+  }, [showIncomingCall]);
 
   const triggerIncomingCall = () => {
     const config = {
