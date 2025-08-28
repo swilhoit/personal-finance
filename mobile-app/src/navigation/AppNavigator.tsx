@@ -14,6 +14,7 @@ import VoiceCallScreen from '../screens/VoiceCallScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import { useAuth } from '../hooks/useAuth';
+import { CallManager } from '../components/CallManager';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -111,7 +112,9 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {user ? <RootStack /> : <AuthStack />}
+      <CallManager>
+        {user ? <RootStack /> : <AuthStack />}
+      </CallManager>
     </NavigationContainer>
   );
 }

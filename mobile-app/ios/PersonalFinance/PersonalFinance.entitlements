@@ -2,29 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Push Notifications -->
-    <key>aps-environment</key>
-    <string>development</string>
-    
-    <!-- Background Modes for VoIP and Audio -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>audio</string>
-        <string>voip</string>
-        <string>background-fetch</string>
-    </array>
-    
-    <!-- Associated Domains for Plaid -->
-    <key>com.apple.developer.associated-domains</key>
-    <array>
-        <string>applinks:production.plaid.com</string>
-        <string>applinks:cdn.plaid.com</string>
-    </array>
-    
-    <!-- Keychain Access Groups -->
-    <key>keychain-access-groups</key>
-    <array>
-        <string>$(AppIdentifierPrefix)com.mama.personalfinance</string>
-    </array>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.mama.personalfinance</string>
+	</array>
 </dict>
 </plist>

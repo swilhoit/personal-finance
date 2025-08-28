@@ -57,17 +57,9 @@ class CallService {
 
   private async playRingtone(): Promise<void> {
     try {
-      // For now, we'll use a system sound
-      // In production, you'd load a custom ringtone file
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3' },
-        { 
-          isLooping: true, 
-          shouldPlay: true,
-          volume: 0.8,
-        }
-      );
-      this.ringtoneSound = sound;
+      // Skip playing ringtone for now to avoid crash
+      // In production, you'd load a custom ringtone file bundled with the app
+      console.log('Ringtone would play here');
     } catch (error) {
       console.error('Error playing ringtone:', error);
     }

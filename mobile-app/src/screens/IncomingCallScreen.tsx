@@ -176,16 +176,23 @@ export default function IncomingCallScreen({
   return (
     <View style={StyleSheet.absoluteFillObject}>
       {/* Background with blur effect */}
-      <ImageBackground
-        source={callerImage ? { uri: callerImage } : require('../../assets/gradient-bg.png')}
-        style={StyleSheet.absoluteFillObject}
-        blurRadius={30}
-      >
+      {callerImage ? (
+        <ImageBackground
+          source={{ uri: callerImage }}
+          style={StyleSheet.absoluteFillObject}
+          blurRadius={30}
+        >
+          <LinearGradient
+            colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)', 'rgba(0,0,0,0.95)']}
+            style={StyleSheet.absoluteFillObject}
+          />
+        </ImageBackground>
+      ) : (
         <LinearGradient
-          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)', 'rgba(0,0,0,0.95)']}
+          colors={['#1a1a2e', '#16213e', '#0f3460']}
           style={StyleSheet.absoluteFillObject}
         />
-      </ImageBackground>
+      )}
 
       <Animated.View 
         style={[
