@@ -55,6 +55,14 @@ Create push notification certificates
 
 Build for local testing
 
+### ios build_testflight
+
+```sh
+[bundle exec] fastlane ios build_testflight
+```
+
+Build for TestFlight without upload
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

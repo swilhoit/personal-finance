@@ -53,7 +53,11 @@
     "extra": {
       "eas": {
         "projectId": "your-project-id-here"
-      }
+      },
+      "EXPO_PUBLIC_OPENAI_API_KEY": "YOUR_OPENAI_API_KEY_HERE",
+      "EXPO_PUBLIC_SUPABASE_URL": "https://ymxhsdtagnalxebnskst.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlteGhzZHRhZ25hbHhlYm5za3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NzQyOTUsImV4cCI6MjA3MDQ1MDI5NX0.eO8Tq7P-y-WWoMDBxWz7DvVFR2mmPm3_WIx04RABkTE",
+      "EXPO_PUBLIC_DEMO_MODE": true
     }
   }
 }

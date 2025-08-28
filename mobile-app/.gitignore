@@ -18,6 +18,11 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# JavaScript bundles (may contain secrets)
+ios/main.jsbundle
+ios/main.jsbundle.js
+android/app/src/main/assets/index.android.bundle
+
 # Metro
 .metro-health-check*
 

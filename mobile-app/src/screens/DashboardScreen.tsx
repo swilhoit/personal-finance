@@ -13,6 +13,7 @@ import { supabase } from '../config/supabase';
 import { useAuth } from '../hooks/useAuth';
 import CallService from '../services/CallService';
 import { useNavigation } from '@react-navigation/native';
+import { ChaosTestButton } from '../components/ChaosTestButton';
 
 interface QuickStat {
   label: string;
@@ -152,6 +153,7 @@ export default function DashboardScreen() {
   }
 
   return (
+    <>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -237,6 +239,8 @@ export default function DashboardScreen() {
         </View>
       </View>
     </ScrollView>
+    <ChaosTestButton />
+    </>
   );
 }
 

@@ -83,6 +83,8 @@ export const CallManager: React.FC<CallManagerProps> = ({ children }) => {
           callerName={callConfig?.callerName}
           callerNumber={callConfig?.callerNumber}
           callerImage={callConfig?.callerImage}
+          callerAvatar={callConfig?.callerAvatar}
+          chaosLevel={callConfig?.chaosLevel || 5}
           onAccept={handleAccept}
           onDecline={handleDecline}
           onMessage={handleMessage}

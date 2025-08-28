@@ -16,6 +16,7 @@ import * as Haptics from 'expo-haptics';
 import OpenAIRealtimeService from '../services/OpenAIRealtimeService';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../config/supabase';
+import Constants from 'expo-constants';
 
 interface VoiceCallScreenProps {
   navigation?: any;
@@ -63,9 +64,14 @@ export default function VoiceCallScreen({ navigation, route }: VoiceCallScreenPr
     try {
       setConnectionStatus('Connecting to AI assistant...');
       
+      // Get API key from Constants
+      const apiKey = Constants.expoConfig?.extra?.EXPO_PUBLIC_OPENAI_API_KEY || 
+                    Constants.manifest?.extra?.EXPO_PUBLIC_OPENAI_API_KEY ||
+                    '';
+      
       // Initialize OpenAI Realtime Service
       realtimeService.current = new OpenAIRealtimeService({
-        apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY!,
+        apiKey: apiKey,
         voice: 'alloy',
         instructions: `You are a friendly AI financial advisor having a voice conversation. 
                       Keep responses conversational and concise. 

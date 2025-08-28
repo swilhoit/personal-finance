@@ -1,5 +1,6 @@
 import { Audio } from 'expo-av';
 import { EventEmitter } from 'events';
+import Constants from 'expo-constants';
 
 interface RealtimeConfig {
   apiKey: string;
@@ -26,7 +27,11 @@ class OpenAIRealtimeService extends EventEmitter {
 
   constructor(config: RealtimeConfig) {
     super();
-    this.apiKey = config.apiKey || process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
+    // Use provided key or fallback to Constants
+    this.apiKey = config.apiKey || 
+                  Constants.expoConfig?.extra?.EXPO_PUBLIC_OPENAI_API_KEY || 
+                  Constants.manifest?.extra?.EXPO_PUBLIC_OPENAI_API_KEY ||
+                  '';
     this.voice = config.voice || 'alloy';
     this.setupAudio();
   }

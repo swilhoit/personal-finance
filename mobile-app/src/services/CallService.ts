@@ -6,6 +6,8 @@ interface CallConfig {
   callerName: string;
   callerNumber?: string;
   callerImage?: string;
+  callerAvatar?: string;
+  chaosLevel?: number;
   callType?: 'video' | 'audio';
   onAnswer?: () => void;
   onDecline?: () => void;
