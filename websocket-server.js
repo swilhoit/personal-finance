@@ -60,10 +60,46 @@ const wss = new WebSocket.Server({
 });
 
 wss.on('connection', async (clientWs, request) => {
-  const user = request.user;
-  console.log(`🔌 Client connected: ${user?.id || 'unknown'}`);
-  console.log('🔍 Full user object:', user);
-  console.log('🔍 Request headers:', request.headers);
+  console.log('🔌 New WebSocket connection attempt');
+  
+  // Extract auth token from query parameters
+  const url = new URL(request.url, 'http://localhost');
+  const authToken = url.searchParams.get('auth');
+  
+  console.log('🔍 Auth token from URL:', authToken ? `present (${authToken.substring(0, 20)}...)` : 'missing');
+  
+  let user = null;
+  
+  if (authToken) {
+    try {
+      console.log('🔍 Verifying auth token with Supabase...');
+      const { data: { user: authUser }, error } = await supabase.auth.getUser(authToken);
+      
+      console.log('🔍 Supabase auth result:', { 
+        user: authUser ? { id: authUser.id, email: authUser.email } : null, 
+        error: error?.message 
+      });
+      
+      if (authUser && !error) {
+        user = authUser;
+        console.log('✅ User authenticated:', user.id);
+      } else {
+        console.log('❌ Authentication failed:', error?.message || 'No user found');
+        clientWs.close(1008, 'Authentication failed');
+        return;
+      }
+    } catch (error) {
+      console.error('❌ Auth verification error:', error);
+      clientWs.close(1008, 'Authentication error');
+      return;
+    }
+  } else {
+    console.log('❌ No auth token provided');
+    clientWs.close(1008, 'No authentication token');
+    return;
+  }
+  
+  console.log(`🔌 Client connected successfully: ${user?.id || 'unknown'}`);
 
   let openaiWs = null;
 
