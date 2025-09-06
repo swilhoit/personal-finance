@@ -41,4 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # large media files
-public/hero-video.mp4
+# public/hero-video.mp4
