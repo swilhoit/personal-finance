@@ -340,7 +340,7 @@ async function handleFunctionCall(data, userId) {
 }
 
 // Start server
-const PORT = process.env.REALTIME_PORT || 8080;
+const PORT = process.env.PORT || process.env.REALTIME_PORT || 8080;
 server.listen(PORT, () => {
   console.log(`🎤 OpenAI Realtime WebSocket Proxy running on port ${PORT}`);
   console.log(`📡 Connect to: ws://localhost:${PORT}?auth=YOUR_SUPABASE_TOKEN`);
