@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Personal Finance",
+    "slug": "personal-finance-ios",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "personalfinance",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#10b981"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.personalfinance",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan bank documents.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to save financial reports.",
+        "NSFaceIDUsageDescription": "This app uses Face ID for secure authentication.",
+        "CFBundleAllowMixedLocalizations": true
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#10b981"
+      },
+      "package": "com.yourcompany.personalfinance",
+      "versionCode": 1,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      },
+      "EXPO_PUBLIC_OPENAI_API_KEY": "YOUR_OPENAI_API_KEY_HERE",
+      "EXPO_PUBLIC_SUPABASE_URL": "https://ymxhsdtagnalxebnskst.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlteGhzZHRhZ25hbHhlYm5za3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NzQyOTUsImV4cCI6MjA3MDQ1MDI5NX0.eO8Tq7P-y-WWoMDBxWz7DvVFR2mmPm3_WIx04RABkTE",
+      "EXPO_PUBLIC_DEMO_MODE": true
+    }
+  }
+}

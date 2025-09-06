@@ -1,0 +1,107 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#     https://docs.fastlane.tools/plugins/available-plugins
+
+# Update this to your app's platform
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    # Skip git check for now (report.xml causes issues)
+    # ensure_git_status_clean
+    
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "PersonalFinance.xcodeproj"
+    )
+    
+    # Build the app with automatic signing for App Store
+    build_app(
+      workspace: "PersonalFinance.xcworkspace",
+      scheme: "PersonalFinance",
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates"
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      team_id: ENV["TEAM_ID"]
+    )
+    
+    # Commit the version bump
+    commit_version_bump(
+      xcodeproj: "PersonalFinance.xcodeproj",
+      message: "Version bump for TestFlight build"
+    )
+    
+    # Push to git
+    push_to_git_remote
+  end
+
+  desc "Setup certificates and provisioning profiles"
+  lane :setup_certs do
+    match(
+      type: "development",
+      readonly: false,
+      app_identifier: "com.mama.personalfinance"
+    )
+    
+    match(
+      type: "appstore",
+      readonly: false,
+      app_identifier: "com.mama.personalfinance"
+    )
+  end
+
+  desc "Register devices for development"
+  lane :register_devices do
+    register_devices(
+      devices_file: "./fastlane/devices.txt"
+    )
+  end
+
+  desc "Create push notification certificates"
+  lane :push_certs do
+    get_push_certificate(
+      app_identifier: "com.mama.personalfinance",
+      save_private_key: true,
+      output_path: "./fastlane/certificates"
+    )
+  end
+  
+  desc "Build for local testing"
+  lane :build do
+    # Skip match for now, use automatic signing
+    # match(
+    #   type: "development",
+    #   readonly: true,
+    #   app_identifier: "com.mama.personalfinance"
+    # )
+    
+    build_app(
+      workspace: "PersonalFinance.xcworkspace",
+      scheme: "PersonalFinance",
+      export_method: "development",
+      xcargs: "-allowProvisioningUpdates",
+      skip_profile_detection: false
+    )
+  end
+  
+  desc "Build for TestFlight without upload"
+  lane :build_testflight do
+    build_app(
+      workspace: "PersonalFinance.xcworkspace",
+      scheme: "PersonalFinance",
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates",
+      skip_profile_detection: false
+    )
+  end
+end
