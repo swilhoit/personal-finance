@@ -79,7 +79,7 @@ export default function TrueRealtimeVoicePage() {
               Connect to WebSocket
             </button>
             <p className="text-sm text-slate-600 mt-4">
-              This connects directly to OpenAI's Realtime API for instant voice chat
+              This connects directly to OpenAI&apos;s Realtime API for instant voice chat
             </p>
           </div>
         )}
@@ -185,7 +185,7 @@ export default function TrueRealtimeVoicePage() {
                   YOU (LIVE TRANSCRIPT):
                 </div>
                 <div className="text-lg font-dm-mono font-medium text-slate-700">
-                  "{voiceChat.transcript}"
+                  &ldquo;{voiceChat.transcript}&rdquo;
                 </div>
               </div>
             )}

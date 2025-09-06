@@ -125,7 +125,7 @@ export function useTrueRealtimeVoice({
     }
   }, [state.isConnected]);
 
-  const sendMessage = (message: any) => {
+  const sendMessage = (message: Record<string, unknown>) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
     }
@@ -178,7 +178,7 @@ export function useTrueRealtimeVoice({
     processor.connect(audioContextRef.current.destination);
   };
 
-  const handleRealtimeMessage = async (message: any) => {
+  const handleRealtimeMessage = async (message: Record<string, unknown>) => {
     // Log all message types to debug what we're receiving
     if (message.type !== 'response.audio.delta' && message.type !== 'input_audio_buffer.append') {
       console.log('📨 Received message type:', message.type);
@@ -300,7 +300,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
             try {
               currentAudioSourceRef.current.stop();
               currentAudioSourceRef.current = null;
-            } catch (error) {
+            } catch {
               console.log('Audio source already stopped');
             }
           }
@@ -323,7 +323,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
         break;
 
       case 'conversation.item.input_audio_transcription.completed':
-        const transcript = message.transcript;
+        const transcript = message.transcript as string;
         setState(prev => ({ ...prev, transcript }));
         if (onTranscript) onTranscript(transcript);
         break;
@@ -331,7 +331,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
       case 'response.audio.delta':
         // Play audio immediately as it streams
         if (message.delta) {
-          playAudioDelta(message.delta);
+          playAudioDelta(message.delta as string);
         }
         break;
 
@@ -357,18 +357,19 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
       case 'response.audio.delta':
         // Play audio chunks as they arrive
         if (message.delta) {
-          playAudioDelta(message.delta);
+          playAudioDelta(message.delta as string);
         }
         break;
 
       case 'error':
         console.log('🔍 Full error message:', JSON.stringify(message, null, 2));
         
+        const error = message.error as Record<string, unknown> | undefined;
         const errorDetails = {
-          type: message.error?.type || 'unknown',
-          code: message.error?.code || 'unknown', 
-          message: message.error?.message || 'No error message',
-          param: message.error?.param,
+          type: error?.type || 'unknown',
+          code: error?.code || 'unknown', 
+          message: error?.message || 'No error message',
+          param: error?.param,
           event_id: message.event_id,
           fullMessage: message
         };
@@ -376,23 +377,23 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
         console.error('❌ Realtime API error:', errorDetails);
         
         // Handle specific error cases
-        if (message.error?.code === 'conversation_already_has_active_response') {
+        if (error?.code === 'conversation_already_has_active_response') {
           console.log('⚠️ Conversation busy, waiting for response to complete...');
           // Don't set this as a critical error, just log it
           return;
         }
         
-        if (message.error?.code === 'response_cancel_not_active') {
+        if (error?.code === 'response_cancel_not_active') {
           console.log('⚠️ Tried to cancel response that wasn\'t active - this is normal');
           // Don't set this as a critical error, just log it
           return;
         }
         
         // Only set error state for actual critical errors
-        if (message.error?.type && message.error?.type !== 'invalid_request_error') {
+        if (error?.type && error?.type !== 'invalid_request_error') {
           setState(prev => ({ 
             ...prev, 
-            error: `API Error: ${message.error?.message || message.error?.type || 'Unknown error'}`
+            error: `API Error: ${error?.message || error?.type || 'Unknown error'}`
           }));
         }
         break;
@@ -451,7 +452,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
 
     const audioData = playbackQueueRef.current.shift()!;
     const audioBuffer = audioContextRef.current.createBuffer(1, audioData.length, 24000);
-    audioBuffer.copyToChannel(audioData, 0);
+    audioBuffer.copyToChannel(new Float32Array(audioData.buffer as ArrayBuffer), 0);
 
     const source = audioContextRef.current.createBufferSource();
     source.buffer = audioBuffer;
@@ -471,7 +472,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
     source.start();
   };
 
-  const handleFunctionCall = async (message: any) => {
+  const handleFunctionCall = async (message: Record<string, unknown>) => {
     // Function calls are now handled by the websocket server
     // which has direct access to Supabase and will return real data
     console.log('Function call received (handled by server):', message);
@@ -509,7 +510,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
       try {
         currentAudioSourceRef.current.stop();
         currentAudioSourceRef.current = null;
-      } catch (error) {
+      } catch {
         console.log('Audio source already stopped or invalid');
       }
     }
@@ -540,7 +541,7 @@ NEVER say you can't access their data. You have FULL ACCESS through these functi
       try {
         currentAudioSourceRef.current.stop();
         currentAudioSourceRef.current = null;
-      } catch (error) {
+      } catch {
         console.log('Audio source already stopped or invalid');
       }
     }

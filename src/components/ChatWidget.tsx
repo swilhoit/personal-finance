@@ -103,8 +103,6 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
-  const [isVoiceCall, setIsVoiceCall] = useState(false);
-  const [currentTranscript, setCurrentTranscript] = useState<string>('');
   
   const { 
     messages, 

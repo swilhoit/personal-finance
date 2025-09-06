@@ -1,7 +1,6 @@
-import { NextRequest } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Check authentication
     const supabase = await createSupabaseServerClient();
