@@ -75,7 +75,8 @@ export function useTrueRealtimeVoice({
       streamRef.current = stream;
 
       // Connect to our WebSocket proxy server (not directly to OpenAI)
-      const ws = new WebSocket(`ws://localhost:8080?auth=${session.access_token}`);
+      const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:8080';
+      const ws = new WebSocket(`${wsUrl}?auth=${session.access_token}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
