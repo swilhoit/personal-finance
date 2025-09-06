@@ -1,43 +1,17 @@
 {
-  "name": "personal-finance",
-  "version": "0.1.0",
-  "private": true,
+  "name": "personal-finance-websocket",
+  "version": "1.0.0",
+  "description": "WebSocket proxy server for OpenAI Realtime API",
+  "main": "websocket-server.js",
   "scripts": {
-    "dev": "next dev",
-    "realtime": "node websocket-server.js",
-    "dev:full": "concurrently \"npm run dev\" \"npm run realtime\"",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "node websocket-server.js"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^2.0.8",
-    "@ai-sdk/react": "^2.0.9",
-    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.54.0",
-    "ai": "^5.0.9",
-    "concurrently": "^9.2.1",
-    "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
-    "next": "15.4.6",
-    "openai": "^5.12.2",
-    "plaid": "^37.0.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-plaid-link": "^4.1.1",
-    "ws": "^8.18.3",
-    "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@react-native-community/cli": "^20.0.1",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.4.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "ws": "^8.18.3"
   }
 }
