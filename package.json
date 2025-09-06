@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "realtime": "node websocket-server.js",
+    "dev:full": "concurrently \"npm run dev\" \"npm run realtime\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,13 +16,16 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.54.0",
     "ai": "^5.0.9",
+    "concurrently": "^9.2.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.2",
     "next": "15.4.6",
     "openai": "^5.12.2",
     "plaid": "^37.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-plaid-link": "^4.1.1",
+    "ws": "^8.18.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {

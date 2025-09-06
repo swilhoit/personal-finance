@@ -103,6 +103,8 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
+  const [isVoiceCall, setIsVoiceCall] = useState(false);
+  const [currentTranscript, setCurrentTranscript] = useState<string>('');
   
   const { 
     messages, 
@@ -121,6 +123,10 @@ export default function ChatWidget() {
       }
     },
   });
+  
+  // Voice functionality moved to dedicated voice chat page - removed from ChatWidget
+
+  // Voice call functionality removed - use dedicated voice chat page instead
   
   useEffect(() => {
     try {
@@ -224,6 +230,13 @@ export default function ChatWidget() {
             </div>
           )}
           
+          {/* Speech bubble - "Chat Now!" */}
+          <div className="absolute bottom-full right-0 mb-4 px-3 py-2 bg-yellow-400 text-gray-900 text-sm font-bold rounded-2xl shadow-lg animate-bounce whitespace-nowrap font-['Rubik_Mono_One'] border-2 border-yellow-500">
+            CHAT NOW! 💬
+            {/* Speech bubble tail */}
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-yellow-400"></div>
+          </div>
+          
           {/* Hover text */}
           <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-['Rubik_Mono_One']">
             CHAT WITH AI
@@ -244,27 +257,9 @@ export default function ChatWidget() {
         }`}>
           {/* Header */}
           <div className="px-4 py-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 text-white flex items-center justify-between relative">
-            {/* Animated background pattern */}
-            <div className="absolute inset-0 opacity-20 overflow-hidden">
-              {[
-                { left: '10%', top: '20%', delay: '0s' },
-                { left: '70%', top: '30%', delay: '0.6s' },
-                { left: '30%', top: '60%', delay: '1.2s' },
-                { left: '80%', top: '70%', delay: '1.8s' },
-                { left: '50%', top: '40%', delay: '2.4s' },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="absolute animate-float text-base"
-                  style={{
-                    left: item.left,
-                    top: item.top,
-                    animationDelay: item.delay,
-                  }}
-                >
-                  💰
-                </div>
-              ))}
+            {/* Grid pattern background */}
+            <div className="absolute inset-0 opacity-30 overflow-hidden">
+              <div className="absolute inset-0 bg-grid-pattern"></div>
             </div>
             
             <div className="relative flex items-center gap-3">
@@ -285,6 +280,15 @@ export default function ChatWidget() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={minimized ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
                 </svg>
               </button>
+              <a
+                href="/voice-chat"
+                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
+                aria-label="Voice chat"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </a>
               <a
                 href="/chat"
                 className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
@@ -430,8 +434,8 @@ export default function ChatWidget() {
               </div>
 
               {/* Input Area */}
-              <form onSubmit={handleSubmit} className="border-t-4 border-cyan-400 dark:border-cyan-600 p-3 bg-gray-50 dark:bg-gray-900/50">
-                <div className="flex gap-2">
+                <form onSubmit={handleSubmit} className="border-t-4 border-cyan-400 dark:border-cyan-600 p-3 bg-gray-50 dark:bg-gray-900/50">
+                  <div className="flex gap-2">
                   <input
                     ref={inputRef}
                     value={input}
@@ -449,16 +453,25 @@ export default function ChatWidget() {
                       STOP
                     </button>
                   ) : (
-                    <button
-                      type="submit"
-                      disabled={input.trim().length === 0}
-                      className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      SEND
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => window.open('/voice-true-realtime', '_blank')}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all flex items-center gap-1"
+                      >
+                        🎤 VOICE
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={input.trim().length === 0}
+                        className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        SEND
+                      </button>
+                    </>
                   )}
-                </div>
-              </form>
+                  </div>
+                </form>
             </>
           )}
         </div>
@@ -485,8 +498,11 @@ export default function ChatWidget() {
           }
         }
 
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
+        .bg-grid-pattern {
+          background-image: 
+            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
         }
 
         .animate-slideIn {

@@ -2,45 +2,28 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light";
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: () => void; // Keep for compatibility but won't do anything
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Get theme from localStorage or default to light
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const initialTheme = savedTheme || "light";
-    setTheme(initialTheme);
-    
-    // Apply theme to document
-    if (initialTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    
+    // Always force light mode
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
     setMounted(true);
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    // Do nothing - dark mode is disabled
   };
 
   // Prevent flash of incorrect theme

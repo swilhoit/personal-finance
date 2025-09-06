@@ -1,36 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  /* Earth tone palette for light mode */
-  --background: #faf8f5; /* Warm off-white */
-  --foreground: #3d3028; /* Deep earth brown */
+  /* Light mode with blue background */
+  --background: #0066ff; /* Bright blue */
+  --foreground: #1f2937; /* Dark gray text */
   
-  /* Natural earth tones */
-  --stone-50: #faf8f5;
-  --stone-100: #f5f0e8;
-  --stone-200: #e8dfd2;
-  --stone-300: #d4c4b0;
-  --stone-400: #b8a08c;
-  --stone-500: #9b826f;
-  --stone-600: #7d6754;
-  --stone-700: #665343;
-  --stone-800: #524337;
-  --stone-900: #3d3028;
+  /* Cyan/Teal theme colors with better contrast */
+  --cyan-50: #ecfeff;
+  --cyan-100: #cffafe;
+  --cyan-200: #a5f3fc;
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --cyan-600: #0891b2;
+  --cyan-700: #0e7490;
+  --cyan-800: #155e75;
+  --cyan-900: #164e63;
   
-  /* Accent colors - muted earth tones */
-  --sage-green: #87a878;
-  --terracotta: #c17767;
-  --sand: #d4a574;
-  --clay-blue: #7a95a7;
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-dm-mono);
+  --font-mono: var(--font-dm-mono);
   --font-rubik-mono: var(--font-rubik-mono);
   --font-bungee: var(--font-bungee);
+  --font-dm-mono: var(--font-dm-mono);
 }
 
 /* Dark mode colors when dark class is applied */
@@ -38,36 +44,51 @@
   --background: #0a0a0a;
   --foreground: #ededed;
   
-  /* Update stone colors for dark mode */
-  --stone-50: #18181b;
-  --stone-100: #27272a;
-  --stone-200: #3f3f46;
-  --stone-300: #52525b;
-  --stone-400: #71717a;
-  --stone-500: #a1a1aa;
-  --stone-600: #d4d4d8;
-  --stone-700: #e4e4e7;
-  --stone-800: #f4f4f5;
-  --stone-900: #fafafa;
+  /* Dark mode cyan/teal colors */
+  --cyan-50: #164e63;
+  --cyan-100: #155e75;
+  --cyan-200: #0e7490;
+  --cyan-300: #0891b2;
+  --cyan-400: #06b6d4;
+  --cyan-500: #22d3ee;
+  --cyan-600: #67e8f9;
+  --cyan-700: #a5f3fc;
+  --cyan-800: #cffafe;
+  --cyan-900: #ecfeff;
+  
+  --teal-50: #134e4a;
+  --teal-100: #115e59;
+  --teal-200: #0f766e;
+  --teal-300: #0d9488;
+  --teal-400: #14b8a6;
+  --teal-500: #2dd4bf;
+  --teal-600: #5eead4;
+  --teal-700: #99f6e4;
+  --teal-800: #ccfbf1;
+  --teal-900: #f0fdfa;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-dm-mono), 'DM Mono', monospace;
 }
 
-/* Custom utility classes for earth tones */
-.bg-earth-50 { background-color: var(--stone-50); }
-.bg-earth-100 { background-color: var(--stone-100); }
-.bg-earth-200 { background-color: var(--stone-200); }
-.bg-earth-300 { background-color: var(--stone-300); }
-.text-earth-600 { color: var(--stone-600); }
-.text-earth-700 { color: var(--stone-700); }
-.text-earth-800 { color: var(--stone-800); }
-.text-earth-900 { color: var(--stone-900); }
+/* Custom utility classes for cyan/teal theme */
+.bg-cyan-50 { background-color: var(--cyan-50); }
+.bg-cyan-100 { background-color: var(--cyan-100); }
+.bg-cyan-200 { background-color: var(--cyan-200); }
+.bg-cyan-300 { background-color: var(--cyan-300); }
+.text-cyan-600 { color: var(--cyan-600); }
+.text-cyan-700 { color: var(--cyan-700); }
+.text-cyan-800 { color: var(--cyan-800); }
+.text-cyan-900 { color: var(--cyan-900); }
 
-.bg-sage { background-color: var(--sage-green); }
-.bg-terracotta { background-color: var(--terracotta); }
-.bg-sand { background-color: var(--sand); }
-.bg-clay { background-color: var(--clay-blue); }
+.bg-teal-50 { background-color: var(--teal-50); }
+.bg-teal-100 { background-color: var(--teal-100); }
+.bg-teal-200 { background-color: var(--teal-200); }
+.bg-teal-300 { background-color: var(--teal-300); }
+.text-teal-600 { color: var(--teal-600); }
+.text-teal-700 { color: var(--teal-700); }
+.text-teal-800 { color: var(--teal-800); }
+.text-teal-900 { color: var(--teal-900); }

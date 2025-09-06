@@ -15,8 +15,8 @@ export default async function SpendingOverview() {
 
   if (!monthSpending || monthSpending.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-        <svg className="w-12 h-12 mx-auto mb-3 text-zinc-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="text-center py-8 text-zinc-500 text-zinc-400">
+        <svg className="w-12 h-12 mx-auto mb-3 text-zinc-300 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
         <p className="text-sm">No spending data yet</p>
@@ -40,7 +40,7 @@ export default async function SpendingOverview() {
     <div className="space-y-4">
       <div className="flex items-baseline justify-between">
         <p className="text-2xl font-bold">${total.toFixed(2)}</p>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">This month</p>
+        <p className="text-sm text-zinc-500 text-zinc-400">This month</p>
       </div>
       
       <div className="space-y-3">
@@ -55,17 +55,17 @@ export default async function SpendingOverview() {
                 <span className="font-medium truncate flex-1">
                   {cat.category_name ?? "Uncategorized"}
                 </span>
-                <span className="text-zinc-600 dark:text-zinc-400 ml-2">
+                <span className="text-zinc-600 text-zinc-400 ml-2">
                   ${amount.toFixed(2)}
                 </span>
               </div>
-              <div className="relative h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+              <div className="relative h-2 bg-zinc-100 bg-zinc-800 rounded-full overflow-hidden">
                 <div 
                   className={`absolute inset-y-0 left-0 ${colors[idx % colors.length]} rounded-full transition-all duration-500`}
                   style={{ width: `${percentage}%` }}
                 />
               </div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs text-zinc-500 text-zinc-400">
                 {percentOfTotal.toFixed(1)}% of total • {cat.txn_count} transactions
               </p>
             </div>
@@ -75,7 +75,7 @@ export default async function SpendingOverview() {
       
       <a 
         href="/insights" 
-        className="block text-center py-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+        className="block text-center py-3 text-sm text-blue-600 text-blue-400 hover:underline"
       >
         View detailed insights →
       </a>

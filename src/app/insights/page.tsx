@@ -78,8 +78,8 @@ export default async function InsightsPage() {
   
   // Prepare category breakdown with colors
   const categoryColors = [
-    "#2563eb", "#16a34a", "#dc2626", "#ea580c", "#6b7280", "#374151",
-    "#1f2937", "#111827", "#030712", "#6b7280"
+    "#06b6d4", "#14b8a6", "#0ea5e9", "#06b6d4", "#0891b2", "#0e7490",
+    "#0d9488", "#10b981", "#059669", "#047857"
   ];
   
   const categoryData = topCategories.map((cat, index) => ({
@@ -134,27 +134,32 @@ export default async function InsightsPage() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-green-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Financial Insights</h1>
-              <p className="text-white/80 mt-2">
-                Your spending analysis for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              <h1 className="text-4xl font-dm-mono font-black flex items-center gap-3">
+                <span className="text-5xl">📊</span>
+                INSIGHTS UNLOCKED
+              </h1>
+              <p className="text-white/90 mt-2 font-dm-mono text-sm">
+                LEVEL {new Date().getMonth() + 1} • {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="px-4 py-2 bg-white/10 dark:bg-white/20 backdrop-blur rounded-lg hover:bg-white/20 dark:hover:bg-white/30 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+              <button className="px-6 py-3 bg-white/20 backdrop-blur rounded-xl hover:bg-white/30 transition-all font-dm-mono text-sm flex items-center gap-2">
+                <span>📥</span> EXPORT
               </button>
-              <button className="px-4 py-2 bg-white/10 dark:bg-white/20 backdrop-blur rounded-lg hover:bg-white/20 dark:hover:bg-white/30 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+              <button className="px-6 py-3 bg-white/20 backdrop-blur rounded-xl hover:bg-white/30 transition-all font-dm-mono text-sm flex items-center gap-2">
+                <span>⚙️</span> FILTER
               </button>
             </div>
           </div>
@@ -164,119 +169,95 @@ export default async function InsightsPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {rows.length === 0 ? (
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800 p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-600/20 to-green-600/20 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-3">No Data Available Yet</h2>
-            <p className="text-gray-600 dark:text-zinc-400 mb-8 max-w-md mx-auto">
-              Connect your bank accounts and sync transactions to unlock powerful spending insights and analytics.
+          <div className="bg-white rounded-3xl shadow-2xl border-4 border-cyan-400 p-12 text-center">
+            <div className="text-8xl mb-6 animate-bounce">📈</div>
+            <h2 className="text-3xl font-dm-mono font-black mb-3 bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
+              NO DATA YET!
+            </h2>
+            <p className="text-gray-600 text-gray-400 mb-8 max-w-md mx-auto font-dm-mono">
+              Connect your accounts to unlock epic insights! 🚀
             </p>
-            <a href="/accounts" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-green-600 text-white rounded-xl hover:shadow-lg transition-all">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Connect Account
+            <a href="/accounts" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-2xl hover:scale-105 transition-all font-dm-mono shadow-lg hover:shadow-cyan-500/50">
+              <span className="text-xl">🔗</span>
+              CONNECT ACCOUNT
             </a>
           </div>
         ) : (
           <div className="space-y-8">
             {/* Key Metrics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-cyan-400 p-6 hover:scale-105 transition-transform">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-blue-600/10 rounded-lg">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${weekChange > 0 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
-                    {weekChange > 0 ? '+' : ''}{weekChange.toFixed(1)}%
+                  <div className="text-3xl">💰</div>
+                  <span className={`text-xs font-dm-mono px-2 py-1 rounded-full ${weekChange > 0 ? 'bg-red-100 bg-red-900/30 text-red-600' : 'bg-green-100 bg-green-900/30 text-green-600'}`}>
+                    {weekChange > 0 ? '📈' : '📉'} {Math.abs(weekChange).toFixed(1)}%
                   </span>
                 </div>
-                <p className="text-2xl font-bold mb-1">${total.toFixed(2)}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Total Spending</p>
+                <p className="text-2xl font-dm-mono font-black mb-1 text-cyan-600 text-cyan-400">${total.toFixed(0)}</p>
+                <p className="text-xs font-dm-mono text-gray-500">TOTAL SPENT</p>
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-sky-400 p-6 hover:scale-105 transition-transform">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-green-600/10 rounded-lg">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                  </div>
-                  <span className="text-xs font-medium text-green-600">
-                    {totalTransactions}
+                  <div className="text-3xl">🎯</div>
+                  <span className="text-xs font-dm-mono text-sky-600">
+                    x{totalTransactions}
                   </span>
                 </div>
-                <p className="text-2xl font-bold mb-1">${avgTransaction.toFixed(2)}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Avg Transaction</p>
+                <p className="text-2xl font-dm-mono font-black mb-1 text-sky-600 text-sky-400">${avgTransaction.toFixed(0)}</p>
+                <p className="text-xs font-dm-mono text-gray-500">AVG TRANSACTION</p>
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-teal-400 p-6 hover:scale-105 transition-transform">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-red-600/10 rounded-lg">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs font-medium text-red-600">
-                    {rows.length}
+                  <div className="text-3xl">🏆</div>
+                  <span className="text-xs font-dm-mono text-teal-600">
+                    #{rows.length}
                   </span>
                 </div>
-                <p className="text-2xl font-bold mb-1">{topCategories[0]?.category_name || "N/A"}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Top Category</p>
+                <p className="text-lg font-dm-mono font-black mb-1 text-teal-600 text-teal-400">{topCategories[0]?.category_name || "N/A"}</p>
+                <p className="text-xs font-dm-mono text-gray-500">TOP CATEGORY</p>
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-orange-400 p-6 hover:scale-105 transition-transform">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-orange-600/10 rounded-lg">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <span className="text-xs font-medium text-orange-600">
-                    Daily
+                  <div className="text-3xl">📅</div>
+                  <span className="text-xs font-dm-mono text-orange-600">
+                    DAILY
                   </span>
                 </div>
-                <p className="text-2xl font-bold mb-1">${(total / 30).toFixed(2)}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Avg Daily Spend</p>
+                <p className="text-2xl font-dm-mono font-black mb-1 text-orange-600 text-orange-400">${(total / 30).toFixed(0)}</p>
+                <p className="text-xs font-dm-mono text-gray-500">AVG DAILY</p>
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-purple-400 p-6 hover:scale-105 transition-transform">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-gray-500/10 rounded-lg">
-                    <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <span className="text-xs font-medium text-gray-500">
-                    {topMerchants.length}
+                  <div className="text-3xl">🏪</div>
+                  <span className="text-xs font-dm-mono text-purple-600">
+                    TOP
                   </span>
                 </div>
-                <p className="text-lg font-bold mb-1">{topMerchants[0]?.[0] || "N/A"}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Top Merchant</p>
+                <p className="text-sm font-dm-mono font-black mb-1 text-purple-600 text-purple-400 truncate">{topMerchants[0]?.[0] || "N/A"}</p>
+                <p className="text-xs font-dm-mono text-gray-500">FAV MERCHANT</p>
               </div>
             </div>
 
             {/* Spending Trend and Budget Overview */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+              <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border-4 border-cyan-400 p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold">Spending Trend</h2>
-                  <select className="text-sm px-3 py-1 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-transparent">
-                    <option>Last 30 days</option>
-                    <option>Last 7 days</option>
-                    <option>This month</option>
+                  <h2 className="text-xl font-dm-mono font-black text-cyan-600 text-cyan-400">📈 SPENDING TREND</h2>
+                  <select className="text-sm px-3 py-2 border-2 border-cyan-400 rounded-xl bg-white font-dm-mono text-cyan-700">
+                    <option>LAST 30 DAYS</option>
+                    <option>LAST 7 DAYS</option>
+                    <option>THIS MONTH</option>
                   </select>
                 </div>
                 <SpendingTrendChart data={trendData} height={250} />
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
-                <h2 className="text-lg font-semibold mb-6">Budget Status</h2>
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-teal-400 p-6">
+                <h2 className="text-xl font-dm-mono font-black mb-6 text-teal-600 text-teal-400">💪 BUDGET POWER</h2>
                 <div className="flex flex-col items-center">
                   <RadialProgress 
                     value={total} 
@@ -285,19 +266,19 @@ export default async function InsightsPage() {
                     strokeWidth={12}
                     color={budgetUsed > 100 ? "#dc2626" : budgetUsed > 80 ? "#ea580c" : "#16a34a"}
                   />
-                  <div className="mt-6 w-full space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 dark:text-zinc-400">Spent</span>
-                      <span className="font-semibold">${total.toFixed(0)}</span>
+                  <div className="mt-6 w-full space-y-3">
+                    <div className="flex justify-between text-sm font-dm-mono">
+                      <span className="text-gray-500">SPENT</span>
+                      <span className="font-bold text-cyan-600 text-cyan-400">${total.toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 dark:text-zinc-400">Budget</span>
-                      <span className="font-semibold">${totalBudget.toFixed(0)}</span>
+                    <div className="flex justify-between text-sm font-dm-mono">
+                      <span className="text-gray-500">BUDGET</span>
+                      <span className="font-bold text-teal-600 text-teal-400">${totalBudget.toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-zinc-800">
-                      <span className="text-gray-500 dark:text-zinc-400">Remaining</span>
-                      <span className={`font-semibold ${totalBudget - total < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        ${Math.abs(totalBudget - total).toFixed(0)}
+                    <div className="flex justify-between text-sm pt-3 border-t-2 border-gray-200 border-gray-800 font-dm-mono">
+                      <span className="text-gray-500">REMAINING</span>
+                      <span className={`font-bold ${totalBudget - total < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {totalBudget - total < 0 ? '⚠️' : '✅'} ${Math.abs(totalBudget - total).toFixed(0)}
                       </span>
                     </div>
                   </div>
@@ -306,37 +287,37 @@ export default async function InsightsPage() {
             </div>
 
             {/* Category Breakdown */}
-            <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
+            <div className="bg-white rounded-2xl shadow-lg border-4 border-sky-400 p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Category Breakdown</h2>
-                <button className="text-sm text-blue-600 dark:text-blue-600 hover:text-blue-700 dark:hover:text-green-600 transition-colors">
-                  View All →
+                <h2 className="text-xl font-dm-mono font-black text-sky-600 text-sky-400">🎯 CATEGORY BREAKDOWN</h2>
+                <button className="text-sm font-dm-mono text-sky-600 text-sky-400 hover:text-sky-700 hover:text-sky-300 transition-colors">
+                  VIEW ALL →
                 </button>
               </div>
               <CategoryBreakdown categories={categoryData} />
             </div>
 
-            {/* Top Merchants and Insights */}
+            {/* Top Merchants and Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6">
-                <h3 className="text-lg font-semibold mb-4">Top Merchants</h3>
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-purple-400 p-6">
+                <h3 className="text-xl font-dm-mono font-black mb-4 text-purple-600 text-purple-400">🏪 TOP MERCHANTS</h3>
                 <div className="space-y-3">
                   {topMerchants.map(([merchant, amount], index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
+                    <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 from-purple-900/20 to-pink-900/20 hover:scale-[1.02] transition-transform">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600/20 to-green-600/20 flex items-center justify-center text-sm font-bold">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-dm-mono font-black">
                           {index + 1}
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{merchant}</p>
-                          <p className="text-xs text-gray-500 dark:text-zinc-400">
+                          <p className="font-dm-mono text-sm">{merchant}</p>
+                          <p className="text-xs text-gray-500">
                             {transactions.filter(t => t.merchant_name === merchant).length} visits
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">${amount.toFixed(2)}</p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400">
+                        <p className="font-dm-mono font-black text-purple-600 text-purple-400">${amount.toFixed(0)}</p>
+                        <p className="text-xs font-dm-mono text-gray-500">
                           {((amount / total) * 100).toFixed(1)}%
                         </p>
                       </div>
@@ -345,58 +326,40 @@ export default async function InsightsPage() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-zinc-800 dark:to-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6">
-                <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+              <div className="bg-gradient-to-br from-cyan-100 to-teal-100 rounded-2xl border-4 border-cyan-400 p-6">
+                <h3 className="text-xl font-dm-mono font-black mb-4 text-cyan-600 text-cyan-400">⚡ QUICK ACTIONS</h3>
                 <div className="space-y-3">
-                  <a href="/budgets" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
+                  <a href="/budgets" className="flex items-center justify-between p-4 bg-white rounded-xl hover:scale-[1.02] transition-transform border-2 border-cyan-300">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
+                      <div className="text-3xl">💎</div>
                       <div>
-                        <p className="font-medium text-sm">Set Budget Goals</p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400">Plan next month</p>
+                        <p className="font-dm-mono font-black text-sm text-cyan-600 text-cyan-400">SET BUDGET</p>
+                        <p className="text-xs font-dm-mono text-gray-500">Plan next month</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <span className="text-2xl">→</span>
                   </a>
 
-                  <a href="/transactions" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
+                  <a href="/transactions" className="flex items-center justify-between p-4 bg-white rounded-xl hover:scale-[1.02] transition-transform border-2 border-teal-300">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                      </div>
+                      <div className="text-3xl">📝</div>
                       <div>
-                        <p className="font-medium text-sm">Review Transactions</p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400">Categorize & analyze</p>
+                        <p className="font-dm-mono font-black text-sm text-teal-600 text-teal-400">REVIEW</p>
+                        <p className="text-xs font-dm-mono text-gray-500">Check transactions</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <span className="text-2xl">→</span>
                   </a>
 
-                  <a href="/chat" className="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg hover:shadow-md transition-all border border-gray-100 dark:border-transparent">
+                  <a href="/chat" className="flex items-center justify-between p-4 bg-white rounded-xl hover:scale-[1.02] transition-transform border-2 border-sky-300">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-red-600/10 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                      </div>
+                      <div className="text-3xl">🤖</div>
                       <div>
-                        <p className="font-medium text-sm">Ask AI Assistant</p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400">Get personalized tips</p>
+                        <p className="font-dm-mono font-black text-sm text-sky-600 text-sky-400">ASK AI</p>
+                        <p className="text-xs font-dm-mono text-gray-500">Get tips</p>
                       </div>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <span className="text-2xl">→</span>
                   </a>
                 </div>
               </div>

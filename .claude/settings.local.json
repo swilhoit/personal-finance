@@ -21,7 +21,12 @@
       "Bash(cat:*)",
       "Bash(npx supabase migration:*)",
       "Bash(npx supabase db push:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(kill:*)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

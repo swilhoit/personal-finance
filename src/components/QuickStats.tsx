@@ -47,28 +47,28 @@ export default async function QuickStats() {
       value: totalBalance,
       emoji: "💰",
       gradient: "from-cyan-400 to-teal-400",
-      darkGradient: "dark:from-cyan-600 dark:to-teal-600",
+      darkGradient: "from-cyan-600 to-teal-600",
     },
     {
       label: "This Month",
       value: monthSpend,
       emoji: "📊",
       gradient: "from-sky-400 to-cyan-400",
-      darkGradient: "dark:from-sky-600 dark:to-cyan-600",
+      darkGradient: "from-sky-600 to-cyan-600",
     },
     {
       label: "Daily Average",
       value: avgDaily,
       emoji: "📈",
       gradient: "from-teal-400 to-cyan-400",
-      darkGradient: "dark:from-teal-600 dark:to-cyan-600",
+      darkGradient: "from-teal-600 to-cyan-600",
     },
     {
       label: "Last 30 Days",
       value: last30Days,
       emoji: "📅",
       gradient: "from-cyan-400 to-sky-400",
-      darkGradient: "dark:from-cyan-600 dark:to-sky-600",
+      darkGradient: "from-cyan-600 to-sky-600",
     }
   ];
 
@@ -83,14 +83,14 @@ export default async function QuickStats() {
           <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}></div>
           
           {/* Card */}
-          <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl border-2 border-cyan-400 dark:border-cyan-600 p-4 shadow-lg">
+          <div className="relative bg-white rounded-2xl border-2 border-cyan-400 p-4">
             <div className="flex items-start justify-between mb-2">
-              <p className="font-['Rubik_Mono_One'] text-xs text-cyan-700 dark:text-cyan-300 uppercase">
+              <p className="font-dm-mono text-xs text-cyan-700 text-cyan-300 uppercase">
                 {stat.label}
               </p>
               <span className="text-2xl">{stat.emoji}</span>
             </div>
-            <p className={`text-2xl font-['Bungee'] bg-gradient-to-r ${stat.gradient} ${stat.darkGradient} bg-clip-text text-transparent`}>
+            <p className={`text-2xl font-dm-mono font-black bg-gradient-to-r ${stat.gradient} ${stat.darkGradient} bg-clip-text text-transparent`}>
               ${stat.value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </p>
           </div>

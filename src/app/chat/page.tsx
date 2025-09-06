@@ -278,23 +278,9 @@ export default function ChatPage() {
       
       {/* Header */}
       <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b-4 border-cyan-400 dark:border-cyan-600 relative overflow-hidden">
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(10)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                fontSize: '1.5rem',
-                opacity: 0.2,
-              }}
-            >
-              {['💰', '🤖', '📊', '🎮'][Math.floor(Math.random() * 4)]}
-            </div>
-          ))}
+        {/* Grid pattern background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -521,8 +507,11 @@ export default function ChatPage() {
           }
         }
 
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        .bg-grid-pattern {
+          background-image: 
+            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
         }
 
         .animate-wiggle {

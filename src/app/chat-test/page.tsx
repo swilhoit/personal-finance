@@ -74,7 +74,7 @@ export default function ChatTestPage() {
             placeholder="Type message and press Enter"
             className="px-3 py-2 border rounded flex-1"
           />
-          <button type="submit" className="px-4 py-2 bg-purple-500 text-white rounded">
+          <button type="submit" className="px-4 py-2 font-dm-mono bg-purple-500 text-white rounded">
             Send Message
           </button>
         </form>

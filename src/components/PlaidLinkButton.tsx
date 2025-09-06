@@ -50,7 +50,7 @@ export default function PlaidLinkButton() {
     <button
       onClick={() => open()}
       disabled={!ready}
-      className="rounded-md px-4 py-2 bg-black text-white dark:bg-white dark:text-black"
+      className="rounded-md px-4 py-2 font-dm-mono bg-black text-white dark:bg-white dark:text-black"
     >
       {ready ? "Connect a bank" : "Loading..."}
     </button>

@@ -74,20 +74,20 @@ export default async function AccountsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
+      <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Accounts</h1>
-              <p className="text-sm text-gray-600 dark:text-zinc-400 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 Manage your connected bank accounts and credit cards
               </p>
             </div>
             <div className="flex items-center gap-3">
               {lastSync && (
-                <div className="text-xs text-gray-500 dark:text-zinc-400">
+                <div className="text-xs text-gray-500">
                   <div className="flex items-center gap-1">
                     <div className={`w-2 h-2 rounded-full ${lastSyncSuccess ? 'bg-green-600' : 'bg-red-600'}`} />
                     Last sync: {lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -95,7 +95,7 @@ export default async function AccountsPage() {
                 </div>
               )}
               <form action="/api/plaid/sync-transactions" method="POST">
-                <button className="px-4 py-2 text-sm border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
+                <button className="px-4 py-2 text-sm font-dm-mono border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   Sync Accounts
                 </button>
               </form>
@@ -108,39 +108,39 @@ export default async function AccountsPage() {
       {/* Summary Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6">
-            <p className="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Total Balance</p>
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Total Balance</p>
             <p className="text-2xl font-bold">${totalBalance.toFixed(2)}</p>
-            <p className="text-xs text-gray-600 dark:text-zinc-400 mt-1">Across all accounts</p>
+            <p className="text-xs text-gray-600 mt-1">Across all accounts</p>
           </div>
           
-          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6">
-            <p className="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Available</p>
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Available</p>
             <p className="text-2xl font-bold">${totalAvailable.toFixed(2)}</p>
-            <p className="text-xs text-gray-600 dark:text-zinc-400 mt-1">Ready to spend</p>
+            <p className="text-xs text-gray-600 mt-1">Ready to spend</p>
           </div>
           
-          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6">
-            <p className="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Accounts</p>
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Accounts</p>
             <p className="text-2xl font-bold">{accounts?.length ?? 0}</p>
-            <p className="text-xs text-gray-600 dark:text-zinc-400 mt-1">Connected</p>
+            <p className="text-xs text-gray-600 mt-1">Connected</p>
           </div>
           
-          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6">
-            <p className="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Institutions</p>
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Institutions</p>
             <p className="text-2xl font-bold">{Object.keys(accountsByInstitution).length}</p>
-            <p className="text-xs text-gray-600 dark:text-zinc-400 mt-1">Linked banks</p>
+            <p className="text-xs text-gray-600 mt-1">Linked banks</p>
           </div>
         </div>
 
         {/* Accounts List */}
         {Object.keys(accountsByInstitution).length === 0 ? (
-          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-12 text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-12 text-center">
+            <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
             <h2 className="text-xl font-semibold mb-2">No accounts connected</h2>
-            <p className="text-gray-600 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
+            <p className="text-gray-600 mb-6 max-w-sm mx-auto">
               Connect your bank accounts to start tracking your finances.
             </p>
             <PlaidLinkButton />
@@ -149,16 +149,16 @@ export default async function AccountsPage() {
           <div className="space-y-6">
             {Object.entries(accountsByInstitution).map(([institution, institutionAccounts]) => (
               <div key={institution}>
-                <h2 className="text-sm font-semibold text-gray-600 dark:text-zinc-400 mb-3">
+                <h2 className="text-sm font-semibold text-gray-600 mb-3">
                   {institution}
                 </h2>
-                <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
-                  <div className="divide-y divide-gray-200 dark:divide-zinc-800">
+                <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="divide-y divide-gray-200">
                     {institutionAccounts.map((account) => (
-                      <div key={account.account_id} className="p-4 hover:bg-white dark:hover:bg-zinc-800/50 transition-colors">
+                      <div key={account.account_id} className="p-4 hover:bg-white transition-colors">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getAccountIcon(account.type, account.subtype)} />
                               </svg>
@@ -167,10 +167,10 @@ export default async function AccountsPage() {
                               <div className="font-medium">
                                 {account.name ?? account.official_name ?? "Account"}
                                 {account.mask && (
-                                  <span className="text-gray-500 dark:text-zinc-400 ml-2">•••{account.mask}</span>
+                                  <span className="text-gray-500 ml-2">•••{account.mask}</span>
                                 )}
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-zinc-400 capitalize">
+                              <div className="text-xs text-gray-500 capitalize">
                                 {account.type}{account.subtype ? ` - ${account.subtype.replace(/_/g, ' ')}` : ""}
                               </div>
                             </div>
@@ -181,7 +181,7 @@ export default async function AccountsPage() {
                               ${(account.current_balance ?? 0).toFixed(2)}
                             </div>
                             {account.available_balance != null && account.available_balance !== account.current_balance && (
-                              <div className="text-xs text-gray-500 dark:text-zinc-400">
+                              <div className="text-xs text-gray-500">
                                 Available: ${account.available_balance.toFixed(2)}
                               </div>
                             )}
@@ -189,12 +189,12 @@ export default async function AccountsPage() {
                         </div>
                         
                         {/* Account Actions */}
-                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-zinc-800">
-                          <button className="text-xs text-blue-600 hover:text-blue-700 transition-colors">
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                          <button className="text-xs font-dm-mono text-blue-600 hover:text-blue-700 transition-colors">
                             View Transactions
                           </button>
                           <span className="text-gray-300">•</span>
-                          <button className="text-xs text-blue-600 hover:text-blue-700 transition-colors">
+                          <button className="text-xs font-dm-mono text-blue-600 hover:text-blue-700 transition-colors">
                             Account Details
                           </button>
                           <span className="text-gray-300">•</span>

@@ -41,19 +41,18 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
             <div className="flex items-center gap-3">
               <div className="relative group">
                 <div className="absolute inset-0 bg-white/30 rounded-xl blur-lg group-hover:blur-xl transition-all"></div>
-                <div className="relative w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-white font-['Bungee'] text-lg shadow-lg transform group-hover:scale-110 transition-transform">
+                <div className="relative w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-white font-dm-mono font-black text-lg shadow-lg transform group-hover:scale-110 transition-transform">
                   M
                 </div>
               </div>
               <div>
-                <h1 className="font-['Rubik_Mono_One'] text-white text-base">{currentPage.name}</h1>
-                <p className="text-xs text-white/80 font-['Rubik_Mono_One']">MAMA</p>
+                <h1 className="font-dm-mono text-white text-base">{currentPage.name}</h1>
+                <p className="text-xs text-white/80 font-dm-mono">MAMA</p>
               </div>
             </div>
             
             {/* Right Actions */}
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               <div className="bg-white/20 backdrop-blur-sm rounded-lg">
                 <NotificationCenter />
               </div>
@@ -69,44 +68,9 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
 
       {/* Desktop Header */}
       <header className="hidden lg:block bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 shadow-2xl relative overflow-hidden">
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full">
-            {[
-              { left: '5%', top: '10%', delay: '0s', emoji: '💰' },
-              { left: '15%', top: '60%', delay: '0.5s', emoji: '🎮' },
-              { left: '25%', top: '30%', delay: '1s', emoji: '📊' },
-              { left: '35%', top: '70%', delay: '1.5s', emoji: '🚀' },
-              { left: '45%', top: '20%', delay: '2s', emoji: '💎' },
-              { left: '55%', top: '80%', delay: '2.5s', emoji: '🏆' },
-              { left: '65%', top: '40%', delay: '3s', emoji: '💰' },
-              { left: '75%', top: '15%', delay: '3.5s', emoji: '🎮' },
-              { left: '85%', top: '55%', delay: '4s', emoji: '📊' },
-              { left: '95%', top: '25%', delay: '4.5s', emoji: '🚀' },
-              { left: '10%', top: '85%', delay: '1.2s', emoji: '💎' },
-              { left: '20%', top: '45%', delay: '2.2s', emoji: '🏆' },
-              { left: '30%', top: '5%', delay: '3.2s', emoji: '💰' },
-              { left: '40%', top: '90%', delay: '0.2s', emoji: '🎮' },
-              { left: '50%', top: '50%', delay: '1.7s', emoji: '📊' },
-              { left: '60%', top: '65%', delay: '2.7s', emoji: '🚀' },
-              { left: '70%', top: '35%', delay: '3.7s', emoji: '💎' },
-              { left: '80%', top: '75%', delay: '0.7s', emoji: '🏆' },
-              { left: '90%', top: '8%', delay: '1.3s', emoji: '💰' },
-              { left: '12%', top: '95%', delay: '2.3s', emoji: '🎮' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="absolute animate-float text-3xl opacity-30"
-                style={{
-                  left: item.left,
-                  top: item.top,
-                  animationDelay: item.delay,
-                }}
-              >
-                {item.emoji}
-              </div>
-            ))}
-          </div>
+        {/* Grid pattern background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-grid-pattern"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -114,7 +78,7 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
             {/* Logo and Brand */}
             <div className="flex items-center">
               <Link href="/dashboard" className="group">
-                <span className="font-['Bungee'] text-3xl text-white drop-shadow-lg hover:scale-110 transition-transform inline-block">MAMA</span>
+                <span className="font-dm-mono font-black text-3xl text-white drop-shadow-lg hover:scale-110 transition-transform inline-block">MAMA</span>
               </Link>
             </div>
 
@@ -128,7 +92,7 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg font-['Rubik_Mono_One'] text-xs transition-all transform hover:scale-105 ${
+                    className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg font-dm-mono text-xs transition-all transform hover:scale-105 ${
                       isActive
                         ? "bg-white/30 backdrop-blur-sm text-white shadow-lg scale-105"
                         : "bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 hover:text-white"
@@ -152,7 +116,6 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
-              <ThemeToggle />
               <div className="relative bg-white/20 backdrop-blur-sm rounded-xl">
                 <NotificationCenter />
               </div>
@@ -176,8 +139,11 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
           }
         }
 
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        .bg-grid-pattern {
+          background-image: 
+            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
         }
       `}</style>
     </>

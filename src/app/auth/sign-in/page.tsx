@@ -41,30 +41,9 @@ export default function SignInPage() {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      {/* Floating icons */}
+      {/* Grid pattern overlay */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[
-          { left: '10%', top: '15%', delay: '0s', emoji: '💰' },
-          { left: '80%', top: '20%', delay: '1s', emoji: '🎮' },
-          { left: '25%', top: '70%', delay: '2s', emoji: '🚀' },
-          { left: '70%', top: '80%', delay: '3s', emoji: '💎' },
-          { left: '50%', top: '40%', delay: '4s', emoji: '🏆' },
-          { left: '15%', top: '90%', delay: '1.5s', emoji: '💰' },
-          { left: '90%', top: '50%', delay: '2.5s', emoji: '🎮' },
-          { left: '40%', top: '10%', delay: '3.5s', emoji: '🚀' },
-        ].map((item, i) => (
-          <div
-            key={i}
-            className="absolute animate-float text-5xl opacity-10"
-            style={{
-              left: item.left,
-              top: item.top,
-              animationDelay: item.delay,
-            }}
-          >
-            {item.emoji}
-          </div>
-        ))}
+        <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
       </div>
 
       <div className="relative z-10">
@@ -177,17 +156,11 @@ export default function SignInPage() {
       </div>
 
       <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-30px) rotate(10deg);
-          }
-        }
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        .bg-grid-pattern {
+          background-image: 
+            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
         }
 
         .delay-1000 {
