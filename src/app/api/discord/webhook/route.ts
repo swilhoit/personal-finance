@@ -5,12 +5,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Use service role for webhook handling
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy-load Supabase client to avoid build-time errors
+let supabaseInstance: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return supabaseInstance;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,6 +78,7 @@ async function handleCommand(interaction: DiscordInteraction): Promise<NextRespo
   const discordUser = user || member?.user;
 
   // Resolve guild to user
+  const supabase = getSupabase();
   const { data: guildData } = await supabase
     .from('discord_guilds')
     .select('user_id, settings')
@@ -137,6 +146,7 @@ async function handleCommand(interaction: DiscordInteraction): Promise<NextRespo
 }
 
 async function handleBalanceCommand(userId: string): Promise<NextResponse> {
+  const supabase = getSupabase();
   const { data: accounts } = await supabase
     .from('teller_accounts')
     .select('name, type, current_balance, institution_name')
@@ -180,6 +190,7 @@ async function handleSpendingCommand(userId: string, options?: Array<{ name: str
   const days = typeof daysValue === 'string' ? parseInt(daysValue, 10) : daysValue;
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
+  const supabase = getSupabase();
   const { data: transactions } = await supabase
     .from('transactions')
     .select('amount, category, merchant_name')
@@ -228,6 +239,7 @@ async function handleSpendingCommand(userId: string, options?: Array<{ name: str
 }
 
 async function handleWatchlistCommand(userId: string): Promise<NextResponse> {
+  const supabase = getSupabase();
   const { data: watchlist } = await supabase
     .from('user_watchlists')
     .select('symbol')
@@ -285,6 +297,7 @@ async function handleQuoteCommand(options?: Array<{ name: string; value: string 
     });
   }
 
+  const supabase = getSupabase();
   const { data } = await supabase
     .from('market_data')
     .select('*')
