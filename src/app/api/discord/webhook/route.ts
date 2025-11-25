@@ -49,8 +49,9 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCommand(interaction: any): Promise<NextResponse> {
-  const { guild_id, data, member } = interaction;
+  const { guild_id, data, member, user } = interaction;
   const commandName = data.name;
+  const discordUser = user || member?.user;
 
   // Resolve guild to user
   const { data: guild } = await supabase
@@ -61,13 +62,35 @@ async function handleCommand(interaction: any): Promise<NextResponse> {
     .single();
 
   if (!guild) {
-    return NextResponse.json({
-      type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-      data: {
-        content: '❌ This server is not linked to a Finance AI account. Visit the dashboard to connect.',
-        flags: 64, // Ephemeral
-      },
-    });
+    // Check if the Discord user has a direct connection
+    let userId = null;
+    if (discordUser?.id) {
+      const { data: connection } = await supabase
+        .from('discord_connections')
+        .select('user_id')
+        .eq('discord_user_id', discordUser.id)
+        .eq('is_active', true)
+        .single();
+
+      if (connection) {
+        userId = connection.user_id;
+      }
+    }
+
+    if (!userId) {
+      return NextResponse.json({
+        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+        data: {
+          content: '❌ This server is not linked to a Finance AI account. Please visit the dashboard at ' +
+                   (process.env.NEXT_PUBLIC_SITE_URL || 'your-app-url') +
+                   '/settings/integrations to connect your Discord account and invite the bot.',
+          flags: 64, // Ephemeral
+        },
+      });
+    }
+
+    // Use the Discord user's connection instead
+    guild.user_id = userId;
   }
 
   // Handle different commands
@@ -290,4 +313,5 @@ async function handleComponent(interaction: any): Promise<NextResponse> {
     },
   });
 }
+
 

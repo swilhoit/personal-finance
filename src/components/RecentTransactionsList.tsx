@@ -4,7 +4,7 @@ import Link from "next/link";
 export default async function RecentTransactionsList() {
   const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) return null;
 
   const { data: transactions } = await supabase
@@ -17,9 +17,11 @@ export default async function RecentTransactionsList() {
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">💸</div>
-        <p className="font-dm-mono text-sm text-gray-600 text-gray-400">No transactions yet</p>
-        <p className="text-xs text-gray-500 text-gray-500 mt-1">Connect a bank to start</p>
+        <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <p className="text-sm text-gray-600">No transactions yet</p>
+        <p className="text-xs text-gray-500 mt-1">Connect a bank account to start tracking</p>
       </div>
     );
   }
@@ -28,8 +30,8 @@ export default async function RecentTransactionsList() {
     const isNegative = amount < 0;
     const absAmount = Math.abs(amount);
     return (
-      <span className={`font-dm-mono font-black ${isNegative ? "text-red-500" : "text-green-500"}`}>
-        {isNegative ? "-" : "+"}${absAmount.toFixed(0)}
+      <span className={`font-medium ${isNegative ? "text-gray-900" : "text-gray-700"}`}>
+        {isNegative ? "-" : "+"}${absAmount.toFixed(2)}
       </span>
     );
   };
@@ -39,7 +41,7 @@ export default async function RecentTransactionsList() {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     if (date.toDateString() === today.toDateString()) {
       return "Today";
     } else if (date.toDateString() === yesterday.toDateString()) {
@@ -49,61 +51,47 @@ export default async function RecentTransactionsList() {
     }
   };
 
-  const getCategoryEmoji = (category: string | null) => {
-    const categoryMap: { [key: string]: string } = {
-      "Food and Drink": "🍔",
-      "Travel": "✈️",
-      "Shops": "🛍️",
-      "Transfer": "💸",
-      "Payment": "💳",
-      "Recreation": "🎮",
-      "Service": "🔧",
-      "Transportation": "🚗",
-      "Healthcare": "🏥",
-      "Bank Fees": "🏦"
-    };
-    return categoryMap[category ?? ""] || "💰";
+  const getCategoryInitial = (category: string | null) => {
+    if (!category) return "T";
+    return category.charAt(0).toUpperCase();
   };
 
   return (
     <div className="space-y-2">
       {transactions.map((t) => (
-        <div 
-          key={t.transaction_id} 
-          className="group relative bg-white/50 bg-gray-900/50 rounded-xl p-3 border-2 border-cyan-200 border-cyan-800 hover:border-cyan-400 hover:border-cyan-600 hover:scale-[1.02] transition-all"
+        <div
+          key={t.transaction_id}
+          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-teal-400 from-cyan-600 to-teal-600 flex items-center justify-center text-white shadow-md">
-                  <span className="text-lg">{getCategoryEmoji(t.category)}</span>
-                </div>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-gray-700 font-medium flex-shrink-0">
+              {getCategoryInitial(t.category)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm text-gray-900 truncate">
+                {t.merchant_name || t.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {formatDate(t.date)}
                 {t.pending && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="ml-2 text-gray-400">• Pending</span>
                 )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-dm-mono text-sm text-gray-900 text-gray-100 truncate">
-                  {t.merchant_name ?? t.name ?? "Transaction"}
-                </p>
-                <p className="text-xs text-gray-500 text-gray-500">
-                  {formatDate(t.date)} • {t.category ?? "Other"}
-                  {t.pending && <span className="ml-1 text-yellow-600 text-yellow-400">• Pending</span>}
-                </p>
-              </div>
+                {t.category && (
+                  <span className="ml-2 text-gray-400">• {t.category}</span>
+                )}
+              </p>
             </div>
-            <div className="text-sm font-medium pl-2">
-              {formatAmount(t.amount)}
-            </div>
+          </div>
+          <div className="text-right ml-4 flex-shrink-0">
+            {formatAmount(t.amount)}
           </div>
         </div>
       ))}
-      
-      <Link 
-        href="/transactions" 
-        className="block text-center py-3 mt-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-dm-mono text-sm hover:scale-105 transition-all shadow-lg hover:shadow-cyan-500/50"
+      <Link
+        href="/transactions"
+        className="block text-center py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
-        VIEW ALL →
+        View all transactions →
       </Link>
     </div>
   );

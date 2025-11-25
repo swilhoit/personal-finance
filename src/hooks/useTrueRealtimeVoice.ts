@@ -74,8 +74,14 @@ export function useTrueRealtimeVoice({
       });
       streamRef.current = stream;
 
+      // Check if we have a WebSocket URL configured for production
+      const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
+      
+      if (!wsUrl) {
+        throw new Error('WebSocket server not configured. Please set NEXT_PUBLIC_WEBSOCKET_URL environment variable.');
+      }
+      
       // Connect to our WebSocket proxy server (not directly to OpenAI)
-      const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:8080';
       const ws = new WebSocket(`${wsUrl}?auth=${session.access_token}`);
       wsRef.current = ws;
 
