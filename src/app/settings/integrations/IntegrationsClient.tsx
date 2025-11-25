@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import TellerConnect from "@/components/TellerConnect";
 
 interface DiscordConnection {
   discordUserId: string;
@@ -402,41 +403,41 @@ export default function IntegrationsClient({
             </div>
 
             {tellerAccounts.length > 0 ? (
-              <div className="space-y-2">
-                {tellerAccounts.map((account) => (
-                  <div key={account.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-sm">{account.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {account.institution_name} • {account.type}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold">
-                          ${account.current_balance?.toFixed(2) || '0.00'}
-                        </div>
-                        {account.last_synced_at && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {tellerAccounts.map((account) => (
+                    <div key={account.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-sm">{account.name}</div>
                           <div className="text-xs text-gray-500 mt-1">
-                            Updated {new Date(account.last_synced_at).toLocaleDateString()}
+                            {account.institution_name} • {account.type}
                           </div>
-                        )}
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold">
+                            ${account.current_balance?.toFixed(2) || '0.00'}
+                          </div>
+                          {account.last_synced_at && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Updated {new Date(account.last_synced_at).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="pt-4 border-t border-gray-200">
+                  <TellerConnect />
+                </div>
               </div>
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-500 text-sm mb-4">
                   No bank accounts connected yet.
                 </p>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  Connect Bank Account
-                </Link>
+                <TellerConnect />
               </div>
             )}
           </div>
