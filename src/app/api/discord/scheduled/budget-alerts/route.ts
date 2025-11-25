@@ -216,12 +216,16 @@ async function getBudgetStatuses(
 
   // Build status list
   return budgets.map(budget => {
-    const categories = budget.categories as { id: string; name: string } | null;
+    // Supabase returns joined data - handle both array and object formats
+    const categoriesData = budget.categories;
+    const category = Array.isArray(categoriesData) 
+      ? categoriesData[0] as { id: string; name: string } | undefined
+      : categoriesData as { id: string; name: string } | null;
     const spent = spendingByCategory.get(budget.category_id) || 0;
     const budgetAmount = Number(budget.amount);
     
     return {
-      category_name: categories?.name || 'Unknown',
+      category_name: category?.name || 'Unknown',
       category_id: budget.category_id,
       budget_amount: budgetAmount,
       spent_amount: spent,
