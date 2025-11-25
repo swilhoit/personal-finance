@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
 import { createSupabaseClient } from "@/lib/supabase/client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type TextPart = { type: "text"; text: string };
 type ToolCallPart = { type: "tool-call"; toolName: string; args: unknown };
@@ -44,17 +44,17 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
 function renderToolResultByName(toolName: string, result: unknown) {
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
     const items = result as Array<{ category: string; total: number }>;
-    if (items.length === 0) return <div className="text-xs italic text-cyan-600 dark:text-cyan-400">No spending data found 📊</div>;
+    if (items.length === 0) return <div className="text-sm text-gray-500">No spending data found</div>;
     return (
-      <div className="mt-3 bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-900/20 dark:to-teal-900/20 rounded-xl p-4 border-2 border-cyan-300 dark:border-cyan-700">
-        <div className="font-['Rubik_Mono_One'] text-sm text-cyan-700 dark:text-cyan-300 mb-2 flex items-center gap-2">
-          <span className="text-lg">💰</span> SPENDING BY CATEGORY (30 DAYS)
+      <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+          Spending by Category
         </div>
         <div className="space-y-2">
           {items.map((it, idx) => (
-            <div key={idx} className="flex items-center justify-between bg-white/50 dark:bg-gray-900/50 rounded-lg px-3 py-2">
-              <span className="font-medium text-gray-700 dark:text-gray-300">{it.category || "Uncategorized"}</span>
-              <span className="font-['Bungee'] text-cyan-600 dark:text-cyan-400">${it.total.toFixed(2)}</span>
+            <div key={idx} className="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-700 last:border-0">
+              <span className="text-sm text-gray-700 dark:text-gray-300">{it.category || "Uncategorized"}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${it.total.toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -64,23 +64,20 @@ function renderToolResultByName(toolName: string, result: unknown) {
   
   if (toolName === "getRecentTransactions" && Array.isArray(result)) {
     const rows = result as Array<{ date: string; name: string | null; merchant_name: string | null; amount: number; iso_currency_code: string | null; category: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-cyan-600 dark:text-cyan-400">No recent transactions 💸</div>;
+    if (rows.length === 0) return <div className="text-sm text-gray-500">No recent transactions</div>;
     return (
-      <div className="mt-3 bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/20 dark:to-cyan-900/20 rounded-xl p-4 border-2 border-sky-300 dark:border-sky-700">
-        <div className="font-['Rubik_Mono_One'] text-sm text-sky-700 dark:text-sky-300 mb-2 flex items-center gap-2">
-          <span className="text-lg">💸</span> RECENT TRANSACTIONS
+      <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+          Recent Transactions
         </div>
         <div className="space-y-1">
           {rows.slice(0, 10).map((t, idx) => (
-            <div key={idx} className="flex items-center justify-between bg-white/50 dark:bg-gray-900/50 rounded-lg px-3 py-1.5 text-sm">
-              <div className="flex-1">
-                <span className="font-medium text-gray-700 dark:text-gray-300">{t.merchant_name || t.name || "Transaction"}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-500 ml-2">{t.category}</span>
+            <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+              <div className="flex-1 min-w-0">
+                <span className="text-sm text-gray-900 dark:text-gray-100 block truncate">{t.merchant_name || t.name || "Transaction"}</span>
+                <span className="text-xs text-gray-500">{t.category} · {t.date}</span>
               </div>
-              <div className="text-right">
-                <span className="font-['Bungee'] text-sky-600 dark:text-sky-400">${Number(t.amount).toFixed(2)}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-500 ml-2">{t.date}</span>
-              </div>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">${Number(t.amount).toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -90,17 +87,17 @@ function renderToolResultByName(toolName: string, result: unknown) {
   
   if (toolName === "getAccountBalances" && Array.isArray(result)) {
     const rows = result as Array<{ name: string | null; official_name: string | null; current_balance: number | null; available_balance: number | null; iso_currency_code: string | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-cyan-600 dark:text-cyan-400">No accounts found 🏦</div>;
+    if (rows.length === 0) return <div className="text-sm text-gray-500">No accounts found</div>;
     return (
-      <div className="mt-3 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-xl p-4 border-2 border-teal-300 dark:border-teal-700">
-        <div className="font-['Rubik_Mono_One'] text-sm text-teal-700 dark:text-teal-300 mb-2 flex items-center gap-2">
-          <span className="text-lg">🏦</span> ACCOUNT BALANCES
+      <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+          Account Balances
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {rows.map((a, idx) => (
-            <div key={idx} className="bg-white/50 dark:bg-gray-900/50 rounded-lg px-3 py-2">
-              <div className="font-medium text-gray-700 dark:text-gray-300">{a.name || a.official_name || "Account"}</div>
-              <div className="font-['Bungee'] text-xl text-teal-600 dark:text-teal-400">
+            <div key={idx} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+              <div className="text-sm text-gray-600 dark:text-gray-400">{a.name || a.official_name || "Account"}</div>
+              <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 ${Number(a.current_balance ?? 0).toFixed(2)}
               </div>
             </div>
@@ -112,35 +109,35 @@ function renderToolResultByName(toolName: string, result: unknown) {
   
   if (toolName === "getBudgetStatus" && Array.isArray(result)) {
     const rows = result as Array<{ category_name: string; budget_amount: number; spent_amount: number; remaining_amount: number; month: string }>;
-    if (rows.length === 0) return <div className="text-xs italic text-cyan-600 dark:text-cyan-400">No budgets set 📊</div>;
+    if (rows.length === 0) return <div className="text-sm text-gray-500">No budgets set</div>;
     return (
-      <div className="mt-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border-2 border-purple-300 dark:border-purple-700">
-        <div className="font-['Rubik_Mono_One'] text-sm text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2">
-          <span className="text-lg">📊</span> BUDGET STATUS ({rows[0]?.month})
+      <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+          Budget Status · {rows[0]?.month}
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {rows.map((b, idx) => {
             const percentUsed = (b.spent_amount / b.budget_amount) * 100;
             const isOverBudget = percentUsed > 100;
             return (
-              <div key={idx} className="bg-white/50 dark:bg-gray-900/50 rounded-lg px-3 py-2">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">{b.category_name}</span>
-                  <span className={`font-['Bungee'] text-sm ${isOverBudget ? 'text-red-500' : 'text-green-500'}`}>
-                    {isOverBudget ? '⚠️ OVER' : '✅ OK'}
+              <div key={idx} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{b.category_name}</span>
+                  <span className={`text-xs font-medium ${isOverBudget ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500'}`}>
+                    {isOverBudget ? 'Over budget' : `${Math.round(100 - percentUsed)}% left`}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mb-1">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                   <div 
-                    className={`h-2 rounded-full transition-all ${
-                      isOverBudget ? 'bg-red-500' : percentUsed > 75 ? 'bg-yellow-500' : 'bg-green-500'
+                    className={`h-1.5 rounded-full transition-all ${
+                      isOverBudget ? 'bg-gray-900 dark:bg-gray-100' : 'bg-gray-500'
                     }`}
                     style={{ width: `${Math.min(percentUsed, 100)}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                  <span>Spent: ${b.spent_amount.toFixed(2)}</span>
-                  <span>Budget: ${b.budget_amount.toFixed(2)}</span>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>${b.spent_amount.toFixed(0)} spent</span>
+                  <span>${b.budget_amount.toFixed(0)} budget</span>
                 </div>
               </div>
             );
@@ -166,20 +163,20 @@ function renderDynamicToolUIPart(part: DynamicToolUIPart) {
 }
 
 const quickPrompts = [
-  { text: "What's my balance?", emoji: "💰" },
-  { text: "Monthly spending?", emoji: "📊" },
-  { text: "Top categories", emoji: "🏆" },
-  { text: "Recent transactions", emoji: "💸" },
-  { text: "Budget status", emoji: "🎯" },
-  { text: "Spending trends", emoji: "📈" },
-  { text: "Find recurring", emoji: "🔄" },
-  { text: "Food spending", emoji: "🍔" },
+  { text: "What's my balance?", icon: "◎" },
+  { text: "Monthly spending", icon: "↗" },
+  { text: "Top categories", icon: "▤" },
+  { text: "Recent transactions", icon: "↺" },
+  { text: "Budget status", icon: "▣" },
+  { text: "Spending trends", icon: "⤴" },
 ];
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const router = useRouter();
   
   const { 
     messages, 
@@ -190,14 +187,26 @@ export default function ChatPage() {
     onError: (err) => {
       console.error("[Chat Page] Chat error details:", err);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
-        setError("AI chat is not configured. Please add OPENAI_API_KEY to your environment variables.");
+        setError("AI chat is not configured. Please check environment variables.");
       } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("You need to be logged in to use the AI chat.");
+        handleAuthError();
       } else {
-        setError(`Chat error: ${err.message || "Failed to connect to AI service"}`);
+        setError(`Error: ${err.message || "Failed to connect"}`);
       }
     }
   });
+
+  const handleAuthError = async () => {
+    try {
+      const supabase = createSupabaseClient();
+      await supabase.auth.signOut();
+      setError("Session expired. Redirecting to sign in...");
+      setTimeout(() => router.push("/auth/sign-in"), 1500);
+    } catch {
+      setError("Authentication error. Please sign in again.");
+      router.push("/auth/sign-in");
+    }
+  };
 
   useEffect(() => {
     try {
@@ -226,16 +235,44 @@ export default function ChatPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const supabase = createSupabaseClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        redirect("/auth/sign-in");
+      try {
+        const supabase = createSupabaseClient();
+        // Use getSession first (doesn't refresh), then getUser only if session exists
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("[Chat Page] Session error:", sessionError);
+          // Clear corrupt session
+          await supabase.auth.signOut();
+          router.push("/auth/sign-in");
+          return;
+        }
+
+        if (!session) {
+          router.push("/auth/sign-in");
+          return;
+        }
+
+        // Verify the session is still valid
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          console.error("[Chat Page] User error:", userError);
+          await supabase.auth.signOut();
+          router.push("/auth/sign-in");
+          return;
+        }
+
+        setAuthChecked(true);
+      } catch (err) {
+        console.error("[Chat Page] Auth check failed:", err);
+        router.push("/auth/sign-in");
       }
     };
     checkAuth();
-  }, []);
+  }, [router]);
 
   const handleQuickPrompt = async (prompt: string) => {
+    setError(null);
     try {
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
@@ -257,6 +294,7 @@ export default function ChatPage() {
     if (input.trim().length === 0) return;
     const message = input;
     setInput("");
+    setError(null);
     try {
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
@@ -273,73 +311,80 @@ export default function ChatPage() {
     }
   };
 
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-500">
+          <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+          <span className="text-sm">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-sky-50 to-teal-50 dark:from-gray-900 dark:via-cyan-950 dark:to-teal-950 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
       
       {/* Header */}
-      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b-4 border-cyan-400 dark:border-cyan-600 relative overflow-hidden">
-        {/* Grid pattern background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-        </div>
-        
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-['Bungee'] bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent flex items-center gap-3">
-                <span className="text-4xl">🤖</span> AI ADVISOR
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Assistant
               </h1>
-              <p className="text-sm font-['Rubik_Mono_One'] text-gray-600 dark:text-gray-400 mt-1">
-                YOUR PERSONAL FINANCE CO-PILOT
+              <p className="text-sm text-gray-500">
+                Ask about your finances
               </p>
             </div>
             <a 
               href="/dashboard" 
-              className="hidden sm:flex items-center gap-2 px-4 py-2 font-['Rubik_Mono_One'] text-sm bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 rounded-xl hover:bg-cyan-200 dark:hover:bg-cyan-900/50 transition-all hover:scale-105"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
             >
-              <span>← BACK</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back
             </a>
           </div>
         </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col">
+      <div className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col">
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-4 bg-red-100 dark:bg-red-900/20 border-2 border-red-400 dark:border-red-600 rounded-xl">
-            <div className="flex gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div className="flex-1">
-                <p className="font-['Rubik_Mono_One'] text-sm text-red-600 dark:text-red-400">ERROR DETECTED</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{error}</p>
-              </div>
-            </div>
+          <div className="mb-4 p-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400">{error}</p>
           </div>
         )}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto mb-4 space-y-4 scroll-smooth">
+        <div className="flex-1 overflow-y-auto mb-4 space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-8xl mb-6 animate-bounce">🤖</div>
-              <h2 className="text-3xl font-['Bungee'] mb-3 bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
-                START QUEST
+            <div className="text-center py-16">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                How can I help?
               </h2>
-              <p className="font-['Rubik_Mono_One'] text-sm text-gray-600 dark:text-gray-400 mb-8 max-w-sm mx-auto">
-                ASK ME ANYTHING ABOUT YOUR MONEY - I&apos;M HERE TO HELP YOU WIN!
+              <p className="text-sm text-gray-500 mb-8 max-w-md mx-auto">
+                Ask me anything about your spending, budgets, balances, or financial patterns.
               </p>
               
               {/* Quick Prompts Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-lg mx-auto">
                 {quickPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => handleQuickPrompt(prompt.text)}
-                    className="group relative px-4 py-3 bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/30 dark:to-teal-900/30 border-2 border-cyan-400 dark:border-cyan-600 rounded-xl hover:scale-105 transition-all"
+                    className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
                   >
-                    <span className="text-2xl mb-1 block group-hover:animate-wiggle">{prompt.emoji}</span>
-                    <span className="font-['Rubik_Mono_One'] text-xs text-gray-700 dark:text-gray-300">{prompt.text}</span>
+                    <span className="text-gray-400 text-xs block mb-1">{prompt.icon}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{prompt.text}</span>
                   </button>
                 ))}
               </div>
@@ -349,86 +394,53 @@ export default function ChatPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-slideIn`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <div className={`max-w-[80%] ${message.role === "user" ? "order-2" : ""}`}>
-                    <div className="flex items-start gap-3">
-                      {message.role === "assistant" && (
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-cyan-400 dark:bg-cyan-600 rounded-xl blur-lg opacity-50"></div>
-                          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-white text-xl shadow-lg">
-                            🤖
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <div
-                          className={`rounded-2xl px-5 py-4 shadow-lg ${
-                            message.role === "user"
-                              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-['Rubik_Mono_One']"
-                              : "bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-2 border-cyan-400 dark:border-cyan-600"
-                          }`}
-                        >
-                          {message.parts.map((part, partIndex) => {
-                            if (isTextPart(part)) {
-                              return (
-                                <div key={partIndex} className={`whitespace-pre-wrap ${
-                                  message.role === "assistant" ? "text-gray-800 dark:text-gray-200" : ""
-                                }`}>
-                                  {part.text}
-                                </div>
-                              );
-                            }
-                            if (isToolCallPart(part)) {
-                              return (
-                                <div key={partIndex} className="flex items-center gap-2 text-sm text-cyan-600 dark:text-cyan-400 italic mt-2">
-                                  <div className="animate-spin">⚙️</div>
-                                  <span className="font-['Rubik_Mono_One']">
-                                    LOADING {part.toolName.replace(/([A-Z])/g, " $1").toUpperCase()}...
-                                  </span>
-                                </div>
-                              );
-                            }
-                            if (isToolResultPart(part)) {
-                              return <div key={partIndex}>{renderToolResult(part)}</div>;
-                            }
-                            if (isDynamicToolUIPart(part)) {
-                              return <div key={partIndex}>{renderDynamicToolUIPart(part)}</div>;
-                            }
-                            return null;
-                          })}
-                        </div>
-                        {message.role === "assistant" && (
-                          <div className="text-xs font-['Rubik_Mono_One'] text-gray-500 dark:text-gray-500 mt-2 px-2">
-                            {new Date().toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      {message.role === "user" && (
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-orange-400 dark:bg-orange-600 rounded-xl blur-lg opacity-50"></div>
-                          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-['Bungee'] text-sm shadow-lg">
-                            P1
-                          </div>
-                        </div>
-                      )}
+                  <div className={`max-w-[85%] sm:max-w-[75%]`}>
+                    <div
+                      className={`rounded-lg px-4 py-3 ${
+                        message.role === "user"
+                          ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                          : "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      }`}
+                    >
+                      {message.parts.map((part, partIndex) => {
+                        if (isTextPart(part)) {
+                          return (
+                            <div key={partIndex} className="whitespace-pre-wrap text-sm">
+                              {part.text}
+                            </div>
+                          );
+                        }
+                        if (isToolCallPart(part)) {
+                          return (
+                            <div key={partIndex} className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                              <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                              <span>Loading {part.toolName.replace(/([A-Z])/g, " $1").toLowerCase()}...</span>
+                            </div>
+                          );
+                        }
+                        if (isToolResultPart(part)) {
+                          return <div key={partIndex}>{renderToolResult(part)}</div>;
+                        }
+                        if (isDynamicToolUIPart(part)) {
+                          return <div key={partIndex}>{renderDynamicToolUIPart(part)}</div>;
+                        }
+                        return null;
+                      })}
                     </div>
                   </div>
                 </div>
               ))}
               
               {status === "streaming" && (
-                <div className="flex justify-start animate-slideIn">
-                  <div className="flex items-center gap-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-xl px-4 py-3 border-2 border-cyan-400 dark:border-cyan-600">
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 rounded-lg px-4 py-3">
                     <div className="flex gap-1">
-                      <div className="w-3 h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-3 h-3 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-3 h-3 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
-                    <span className="font-['Rubik_Mono_One'] text-sm text-cyan-700 dark:text-cyan-300">AI THINKING...</span>
                   </div>
                 </div>
               )}
@@ -438,90 +450,36 @@ export default function ChatPage() {
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSubmit} className="border-t-4 border-cyan-400 dark:border-cyan-600 pt-4 pb-safe">
-          <div className="flex gap-3">
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={status === "streaming" ? "AI IS TYPING..." : "TYPE YOUR QUESTION..."}
-                disabled={status === "streaming"}
-                className="w-full px-5 py-4 rounded-2xl border-3 border-cyan-400 dark:border-cyan-600 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm font-['Rubik_Mono_One'] text-sm focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-700 disabled:opacity-50 placeholder:text-gray-400"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl opacity-50">
-                💬
-              </div>
-            </div>
+        <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-800 pt-4">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={status === "streaming" ? "Generating response..." : "Ask a question..."}
+              disabled={status === "streaming"}
+              className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600 disabled:opacity-50 placeholder:text-gray-400"
+            />
             {status === "streaming" ? (
               <button
                 type="button"
                 onClick={stop}
-                className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-2xl font-['Rubik_Mono_One'] hover:scale-105 transition-all shadow-lg hover:shadow-red-500/50"
+                className="px-4 py-3 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
               >
-                STOP
+                Stop
               </button>
             ) : (
               <button
                 type="submit"
                 disabled={input.trim().length === 0}
-                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-2xl font-['Rubik_Mono_One'] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-cyan-500/50"
+                className="px-4 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                SEND 🚀
+                Send
               </button>
             )}
           </div>
-          <p className="text-xs font-['Rubik_Mono_One'] text-gray-500 dark:text-gray-500 mt-3 text-center">
-            💡 PRO TIP: ASK ABOUT SPENDING, BUDGETS, BALANCES, OR FINANCIAL PATTERNS
-          </p>
         </form>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(10deg);
-          }
-        }
-
-        @keyframes wiggle {
-          0%, 100% {
-            transform: rotate(-3deg);
-          }
-          50% {
-            transform: rotate(3deg);
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .bg-grid-pattern {
-          background-image: 
-            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
-          background-size: 40px 40px;
-        }
-
-        .animate-wiggle {
-          animation: wiggle 0.5s ease-in-out;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

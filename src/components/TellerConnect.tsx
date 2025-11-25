@@ -1,90 +1,271 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import type { TellerEnrollment, TellerConnectInstance } from "@/types/teller";
 
-export default function TellerConnect() {
-  const [isConnecting, setIsConnecting] = useState(false);
+const TELLER_CONNECT_SCRIPT_URL = "https://cdn.teller.io/connect/connect.js";
+
+interface TellerConnectProps {
+  /** Custom button text */
+  buttonText?: string;
+  /** Custom class name for the button */
+  className?: string;
+  /** Callback when bank is successfully connected */
+  onSuccess?: (enrollment: TellerEnrollment) => void;
+  /** Callback when user exits without connecting */
+  onExit?: () => void;
+  /** Callback on error */
+  onError?: (error: string) => void;
+}
+
+export default function TellerConnect({
+  buttonText,
+  className,
+  onSuccess,
+  onExit,
+  onError,
+}: TellerConnectProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [config, setConfig] = useState<{
+    applicationId: string;
+    environment: "sandbox" | "development" | "production";
+    userId: string;
+  } | null>(null);
+  
+  const tellerInstanceRef = useRef<TellerConnectInstance | null>(null);
 
-  const handleConnect = async () => {
-    setIsConnecting(true);
+  // Load Teller Connect script
+  useEffect(() => {
+    // Check if script is already loaded
+    if (window.TellerConnect) {
+      setIsScriptLoaded(true);
+      return;
+    }
+
+    // Check if script tag already exists
+    const existingScript = document.querySelector(
+      `script[src="${TELLER_CONNECT_SCRIPT_URL}"]`
+    );
+    if (existingScript) {
+      existingScript.addEventListener("load", () => setIsScriptLoaded(true));
+      return;
+    }
+
+    // Create and load script
+    const script = document.createElement("script");
+    script.src = TELLER_CONNECT_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => setIsScriptLoaded(true);
+    script.onerror = () => {
+      setError("Failed to load Teller Connect. Please try again.");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup: destroy Teller instance if it exists
+      if (tellerInstanceRef.current) {
+        tellerInstanceRef.current.destroy();
+        tellerInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // Fetch Teller configuration on mount
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch("/api/teller/create-enrollment", {
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          if (response.status === 503) {
+            // Teller not configured - don't show error, just disable
+            return;
+          }
+          const data = await response.json();
+          throw new Error(data.error || "Failed to get Teller configuration");
+        }
+
+        const data = await response.json();
+        setConfig({
+          applicationId: data.applicationId,
+          environment: data.environment || "sandbox",
+          userId: data.userId,
+        });
+      } catch (err) {
+        console.error("Error fetching Teller config:", err);
+        // Don't set error here - we'll handle it when user clicks
+      }
+    };
+
+    fetchConfig();
+  }, []);
+
+  // Handle successful enrollment - save to backend
+  const handleEnrollmentSuccess = useCallback(
+    async (enrollment: TellerEnrollment) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/teller/exchange-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            accessToken: enrollment.accessToken,
+            enrollmentId: enrollment.enrollmentId || enrollment.user?.id,
+            institution: enrollment.institution,
+            accounts: enrollment.accounts,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to save bank connection");
+        }
+
+        // Trigger initial sync
+        await fetch("/api/teller/sync", { method: "POST" });
+
+        // Call success callback
+        onSuccess?.(enrollment);
+
+        // Refresh page to show new accounts
+        window.location.reload();
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to connect bank";
+        setError(errorMessage);
+        onError?.(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSuccess, onError]
+  );
+
+  // Open Teller Connect
+  const handleConnect = useCallback(async () => {
     setError(null);
 
-    try {
-      // Get Teller configuration
+    // If config not loaded, try to fetch it
+    if (!config) {
+      setIsLoading(true);
+      try {
+        const response = await fetch("/api/teller/create-enrollment", {
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          if (response.status === 503) {
+            setError(
+              "Banking integration is not configured yet. Please contact support."
+            );
+            setIsLoading(false);
+            return;
+          }
+          const data = await response.json();
+          throw new Error(data.error || "Failed to get Teller configuration");
+        }
+
+        const data = await response.json();
+        setConfig({
+          applicationId: data.applicationId,
+          environment: data.environment || "sandbox",
+          userId: data.userId,
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to initialize";
+        setError(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(false);
+    }
+
+    // Wait for script to load
+    if (!isScriptLoaded || !window.TellerConnect) {
+      setError("Teller Connect is still loading. Please try again.");
+      return;
+    }
+
+    // Use the config we just fetched or the one from state
+    const currentConfig = config || (await (async () => {
       const response = await fetch("/api/teller/create-enrollment", {
         method: "POST",
       });
-
       const data = await response.json();
+      return {
+        applicationId: data.applicationId,
+        environment: data.environment || "sandbox",
+        userId: data.userId,
+      };
+    })());
 
-      if (!response.ok) {
-        // Handle configuration errors gracefully
-        if (response.status === 503) {
-          setError("Banking integration is not configured yet. Please contact support.");
-          setIsConnecting(false);
-          return;
-        }
-        throw new Error(data.error || "Failed to create enrollment");
-      }
-
-      const { applicationId, environment } = data;
-
-      if (!applicationId) {
-        setError("Banking service is not properly configured.");
-        setIsConnecting(false);
-        return;
-      }
-
-      // Build Teller Connect URL
-      const tellerUrl = `https://teller.io/connect/${applicationId}?environment=${environment}`;
-
-      // Open Teller Connect in popup
-      const width = 500;
-      const height = 700;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
-
-      const popup = window.open(
-        tellerUrl,
-        "TellerConnect",
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      if (!popup) {
-        setError("Please allow popups to connect your bank account.");
-        setIsConnecting(false);
-        return;
-      }
-
-      // Poll for completion
-      const checkInterval = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkInterval);
-          setIsConnecting(false);
-          // Refresh to show new accounts
-          window.location.reload();
-        }
-      }, 1000);
-    } catch (error) {
-      console.error("Error connecting bank:", error);
-      setError(error instanceof Error ? error.message : "Failed to connect bank account");
-      setIsConnecting(false);
+    if (!currentConfig?.applicationId) {
+      setError("Banking service is not properly configured.");
+      return;
     }
-  };
+
+    try {
+      // Create Teller Connect instance
+      const tellerConnect = window.TellerConnect.setup({
+        applicationId: currentConfig.applicationId,
+        environment: currentConfig.environment,
+        selectAccount: "multiple",
+        products: ["balance", "transactions"],
+        onSuccess: (enrollment: TellerEnrollment) => {
+          handleEnrollmentSuccess(enrollment);
+        },
+        onExit: () => {
+          onExit?.();
+        },
+        onFailure: (failure) => {
+          console.error("Teller Connect failure:", failure);
+          setError(failure.message || "Bank connection failed. Please try again.");
+          onError?.(failure.message);
+        },
+      });
+
+      tellerInstanceRef.current = tellerConnect;
+
+      // Open the Teller Connect modal
+      tellerConnect.open();
+    } catch (err) {
+      console.error("Error opening Teller Connect:", err);
+      setError("Failed to open bank connection. Please try again.");
+    }
+  }, [config, isScriptLoaded, handleEnrollmentSuccess, onExit, onError]);
+
+  const isDisabled = isLoading || (!isScriptLoaded && !error);
+  const displayButtonText =
+    buttonText ||
+    (isLoading
+      ? "Connecting..."
+      : !isScriptLoaded
+      ? "Loading..."
+      : "Connect Bank Account");
 
   return (
-    <div>
+    <div className="inline-flex flex-col">
       <button
         onClick={handleConnect}
-        disabled={isConnecting}
-        className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={isDisabled}
+        className={
+          className ||
+          "px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        }
       >
-        {isConnecting ? "Connecting..." : "Connect Bank Account"}
+        {displayButtonText}
       </button>
-      {error && (
-        <p className="text-sm text-red-600 mt-2">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600 mt-2 max-w-xs">{error}</p>}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
+import { createSupabaseClient } from "@/lib/supabase/client";
 
 type TextPart = { type: "text"; text: string };
 type ToolCallPart = { type: "tool-call"; toolName: string; args: unknown };
@@ -42,14 +43,14 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
 function renderToolResultByName(toolName: string, result: unknown) {
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
     const items = result as Array<{ category: string; total: number }>;
-    if (items.length === 0) return <div className="text-xs italic text-cyan-600">No data 📊</div>;
+    if (items.length === 0) return <div className="text-xs text-gray-500">No data</div>;
     return (
-      <div className="mt-2 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg p-2 text-xs">
-        <div className="font-['Rubik_Mono_One'] text-cyan-700 dark:text-cyan-300 mb-1">💰 SPENDING</div>
+      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
+        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Spending</div>
         {items.slice(0, 5).map((it, idx) => (
-          <div key={idx} className="flex justify-between py-0.5">
-            <span>{it.category || "Other"}</span>
-            <span className="font-['Bungee'] text-cyan-600 dark:text-cyan-400">${it.total.toFixed(0)}</span>
+          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <span className="text-gray-600 dark:text-gray-400">{it.category || "Other"}</span>
+            <span className="font-medium text-gray-900 dark:text-gray-100">${it.total.toFixed(0)}</span>
           </div>
         ))}
       </div>
@@ -57,14 +58,14 @@ function renderToolResultByName(toolName: string, result: unknown) {
   }
   if (toolName === "getRecentTransactions" && Array.isArray(result)) {
     const rows = result as Array<{ date: string; merchant_name: string | null; amount: number }>;
-    if (rows.length === 0) return <div className="text-xs italic text-cyan-600">No transactions 💸</div>;
+    if (rows.length === 0) return <div className="text-xs text-gray-500">No transactions</div>;
     return (
-      <div className="mt-2 bg-sky-50 dark:bg-sky-900/20 rounded-lg p-2 text-xs">
-        <div className="font-['Rubik_Mono_One'] text-sky-700 dark:text-sky-300 mb-1">💸 RECENT</div>
+      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
+        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Recent</div>
         {rows.slice(0, 5).map((t, idx) => (
-          <div key={idx} className="flex justify-between py-0.5">
-            <span className="truncate flex-1">{t.merchant_name || "Transaction"}</span>
-            <span className="font-['Bungee'] text-sky-600 dark:text-sky-400">${Number(t.amount).toFixed(0)}</span>
+          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <span className="text-gray-600 dark:text-gray-400 truncate flex-1">{t.merchant_name || "Transaction"}</span>
+            <span className="font-medium text-gray-900 dark:text-gray-100">${Number(t.amount).toFixed(0)}</span>
           </div>
         ))}
       </div>
@@ -72,14 +73,14 @@ function renderToolResultByName(toolName: string, result: unknown) {
   }
   if (toolName === "getAccountBalances" && Array.isArray(result)) {
     const rows = result as Array<{ name: string | null; current_balance: number | null }>;
-    if (rows.length === 0) return <div className="text-xs italic text-cyan-600">No accounts 🏦</div>;
+    if (rows.length === 0) return <div className="text-xs text-gray-500">No accounts</div>;
     return (
-      <div className="mt-2 bg-teal-50 dark:bg-teal-900/20 rounded-lg p-2 text-xs">
-        <div className="font-['Rubik_Mono_One'] text-teal-700 dark:text-teal-300 mb-1">🏦 BALANCES</div>
+      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
+        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Balances</div>
         {rows.map((a, idx) => (
-          <div key={idx} className="py-0.5">
-            <div className="text-gray-600 dark:text-gray-400">{a.name || "Account"}</div>
-            <div className="font-['Bungee'] text-lg text-teal-600 dark:text-teal-400">
+          <div key={idx} className="py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <div className="text-gray-500 dark:text-gray-500 text-[10px]">{a.name || "Account"}</div>
+            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
               ${Number(a.current_balance ?? 0).toFixed(0)}
             </div>
           </div>
@@ -91,10 +92,10 @@ function renderToolResultByName(toolName: string, result: unknown) {
 }
 
 const quickActions = [
-  { text: "Balance?", emoji: "💰" },
-  { text: "Spending", emoji: "📊" },
-  { text: "Recent", emoji: "💸" },
-  { text: "Budget?", emoji: "🎯" },
+  { text: "Balance", icon: "◎" },
+  { text: "Spending", icon: "↗" },
+  { text: "Recent", icon: "↺" },
+  { text: "Budget", icon: "▣" },
 ];
 
 export default function ChatWidget() {
@@ -103,6 +104,7 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   
   const { 
     messages, 
@@ -114,17 +116,42 @@ export default function ChatWidget() {
       console.error("[ChatWidget] Chat error:", err);
       if (err.message?.includes("503") || err.message?.includes("not configured")) {
         setError("AI not configured");
-      } else if (err.message?.includes("401")) {
-        setError("Please log in");
+      } else if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
+        // Clear potentially corrupt session and show login prompt
+        handleAuthError();
       } else {
         setError("Connection error");
       }
     },
   });
-  
-  // Voice functionality moved to dedicated voice chat page - removed from ChatWidget
 
-  // Voice call functionality removed - use dedicated voice chat page instead
+  const handleAuthError = async () => {
+    try {
+      const supabase = createSupabaseClient();
+      await supabase.auth.signOut();
+      setError("Session expired. Please log in again.");
+    } catch {
+      setError("Please log in");
+    }
+  };
+
+  // Check auth status on mount with error handling
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createSupabaseClient();
+        const { error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.error("[ChatWidget] Session error:", sessionError);
+          // Don't show error, just mark as checked - widget will show login prompt if needed
+        }
+      } catch (err) {
+        console.error("[ChatWidget] Auth check error:", err);
+      }
+      setAuthChecked(true);
+    };
+    checkAuth();
+  }, []);
   
   useEffect(() => {
     try {
@@ -156,6 +183,7 @@ export default function ChatWidget() {
   }, [open]);
 
   const handleQuickAction = async (action: string) => {
+    setError(null);
     try {
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
@@ -177,6 +205,7 @@ export default function ChatWidget() {
     if (input.trim().length === 0) return;
     const message = input;
     setInput("");
+    setError(null);
     try {
       const sid = sessionId ?? (() => {
         const id = crypto.randomUUID();
@@ -193,116 +222,68 @@ export default function ChatWidget() {
     }
   };
 
+  if (!authChecked) return null;
+
   return (
     <>
-      {/* Floating Button - Hidden on mobile */}
+      {/* Floating Button */}
       <button
         onClick={() => setOpen(!open)}
-        className={`hidden md:block fixed bottom-6 right-6 z-50 transition-all transform hover:scale-110 ${
+        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 shadow-lg hover:scale-105 transition-all ${
           open ? "scale-0 opacity-0" : "scale-100 opacity-100"
         }`}
         aria-label="Open AI chat"
       >
-        <div className="relative group">
-          {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-teal-400 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-          
-          {/* Button */}
-          <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-cyan-400 dark:border-cyan-600">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
-            >
-              <source src="/hero-video.mp4" type="video/mp4" />
-            </video>
-          </div>
-          
-          {/* Notification dot */}
-          {messages.length > 0 && !open && (
-            <div className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-yellow-500"></span>
-            </div>
-          )}
-          
-          {/* Speech bubble - "Chat Now!" */}
-          <div className="absolute bottom-full right-0 mb-4 px-3 py-2 bg-yellow-400 text-gray-900 text-sm font-bold rounded-2xl shadow-lg animate-bounce whitespace-nowrap font-['Rubik_Mono_One'] border-2 border-yellow-500">
-            CHAT NOW! 💬
-            {/* Speech bubble tail */}
-            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-yellow-400"></div>
-          </div>
-          
-          {/* Hover text */}
-          <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-['Rubik_Mono_One']">
-            CHAT WITH AI
-          </div>
-        </div>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        {messages.length > 0 && !open && (
+          <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gray-500 rounded-full" />
+        )}
       </button>
 
-      {/* Chat Window - Hidden on mobile */}
+      {/* Chat Window */}
       <div
-        className={`hidden md:block fixed z-50 transition-all transform ${
+        className={`hidden md:block fixed z-50 transition-all duration-200 ${
           open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
-        } ${
-          minimized ? "bottom-6 right-6" : "bottom-6 right-6"
-        }`}
+        } bottom-6 right-6`}
       >
-        <div className={`bg-white dark:bg-gray-900 shadow-2xl rounded-3xl border-4 border-cyan-400 dark:border-cyan-600 overflow-hidden transition-all ${
-          minimized ? "w-[320px] h-[80px]" : "w-[400px] h-[600px]"
+        <div className={`bg-white dark:bg-gray-900 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-200 ${
+          minimized ? "w-72 h-14" : "w-80 h-[480px]"
         }`}>
           {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 text-white flex items-center justify-between relative">
-            {/* Grid pattern background */}
-            <div className="absolute inset-0 opacity-30 overflow-hidden">
-              <div className="absolute inset-0 bg-grid-pattern"></div>
+          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Assistant</span>
             </div>
             
-            <div className="relative flex items-center gap-3">
-              <div className="relative">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
-              </div>
-              <span className="font-['Bungee'] text-lg">AI ADVISOR</span>
-            </div>
-            
-            <div className="relative flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setMinimized(!minimized)}
-                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                aria-label="Minimize chat"
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                aria-label={minimized ? "Expand" : "Minimize"}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={minimized ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={minimized ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
                 </svg>
               </button>
               <a
-                href="/voice-chat"
-                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                aria-label="Voice chat"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-              </a>
-              <a
                 href="/chat"
-                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                aria-label="Full chat view"
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                aria-label="Full view"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
                 </svg>
               </a>
               <button
                 onClick={() => setOpen(false)}
-                className="hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                aria-label="Close chat"
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                aria-label="Close"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -311,40 +292,34 @@ export default function ChatWidget() {
           {!minimized && (
             <>
               {error && (
-                <div className="px-4 py-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-b-2 border-red-400 dark:border-red-600 text-xs font-['Rubik_Mono_One'] flex items-center gap-2">
-                  <span>⚠️</span> {error}
+                <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 text-xs flex items-center gap-2">
+                  <span>⚠</span> {error}
                 </div>
               )}
 
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[calc(100%-140px)]">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[calc(100%-120px)]">
                 {messages.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-cyan-400 dark:border-cyan-600 animate-bounce">
-                      <video 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline
-                        className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
-                      >
-                        <source src="/hero-video.mp4" type="video/mp4" />
-                      </video>
+                  <div className="text-center py-6">
+                    <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
                     </div>
-                    <p className="font-['Bungee'] text-lg text-cyan-600 dark:text-cyan-400 mb-2">
-                      READY TO HELP!
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      How can I help?
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 font-['Rubik_Mono_One']">
-                      Ask about your money
+                    <p className="text-xs text-gray-500 mb-4">
+                      Ask about your finances
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {quickActions.map((action, index) => (
                         <button
                           key={index}
                           onClick={() => handleQuickAction(action.text)}
-                          className="px-3 py-2 bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/30 dark:to-teal-900/30 rounded-xl hover:scale-105 transition-all border-2 border-cyan-400 dark:border-cyan-600 font-['Rubik_Mono_One'] text-xs text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2"
+                          className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300 flex items-center justify-center gap-1.5"
                         >
-                          <span className="text-lg">{action.emoji}</span>
+                          <span className="text-gray-400">{action.icon}</span>
                           <span>{action.text}</span>
                         </button>
                       ))}
@@ -355,34 +330,14 @@ export default function ChatWidget() {
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-slideIn`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
-                        <div className={`max-w-[85%] flex items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
-                          {/* Avatar */}
-                          {message.role === "user" ? (
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-yellow-400 to-orange-500">
-                              <span className="text-white text-sm">P1</span>
-                            </div>
-                          ) : (
-                            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 border border-cyan-400/50 dark:border-cyan-600/50">
-                              <video 
-                                autoPlay 
-                                loop 
-                                muted 
-                                playsInline
-                                className="w-[200%] h-[200%] object-cover translate-x-0 -translate-y-[25%]"
-                              >
-                                <source src="/hero-video.mp4" type="video/mp4" />
-                              </video>
-                            </div>
-                          )}
-                          
-                          {/* Message bubble */}
+                        <div className={`max-w-[85%] ${message.role === "user" ? "order-2" : ""}`}>
                           <div
-                            className={`rounded-2xl px-4 py-3 text-sm ${
+                            className={`rounded-lg px-3 py-2 text-sm ${
                               message.role === "user"
-                                ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-['Rubik_Mono_One']"
-                                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-cyan-400 dark:border-cyan-600"
+                                ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                             }`}
                           >
                             {message.parts.map((part, i) => {
@@ -391,9 +346,9 @@ export default function ChatWidget() {
                               }
                               if (isToolCallPart(part)) {
                                 return (
-                                  <div key={i} className="flex items-center gap-1 text-xs text-cyan-600 dark:text-cyan-400 italic mt-1">
-                                    <span className="animate-spin">⚙️</span>
-                                    <span className="font-['Rubik_Mono_One']">LOADING...</span>
+                                  <div key={i} className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                                    <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                                    <span>Loading...</span>
                                   </div>
                                 );
                               }
@@ -415,14 +370,13 @@ export default function ChatWidget() {
                     ))}
                     
                     {status === "streaming" && (
-                      <div className="flex justify-start animate-slideIn">
-                        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-xl px-3 py-2 border-2 border-cyan-400 dark:border-cyan-600">
+                      <div className="flex justify-start">
+                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2">
                           <div className="flex gap-1">
-                            <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                            <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                            <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                           </div>
-                          <span className="text-xs font-['Rubik_Mono_One'] text-cyan-700 dark:text-cyan-300">THINKING...</span>
                         </div>
                       </div>
                     )}
@@ -432,81 +386,39 @@ export default function ChatWidget() {
               </div>
 
               {/* Input Area */}
-                <form onSubmit={handleSubmit} className="border-t-4 border-cyan-400 dark:border-cyan-600 p-3 bg-gray-50 dark:bg-gray-900/50">
-                  <div className="flex gap-2">
+              <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-800 p-3">
+                <div className="flex gap-2">
                   <input
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder={status === "streaming" ? "AI TYPING..." : "ASK SOMETHING..."}
+                    placeholder={status === "streaming" ? "Typing..." : "Ask something..."}
                     disabled={status === "streaming"}
-                    className="flex-1 px-3 py-2 rounded-xl border-2 border-cyan-400 dark:border-cyan-600 bg-white dark:bg-gray-900 font-['Rubik_Mono_One'] text-xs focus:outline-none focus:ring-2 focus:ring-cyan-300 dark:focus:ring-cyan-700 disabled:opacity-50 placeholder:text-gray-400"
+                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600 disabled:opacity-50 placeholder:text-gray-400"
                   />
                   {status === "streaming" ? (
                     <button
                       type="button"
                       onClick={stop}
-                      className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all"
+                      className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                     >
-                      STOP
+                      Stop
                     </button>
                   ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => window.open('/voice-true-realtime', '_blank')}
-                        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all flex items-center gap-1"
-                      >
-                        🎤 VOICE
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={input.trim().length === 0}
-                        className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-['Rubik_Mono_One'] text-xs hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        SEND
-                      </button>
-                    </>
+                    <button
+                      type="submit"
+                      disabled={input.trim().length === 0}
+                      className="px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Send
+                    </button>
                   )}
-                  </div>
-                </form>
+                </div>
+              </form>
             </>
           )}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-10px) rotate(5deg);
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .bg-grid-pattern {
-          background-image: 
-            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
-          background-size: 40px 40px;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-      `}</style>
     </>
   );
 }
