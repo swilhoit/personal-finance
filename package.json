@@ -22,11 +22,11 @@
     "discord.js": "^14.18.0",
     "dotenv": "^17.2.2",
     "next": "15.4.6",
+    "node-cron": "^3.0.3",
     "openai": "^5.12.2",
-    "plaid": "^37.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-plaid-link": "^4.1.1",
+    "recharts": "^2.15.0",
     "ws": "^8.18.3",
     "yahoo-finance2": "^2.14.0",
     "zod": "^3.25.76"

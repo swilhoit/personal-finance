@@ -8,8 +8,9 @@ export async function GET() {
       hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       hasOpenAI: !!process.env.OPENAI_API_KEY,
-      hasPlaidClient: !!process.env.PLAID_CLIENT_ID,
-      hasPlaidSecret: !!process.env.PLAID_SECRET,
+      hasTeller: !!process.env.TELLER_APPLICATION_ID,
+      hasAnthropic: !!process.env.ANTHROPIC_API_KEY,
+      hasFinnhub: !!process.env.FINNHUB_API_KEY,
     }
   });
 }

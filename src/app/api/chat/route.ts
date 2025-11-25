@@ -139,8 +139,8 @@ export async function POST(req: Request) {
     execute: async () => {
       try {
         const { data, error } = await supabase
-          .from("plaid_accounts")
-          .select("name, official_name, current_balance, available_balance, iso_currency_code")
+          .from("teller_accounts")
+          .select("name, institution_name, current_balance, available_balance, currency")
           .eq("user_id", user.id)
           .limit(100);
         if (error) {

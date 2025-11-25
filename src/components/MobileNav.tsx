@@ -22,16 +22,16 @@ export default function MobileNav() {
       color: "from-green-400 to-green-600",
     },
     {
+      href: "/investments",
+      label: "INVEST",
+      emoji: "📈",
+      color: "from-indigo-400 to-purple-600",
+    },
+    {
       href: "/insights",
       label: "STATS",
       emoji: "📊",
       color: "from-purple-400 to-purple-600",
-    },
-    {
-      href: "/accounts",
-      label: "BANK",
-      emoji: "🏦",
-      color: "from-orange-400 to-orange-600",
     },
     {
       href: "/settings",
