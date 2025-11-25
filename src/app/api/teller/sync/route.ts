@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { syncTellerToSupabase } from '@/services/tellerService';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const supabase = await createClient();
     
@@ -52,11 +52,12 @@ export async function POST(request: NextRequest) {
           ...result,
           success: true,
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         results.push({
           institution: enrollment.institution_name,
           success: false,
-          error: error.message,
+          error: errorMessage,
         });
       }
     }

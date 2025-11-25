@@ -3,9 +3,24 @@
  * Fetches market news from Finnhub API
  */
 
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
+
+interface SavedNewsArticle {
+  id: string;
+  article_id: number;
+  symbol: string;
+  headline: string;
+  summary: string;
+  source: string;
+  url: string;
+  image_url?: string;
+  published_at: string;
+  category: string;
+  is_significant: boolean;
+  created_at: string;
+}
 
 export interface NewsArticle {
   id: number;
@@ -34,11 +49,11 @@ export interface NewsSentiment {
 
 export class NewsService {
   private apiKey: string;
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: SupabaseClient;
   private seenArticles: Set<number> = new Set();
   private readonly MAX_SEEN_ARTICLES = 1000;
 
-  constructor(apiKey: string, supabase: ReturnType<typeof createClient>) {
+  constructor(apiKey: string, supabase: SupabaseClient) {
     this.apiKey = apiKey;
     this.supabase = supabase;
   }
@@ -197,7 +212,7 @@ export class NewsService {
   /**
    * Get recent significant news from database
    */
-  async getSignificantNews(days: number = 7, limit: number = 20): Promise<any[]> {
+  async getSignificantNews(days: number = 7, limit: number = 20): Promise<SavedNewsArticle[]> {
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await this.supabase
@@ -219,7 +234,7 @@ export class NewsService {
   /**
    * Get news for a specific symbol
    */
-  async getNewsForSymbol(symbol: string, days: number = 7): Promise<any[]> {
+  async getNewsForSymbol(symbol: string, days: number = 7): Promise<SavedNewsArticle[]> {
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await this.supabase

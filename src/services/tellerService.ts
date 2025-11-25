@@ -3,7 +3,7 @@
  * Handles bank account connections and transaction syncing via Teller.io
  */
 
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const TELLER_API_BASE = 'https://api.teller.io';
 
@@ -128,7 +128,7 @@ export class TellerService {
  * Sync Teller data to Supabase
  */
 export async function syncTellerToSupabase(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   userId: string,
   enrollmentId: string,
   accessToken: string
@@ -147,7 +147,7 @@ export async function syncTellerToSupabase(
       let balance: TellerBalance | null = null;
       try {
         balance = await teller.getBalance(account.id);
-      } catch (e) {
+      } catch {
         console.warn(`Could not fetch balance for account ${account.id}`);
       }
 

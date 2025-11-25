@@ -3,15 +3,16 @@
  * Fetches stock prices, historical performance using Yahoo Finance
  */
 
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Dynamic import for yahoo-finance2 (ESM)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let yahooFinance: any = null;
 
 async function getYahooFinance() {
   if (!yahooFinance) {
-    const module = await import('yahoo-finance2');
-    yahooFinance = module.default;
+    const yahooModule = await import('yahoo-finance2');
+    yahooFinance = yahooModule.default;
   }
   return yahooFinance;
 }
@@ -39,11 +40,11 @@ export interface PortfolioCategory {
 }
 
 export class MarketService {
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: SupabaseClient;
   private cache: Map<string, { data: TickerData; expires: number }> = new Map();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  constructor(supabase: ReturnType<typeof createClient>) {
+  constructor(supabase: SupabaseClient) {
     this.supabase = supabase;
   }
 
@@ -59,6 +60,7 @@ export class MarketService {
 
     try {
       const yf = await getYahooFinance();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const quote: any = await yf.quote(symbol);
 
       if (!quote || !quote.regularMarketPrice) {
@@ -97,8 +99,9 @@ export class MarketService {
       await this.saveMarketData(tickerData);
 
       return tickerData;
-    } catch (error: any) {
-      console.error(`Failed to fetch data for ${symbol}:`, error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Failed to fetch data for ${symbol}:`, errorMessage);
       return null;
     }
   }
@@ -116,6 +119,7 @@ export class MarketService {
       const now = new Date();
       const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const historical: any = await yf.historical(symbol, {
         period1: oneYearAgo,
         period2: now,
@@ -153,8 +157,9 @@ export class MarketService {
         performance90d: price90d ? ((currentPrice - price90d) / price90d) * 100 : undefined,
         performance365d: price365d ? ((currentPrice - price365d) / price365d) * 100 : undefined,
       };
-    } catch (error: any) {
-      console.warn(`Failed to fetch historical data for ${symbol}:`, error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(`Failed to fetch historical data for ${symbol}:`, errorMessage);
       return null;
     }
   }

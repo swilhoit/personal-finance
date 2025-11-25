@@ -50,7 +50,6 @@ interface IntegrationsClientProps {
 export default function IntegrationsClient({
   discordConnection,
   guilds: initialGuilds,
-  tellerEnrollments,
   tellerAccounts,
   botInviteUrl,
 }: IntegrationsClientProps) {
@@ -58,7 +57,7 @@ export default function IntegrationsClient({
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [guilds, setGuilds] = useState(initialGuilds);
-  const [availableGuilds, setAvailableGuilds] = useState<any[]>([]);
+  const [availableGuilds, setAvailableGuilds] = useState<Array<{ id: string; name: string; icon: string | null; isLinked: boolean }>>([]);
   const [isLoadingGuilds, setIsLoadingGuilds] = useState(false);
   const [isLinkingGuild, setIsLinkingGuild] = useState<string | null>(null);
 
@@ -115,7 +114,7 @@ export default function IntegrationsClient({
       } else {
         throw new Error('Failed to fetch guilds');
       }
-    } catch (error) {
+    } catch {
       setNotification({ type: 'error', message: 'Failed to load Discord servers' });
     } finally {
       setIsLoadingGuilds(false);
@@ -138,11 +137,12 @@ export default function IntegrationsClient({
         // Refresh page to show updated guilds
         setTimeout(() => window.location.reload(), 1500);
       } else {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to link server');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to link server');
       }
-    } catch (error: any) {
-      setNotification({ type: 'error', message: error.message || 'Failed to link server' });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to link server';
+      setNotification({ type: 'error', message });
     } finally {
       setIsLinkingGuild(null);
     }
@@ -168,7 +168,7 @@ export default function IntegrationsClient({
       } else {
         throw new Error('Failed to unlink server');
       }
-    } catch (error) {
+    } catch {
       setNotification({ type: 'error', message: 'Failed to unlink server' });
     }
   };
@@ -253,6 +253,7 @@ export default function IntegrationsClient({
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
                   <div className="flex items-center gap-3">
                     {discordConnection.avatar && (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={getDiscordAvatarUrl(discordConnection.discordUserId, discordConnection.avatar) || undefined}
                         alt="Discord avatar"
@@ -301,6 +302,7 @@ export default function IntegrationsClient({
                         <div key={guild.id} className="bg-white rounded-lg p-3 border border-gray-200 flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             {guild.icon && (
+                              // eslint-disable-next-line @next/next/no-img-element
                               <img src={guild.icon} alt="" className="w-8 h-8 rounded-full" />
                             )}
                             <div>
@@ -326,7 +328,7 @@ export default function IntegrationsClient({
 
                   <div className="mt-4 pt-4 border-t border-blue-200">
                     <p className="text-xs text-gray-600 mb-2">
-                      Don't see your server? Make sure the bot is invited first.
+                      Don&apos;t see your server? Make sure the bot is invited first.
                     </p>
                     {botInviteUrl && (
                       <a

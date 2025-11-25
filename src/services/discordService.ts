@@ -3,7 +3,19 @@
  * Handles Discord bot operations and webhook notifications
  */
 
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+interface DiscordGuild {
+  id: string;
+  user_id: string;
+  guild_id: string;
+  guild_name: string;
+  is_active: boolean;
+  settings?: Record<string, unknown>;
+  notification_channel_id?: string;
+  finance_channel_id?: string;
+  registered_at: string;
+}
 
 export interface DiscordEmbed {
   title?: string;
@@ -35,12 +47,12 @@ export const DiscordColors = {
 };
 
 export class DiscordService {
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: SupabaseClient;
   private botToken?: string;
   private webhookUrl?: string;
 
   constructor(
-    supabase: ReturnType<typeof createClient>,
+    supabase: SupabaseClient,
     options?: { botToken?: string; webhookUrl?: string }
   ) {
     this.supabase = supabase;
@@ -96,7 +108,7 @@ export class DiscordService {
     category: string,
     spent: number,
     limit: number,
-    currency: string = 'USD'
+    _currency: string = 'USD'
   ): Promise<boolean> {
     const percent = (spent / limit) * 100;
     const color = percent >= 100 ? DiscordColors.Red : 
@@ -252,7 +264,7 @@ export class DiscordService {
     type: 'budget_alert' | 'market_alert' | 'transaction' | 'weekly_report' | 'system',
     title: string,
     message: string,
-    data?: Record<string, any>
+    data?: Record<string, unknown>
   ): Promise<void> {
     try {
       await this.supabase.from('discord_notifications').insert({
@@ -273,7 +285,7 @@ export class DiscordService {
   /**
    * Get user's Discord guild registration
    */
-  async getUserGuild(userId: string): Promise<any | null> {
+  async getUserGuild(userId: string): Promise<DiscordGuild | null> {
     const { data, error } = await this.supabase
       .from('discord_guilds')
       .select('*')
@@ -315,7 +327,7 @@ export class DiscordService {
   /**
    * Resolve guild to user
    */
-  async resolveGuildUser(guildId: string): Promise<{ userId: string; settings: any } | null> {
+  async resolveGuildUser(guildId: string): Promise<{ userId: string; settings: Record<string, unknown> | null } | null> {
     const { data, error } = await this.supabase
       .from('discord_guilds')
       .select('user_id, settings')
@@ -340,10 +352,10 @@ export class DiscordService {
  */
 export class DiscordBot {
   private token: string;
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: SupabaseClient;
   private discordService: DiscordService;
 
-  constructor(token: string, supabase: ReturnType<typeof createClient>) {
+  constructor(token: string, supabase: SupabaseClient) {
     this.token = token;
     this.supabase = supabase;
     this.discordService = new DiscordService(supabase, { botToken: token });

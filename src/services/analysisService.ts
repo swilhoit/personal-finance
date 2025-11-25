@@ -3,8 +3,56 @@
  * Generates weekly portfolio and spending analysis using Claude
  */
 
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
+
+interface Transaction {
+  transaction_id: string;
+  user_id: string;
+  amount: number;
+  date: string;
+  category?: string;
+  merchant_name?: string;
+  name?: string;
+  pending?: boolean;
+}
+
+interface MarketData {
+  symbol: string;
+  price?: number;
+  change_percent?: number;
+  date: string;
+}
+
+interface Budget {
+  user_id: string;
+  category_id?: string;
+  amount: number;
+  month: string;
+  categories?: { name: string };
+  category_name?: string;
+}
+
+interface Holding {
+  user_id: string;
+  symbol: string;
+  shares: number;
+  cost_basis?: number;
+}
+
+interface SavedAnalysis {
+  id: string;
+  user_id: string;
+  week_start: string;
+  week_end: string;
+  analysis_type: string;
+  title: string;
+  executive_summary: string;
+  detailed_analysis: Record<string, unknown>;
+  recommendations: string[];
+  key_metrics: Record<string, unknown>;
+  created_at: string;
+}
 
 export interface WeeklyAnalysis {
   weekStart: Date;
@@ -28,9 +76,9 @@ export interface WeeklyAnalysis {
 
 export class AnalysisService {
   private anthropic: Anthropic;
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: SupabaseClient;
 
-  constructor(apiKey: string, supabase: ReturnType<typeof createClient>) {
+  constructor(apiKey: string, supabase: SupabaseClient) {
     this.anthropic = new Anthropic({ apiKey });
     this.supabase = supabase;
   }
@@ -81,10 +129,10 @@ export class AnalysisService {
   }
 
   private buildAnalysisPrompt(
-    transactions: any[],
-    marketData: any[],
-    budgets: any[],
-    holdings: any[],
+    transactions: Transaction[],
+    marketData: MarketData[],
+    budgets: Budget[],
+    holdings: Holding[],
     weekStart: string,
     weekEnd: string
   ): string {
@@ -119,7 +167,7 @@ export class AnalysisService {
 
     // Format market data
     const marketText = marketData.slice(0, 10).map(m =>
-      `- ${m.symbol}: $${m.price?.toFixed(2)} (${m.change_percent >= 0 ? '+' : ''}${m.change_percent?.toFixed(2)}%)`
+      `- ${m.symbol}: $${m.price?.toFixed(2)} (${(m.change_percent ?? 0) >= 0 ? '+' : ''}${m.change_percent?.toFixed(2)}%)`
     ).join('\n') || 'No market data';
 
     return `You are a personal financial advisor analyzing a user's weekly finances.
@@ -188,8 +236,8 @@ Return ONLY valid JSON.`;
     responseText: string,
     weekStart: Date,
     weekEnd: Date,
-    transactions: any[],
-    marketData: any[]
+    transactions: Transaction[],
+    _marketData: MarketData[]
   ): WeeklyAnalysis {
     try {
       // Extract JSON from response
@@ -268,7 +316,7 @@ Return ONLY valid JSON.`;
     }
   }
 
-  private async getWeeklyTransactions(userId: string, startDate: string, endDate: string): Promise<any[]> {
+  private async getWeeklyTransactions(userId: string, startDate: string, endDate: string): Promise<Transaction[]> {
     const { data, error } = await this.supabase
       .from('transactions')
       .select('*')
@@ -285,7 +333,7 @@ Return ONLY valid JSON.`;
     return data || [];
   }
 
-  private async getWeeklyMarketData(userId: string, startDate: string, endDate: string): Promise<any[]> {
+  private async getWeeklyMarketData(userId: string, startDate: string, endDate: string): Promise<MarketData[]> {
     // Get user's watchlist symbols
     const { data: watchlist } = await this.supabase
       .from('user_watchlists')
@@ -310,7 +358,7 @@ Return ONLY valid JSON.`;
     return data || [];
   }
 
-  private async getUserBudgets(userId: string): Promise<any[]> {
+  private async getUserBudgets(userId: string): Promise<Budget[]> {
     const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
 
     const { data, error } = await this.supabase
@@ -333,7 +381,7 @@ Return ONLY valid JSON.`;
     }));
   }
 
-  private async getUserHoldings(userId: string): Promise<any[]> {
+  private async getUserHoldings(userId: string): Promise<Holding[]> {
     const { data, error } = await this.supabase
       .from('user_holdings')
       .select('*')
@@ -375,7 +423,7 @@ Return ONLY valid JSON.`;
   /**
    * Get past analyses for a user
    */
-  async getPastAnalyses(userId: string, limit: number = 10): Promise<any[]> {
+  async getPastAnalyses(userId: string, limit: number = 10): Promise<SavedAnalysis[]> {
     const { data, error } = await this.supabase
       .from('weekly_analysis')
       .select('*')

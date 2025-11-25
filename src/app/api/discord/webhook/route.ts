@@ -15,15 +15,15 @@ const supabase = createClient(
 export async function POST(request: NextRequest) {
   try {
     // Verify Discord signature in production
-    const signature = request.headers.get('X-Signature-Ed25519');
-    const timestamp = request.headers.get('X-Signature-Timestamp');
-    
+    // const signature = request.headers.get('X-Signature-Ed25519');
+    // const timestamp = request.headers.get('X-Signature-Timestamp');
+
     if (!process.env.DISCORD_PUBLIC_KEY) {
       console.warn('Discord public key not configured - skipping signature verification');
     }
 
     const body = await request.json();
-    const { type, guild_id, channel_id, data, member } = body;
+    const { type } = body;
 
     // Handle Discord interaction types
     switch (type) {
@@ -48,18 +48,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleCommand(interaction: any): Promise<NextResponse> {
+interface DiscordInteraction {
+  guild_id: string;
+  data: {
+    name: string;
+    options?: Array<{ name: string; value: string | number }>;
+  };
+  member?: {
+    user?: {
+      id: string;
+    };
+  };
+  user?: {
+    id: string;
+  };
+}
+
+async function handleCommand(interaction: DiscordInteraction): Promise<NextResponse> {
   const { guild_id, data, member, user } = interaction;
   const commandName = data.name;
   const discordUser = user || member?.user;
 
   // Resolve guild to user
-  const { data: guild } = await supabase
+  const { data: guildData } = await supabase
     .from('discord_guilds')
     .select('user_id, settings')
     .eq('guild_id', guild_id)
     .eq('is_active', true)
     .single();
+
+  let guild: { user_id: string; settings: Record<string, unknown> | null } | null = guildData;
 
   if (!guild) {
     // Check if the Discord user has a direct connection
@@ -90,7 +108,7 @@ async function handleCommand(interaction: any): Promise<NextResponse> {
     }
 
     // Use the Discord user's connection instead
-    guild.user_id = userId;
+    guild = { user_id: userId, settings: null };
   }
 
   // Handle different commands
@@ -157,8 +175,9 @@ async function handleBalanceCommand(userId: string): Promise<NextResponse> {
   });
 }
 
-async function handleSpendingCommand(userId: string, options?: any[]): Promise<NextResponse> {
-  const days = options?.find(o => o.name === 'days')?.value || 7;
+async function handleSpendingCommand(userId: string, options?: Array<{ name: string; value: string | number }>): Promise<NextResponse> {
+  const daysValue = options?.find(o => o.name === 'days')?.value || 7;
+  const days = typeof daysValue === 'string' ? parseInt(daysValue, 10) : daysValue;
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const { data: transactions } = await supabase
@@ -252,9 +271,10 @@ async function handleWatchlistCommand(userId: string): Promise<NextResponse> {
   });
 }
 
-async function handleQuoteCommand(options?: any[]): Promise<NextResponse> {
-  const symbol = options?.find(o => o.name === 'symbol')?.value?.toUpperCase();
-  
+async function handleQuoteCommand(options?: Array<{ name: string; value: string | number }>): Promise<NextResponse> {
+  const symbolValue = options?.find(o => o.name === 'symbol')?.value;
+  const symbol = symbolValue ? String(symbolValue).toUpperCase() : undefined;
+
   if (!symbol) {
     return NextResponse.json({
       type: 4,
@@ -304,7 +324,7 @@ async function handleQuoteCommand(options?: any[]): Promise<NextResponse> {
   });
 }
 
-async function handleComponent(interaction: any): Promise<NextResponse> {
+async function handleComponent(_interaction: DiscordInteraction): Promise<NextResponse> {
   return NextResponse.json({
     type: 4,
     data: {

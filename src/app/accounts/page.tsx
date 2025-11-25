@@ -45,8 +45,6 @@ export default async function AccountsPage() {
       .eq("status", "active"),
   ]);
 
-  const enrollmentMap = new Map((enrollments as Enrollment[] ?? []).map((e) => [e.id, e]));
-
   // Group accounts by institution
   const accountsByInstitution = (accounts as Account[] ?? []).reduce((acc, account) => {
     const institution = account.institution_name ?? "Unknown Institution";

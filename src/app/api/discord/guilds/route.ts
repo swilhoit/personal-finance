@@ -14,7 +14,7 @@ interface DiscordGuild {
   permissions: string;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const supabase = await createClient();
 
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     const MANAGE_GUILD_PERMISSION = 0x00000020;
     const adminGuilds = discordGuilds.filter(guild => {
       const permissions = BigInt(guild.permissions);
-      const hasManageGuild = (permissions & BigInt(MANAGE_GUILD_PERMISSION)) !== 0n;
+      const hasManageGuild = (permissions & BigInt(MANAGE_GUILD_PERMISSION)) !== BigInt(0);
       const isOwner = guild.owner;
       return isOwner || hasManageGuild;
     });
