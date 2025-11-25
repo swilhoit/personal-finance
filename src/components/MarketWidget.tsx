@@ -54,13 +54,13 @@ export default function MarketWidget({ initialData = [] }: MarketWidgetProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Markets</h3>
+          <h3 className="font-semibold text-gray-900">Markets</h3>
         </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg" />
+            <div key={i} className="h-12 bg-gray-100 rounded-lg" />
           ))}
         </div>
       </div>
@@ -68,12 +68,12 @@ export default function MarketWidget({ initialData = [] }: MarketWidgetProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white">📈 Markets</h3>
+        <h3 className="font-semibold text-gray-900">📈 Markets</h3>
         <Link
           href="/markets"
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="text-sm text-indigo-600 hover:underline"
         >
           View All →
         </Link>
@@ -86,20 +86,20 @@ export default function MarketWidget({ initialData = [] }: MarketWidgetProps) {
             return (
               <div
                 key={item.symbol}
-                className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
               >
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{item.symbol}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">
+                  <p className="font-medium text-gray-900">{item.symbol}</p>
+                  <p className="text-xs text-gray-500 truncate max-w-[120px]">
                     {item.name}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className="font-medium text-gray-900">
                     {formatCurrency(item.price)}
                   </p>
                   <p className={`text-xs font-medium ${
-                    isUp ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                    isUp ? "text-green-600" : "text-red-600"
                   }`}>
                     {isUp ? "▲" : "▼"} {formatPercent(item.changePercent)}
                   </p>
@@ -110,7 +110,7 @@ export default function MarketWidget({ initialData = [] }: MarketWidgetProps) {
         </div>
       ) : (
         <div className="text-center py-6">
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
+          <p className="text-gray-500 text-sm mb-3">
             No stocks in your watchlist
           </p>
           <Link
@@ -124,4 +124,3 @@ export default function MarketWidget({ initialData = [] }: MarketWidgetProps) {
     </div>
   );
 }
-

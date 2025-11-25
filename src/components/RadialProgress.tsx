@@ -35,7 +35,7 @@ export default function RadialProgress({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-200 dark:text-zinc-800"
+          className="text-gray-200"
         />
         {/* Progress circle */}
         <circle
@@ -53,8 +53,8 @@ export default function RadialProgress({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-2xl font-bold">{percentage.toFixed(0)}%</div>
-        {label && <div className="text-xs text-gray-500 dark:text-zinc-400">{label}</div>}
-        {sublabel && <div className="text-xs text-gray-400 dark:text-zinc-500">{sublabel}</div>}
+        {label && <div className="text-xs text-gray-500">{label}</div>}
+        {sublabel && <div className="text-xs text-gray-400">{sublabel}</div>}
       </div>
     </div>
   );

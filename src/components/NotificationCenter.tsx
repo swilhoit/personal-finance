@@ -146,7 +146,7 @@ export default function NotificationCenter() {
       {/* Notification Bell Button */}
       <button 
         onClick={() => setOpen(!open)}
-        className="relative p-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+        className="relative p-2 text-white hover:text-white/80 transition-colors"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -168,9 +168,9 @@ export default function NotificationCenter() {
           />
           
           {/* Dropdown Panel */}
-          <div className="absolute right-0 top-full mt-2 w-96 bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-[70] overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl border border-gray-200 shadow-xl z-[200] overflow-hidden">
             {/* Header */}
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-semibold">Notifications</h3>
               {unreadCount > 0 && (
                 <button 
@@ -186,20 +186,20 @@ export default function NotificationCenter() {
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <svg className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                   </svg>
-                  <p className="text-sm text-gray-500 dark:text-zinc-400">
+                  <p className="text-sm text-gray-500">
                     No notifications yet
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200 dark:divide-zinc-800">
+                <div className="divide-y divide-gray-200">
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-white dark:hover:bg-zinc-800/50 transition-colors cursor-pointer ${
-                        !notification.read ? 'bg-white/50 dark:bg-zinc-800/20' : ''
+                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
+                        !notification.read ? 'bg-blue-50/50' : ''
                       }`}
                       onClick={() => {
                         markAsRead(notification.id);
@@ -209,7 +209,7 @@ export default function NotificationCenter() {
                       }}
                     >
                       <div className="flex gap-3">
-                        <div className={`w-8 h-8 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center flex-shrink-0 ${getNotificationColor(notification.type)}`}>
+                        <div className={`w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 ${getNotificationColor(notification.type)}`}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getNotificationIcon(notification.type)} />
                           </svg>
@@ -217,17 +217,17 @@ export default function NotificationCenter() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
-                              <p className="font-medium text-sm">
+                              <p className="font-medium text-sm text-gray-900">
                                 {notification.title}
                                 {!notification.read && (
                                   <span className="ml-2 inline-block w-2 h-2 bg-blue-600 rounded-full" />
                                 )}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                              <p className="text-xs text-gray-500 mt-0.5">
                                 {notification.message}
                               </p>
                             </div>
-                            <span className="text-xs text-gray-500 dark:text-zinc-500 flex-shrink-0">
+                            <span className="text-xs text-gray-400 flex-shrink-0">
                               {formatTime(notification.created_at)}
                             </span>
                           </div>
@@ -241,7 +241,7 @@ export default function NotificationCenter() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-3 border-t border-gray-200 dark:border-zinc-800">
+              <div className="px-4 py-3 border-t border-gray-200">
                 <button 
                   className="text-sm text-blue-600 hover:text-blue-700 transition-colors w-full text-center"
                   onClick={() => {

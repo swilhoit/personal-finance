@@ -45,12 +45,12 @@ function renderToolResultByName(toolName: string, result: unknown) {
     const items = result as Array<{ category: string; total: number }>;
     if (items.length === 0) return <div className="text-xs text-gray-500">No data</div>;
     return (
-      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
-        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Spending</div>
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Spending</div>
         {items.slice(0, 5).map((it, idx) => (
-          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
-            <span className="text-gray-600 dark:text-gray-400">{it.category || "Other"}</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">${it.total.toFixed(0)}</span>
+          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
+            <span className="text-gray-600">{it.category || "Other"}</span>
+            <span className="font-medium text-gray-900">${it.total.toFixed(0)}</span>
           </div>
         ))}
       </div>
@@ -60,12 +60,12 @@ function renderToolResultByName(toolName: string, result: unknown) {
     const rows = result as Array<{ date: string; merchant_name: string | null; amount: number }>;
     if (rows.length === 0) return <div className="text-xs text-gray-500">No transactions</div>;
     return (
-      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
-        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Recent</div>
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Recent</div>
         {rows.slice(0, 5).map((t, idx) => (
-          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
-            <span className="text-gray-600 dark:text-gray-400 truncate flex-1">{t.merchant_name || "Transaction"}</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">${Number(t.amount).toFixed(0)}</span>
+          <div key={idx} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
+            <span className="text-gray-600 truncate flex-1">{t.merchant_name || "Transaction"}</span>
+            <span className="font-medium text-gray-900">${Number(t.amount).toFixed(0)}</span>
           </div>
         ))}
       </div>
@@ -75,12 +75,12 @@ function renderToolResultByName(toolName: string, result: unknown) {
     const rows = result as Array<{ name: string | null; current_balance: number | null }>;
     if (rows.length === 0) return <div className="text-xs text-gray-500">No accounts</div>;
     return (
-      <div className="mt-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 text-xs border border-gray-200 dark:border-gray-700">
-        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide text-[10px]">Balances</div>
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Balances</div>
         {rows.map((a, idx) => (
-          <div key={idx} className="py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
-            <div className="text-gray-500 dark:text-gray-500 text-[10px]">{a.name || "Account"}</div>
-            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+          <div key={idx} className="py-1 border-b border-gray-100 last:border-0">
+            <div className="text-gray-500 text-[10px]">{a.name || "Account"}</div>
+            <div className="font-medium text-gray-900 text-sm">
               ${Number(a.current_balance ?? 0).toFixed(0)}
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function ChatWidget() {
       {/* Floating Button */}
       <button
         onClick={() => setOpen(!open)}
-        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 shadow-lg hover:scale-105 transition-all ${
+        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-12 h-12 rounded-full bg-gray-900 text-white shadow-lg hover:scale-105 transition-all ${
           open ? "scale-0 opacity-0" : "scale-100 opacity-100"
         }`}
         aria-label="Open AI chat"
@@ -244,24 +244,24 @@ export default function ChatWidget() {
 
       {/* Chat Window */}
       <div
-        className={`hidden md:block fixed z-50 transition-all duration-200 ${
-          open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
-        } bottom-6 right-6`}
+        className={`hidden md:block fixed z-50 transition-all duration-300 ease-out ${
+          open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 pointer-events-none"
+        } top-0 left-0 bottom-0`}
       >
-        <div className={`bg-white dark:bg-gray-900 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-200 ${
-          minimized ? "w-72 h-14" : "w-80 h-[480px]"
+        <div className={`bg-white shadow-2xl border-r border-gray-200 overflow-hidden transition-all duration-200 h-full flex flex-col ${
+          minimized ? "w-72" : "w-80"
         }`}>
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
+          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Assistant</span>
+              <span className="text-sm font-medium text-gray-900">Assistant</span>
             </div>
             
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setMinimized(!minimized)}
-                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
                 aria-label={minimized ? "Expand" : "Minimize"}
               >
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +270,7 @@ export default function ChatWidget() {
               </button>
               <a
                 href="/chat"
-                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
                 aria-label="Full view"
               >
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,7 +279,7 @@ export default function ChatWidget() {
               </a>
               <button
                 onClick={() => setOpen(false)}
-                className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
                 aria-label="Close"
               >
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,21 +292,21 @@ export default function ChatWidget() {
           {!minimized && (
             <>
               {error && (
-                <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 text-xs flex items-center gap-2">
+                <div className="px-4 py-2 bg-gray-100 text-gray-600 border-b border-gray-200 text-xs flex items-center gap-2">
                   <span>⚠</span> {error}
                 </div>
               )}
 
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[calc(100%-120px)]">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 ? (
                   <div className="text-center py-6">
-                    <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
+                    <p className="text-sm font-medium text-gray-900 mb-1">
                       How can I help?
                     </p>
                     <p className="text-xs text-gray-500 mb-4">
@@ -317,7 +317,7 @@ export default function ChatWidget() {
                         <button
                           key={index}
                           onClick={() => handleQuickAction(action.text)}
-                          className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300 flex items-center justify-center gap-1.5"
+                          className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-xs text-gray-700 flex items-center justify-center gap-1.5"
                         >
                           <span className="text-gray-400">{action.icon}</span>
                           <span>{action.text}</span>
@@ -336,8 +336,8 @@ export default function ChatWidget() {
                           <div
                             className={`rounded-lg px-3 py-2 text-sm ${
                               message.role === "user"
-                                ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
-                                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                ? "bg-gray-900 text-white"
+                                : "bg-gray-100 text-gray-900"
                             }`}
                           >
                             {message.parts.map((part, i) => {
@@ -371,7 +371,7 @@ export default function ChatWidget() {
                     
                     {status === "streaming" && (
                       <div className="flex justify-start">
-                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2">
+                        <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
                           <div className="flex gap-1">
                             <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                             <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -386,7 +386,7 @@ export default function ChatWidget() {
               </div>
 
               {/* Input Area */}
-              <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-800 p-3">
+              <form onSubmit={handleSubmit} className="border-t border-gray-200 p-3">
                 <div className="flex gap-2">
                   <input
                     ref={inputRef}
@@ -394,13 +394,13 @@ export default function ChatWidget() {
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={status === "streaming" ? "Typing..." : "Ask something..."}
                     disabled={status === "streaming"}
-                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600 disabled:opacity-50 placeholder:text-gray-400"
+                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:opacity-50 placeholder:text-gray-400"
                   />
                   {status === "streaming" ? (
                     <button
                       type="button"
                       onClick={stop}
-                      className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                      className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors"
                     >
                       Stop
                     </button>
@@ -408,7 +408,7 @@ export default function ChatWidget() {
                     <button
                       type="submit"
                       disabled={input.trim().length === 0}
-                      className="px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Send
                     </button>

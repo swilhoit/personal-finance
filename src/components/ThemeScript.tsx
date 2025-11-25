@@ -5,17 +5,9 @@ export default function ThemeScript() {
         __html: `
           (function() {
             try {
-              const theme = localStorage.getItem('theme');
-              // Default to light if no theme is set
-              if (!theme) {
-                localStorage.setItem('theme', 'light');
-              }
-              // Apply dark class only if explicitly set to dark
-              if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-              } else {
-                document.documentElement.classList.remove('dark');
-              }
+              // Always use light mode only
+              document.documentElement.classList.remove('dark');
+              localStorage.setItem('theme', 'light');
             } catch (e) {}
           })();
         `,

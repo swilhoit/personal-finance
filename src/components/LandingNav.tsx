@@ -34,9 +34,9 @@ export default function LandingNav() {
 
   return (
     <>
-      <nav className={`fixed top-12 left-0 right-0 z-40 transition-all duration-300 ${
+      <nav className={`fixed top-12 left-0 right-0 z-[100] transition-all duration-300 ${
         scrolled 
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-lg" 
+          ? "bg-white/80 backdrop-blur-lg shadow-lg" 
           : "bg-transparent"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,7 +86,7 @@ export default function LandingNav() {
               aria-label="Toggle menu"
             >
               <svg 
-                className={`w-6 h-6 ${scrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`} 
+                className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -107,13 +107,13 @@ export default function LandingNav() {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 bg-black/50 z-[100] md:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
           
           {/* Menu Panel */}
-          <div className="fixed top-28 left-0 right-0 z-50 md:hidden animate-slideDown">
-            <div className="mx-4 mt-2 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-cyan-400 dark:border-cyan-600 overflow-hidden">
+          <div className="fixed top-28 left-0 right-0 z-[150] md:hidden animate-slideDown">
+            <div className="mx-4 mt-2 bg-white rounded-2xl shadow-2xl border-2 border-cyan-400 overflow-hidden">
               {/* Navigation Items */}
               <div className="p-4 space-y-2">
                 {navItems.map((item) => (
@@ -121,10 +121,10 @@ export default function LandingNav() {
                     key={item.href}
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-all"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-50 hover:bg-cyan-100 transition-all"
                   >
                     <span className="text-2xl">{item.emoji}</span>
-                    <span className="font-dm-mono font-medium text-gray-700 dark:text-gray-300">
+                    <span className="font-dm-mono font-medium text-gray-700">
                       {item.label}
                     </span>
                   </a>
@@ -132,14 +132,14 @@ export default function LandingNav() {
               </div>
               
               {/* Divider */}
-              <div className="border-t-2 border-cyan-200 dark:border-cyan-800"></div>
+              <div className="border-t-2 border-cyan-200"></div>
               
               {/* Actions */}
               <div className="p-4 space-y-3">
                 <Link
                   href="/auth/sign-in"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-3 rounded-xl border-2 border-cyan-400 dark:border-cyan-600 text-cyan-700 dark:text-cyan-300 font-dm-mono font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-all"
+                  className="block text-center px-4 py-3 rounded-xl border-2 border-cyan-400 text-cyan-700 font-dm-mono font-medium hover:bg-cyan-100 transition-all"
                 >
                   Sign In
                 </Link>

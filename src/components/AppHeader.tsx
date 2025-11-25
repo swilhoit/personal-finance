@@ -34,7 +34,7 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden bg-gradient-to-r from-cyan-500 to-teal-500 sticky top-0 z-40 shadow-lg">
+      <header className="lg:hidden bg-gradient-to-r from-cyan-500 to-teal-500 sticky top-0 z-[100] shadow-lg">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo and Current Page */}
@@ -67,7 +67,7 @@ export default function AppHeader({ userEmail }: AppHeaderProps) {
       </header>
 
       {/* Desktop Header */}
-      <header className="hidden lg:block bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 shadow-2xl relative overflow-hidden">
+      <header className="hidden lg:block bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 shadow-2xl relative overflow-visible z-[100]">
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-grid-pattern"></div>

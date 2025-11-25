@@ -46,7 +46,7 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
       {/* Category list */}
       <div className="space-y-3">
         {categories.map((category, index) => (
-          <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
+          <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -64,7 +64,7 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
               </div>
               <div>
                 <p className="font-medium text-sm">{category.name}</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">
+                <p className="text-xs text-gray-500">
                   {category.percentage.toFixed(1)}% of total
                 </p>
               </div>
@@ -72,7 +72,7 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
             <div className="text-right">
               <p className="font-semibold">${category.amount.toFixed(2)}</p>
               <div className="flex items-center gap-1 justify-end">
-                <div className="w-16 h-1.5 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     className="h-full rounded-full transition-all duration-500"
                     style={{ 

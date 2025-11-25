@@ -1,6 +1,9 @@
 {
   "crons": [
-    { "path": "/api/plaid/sync-transactions", "schedule": "0 3 * * *" },
-    { "path": "/api/insights/recompute", "schedule": "0 4 * * *" }
+    { "path": "/api/teller/sync-all", "schedule": "0 3 * * *" },
+    { "path": "/api/insights/recompute", "schedule": "0 4 * * *" },
+    { "path": "/api/discord/scheduled/weekly-report", "schedule": "0 14 * * 0" },
+    { "path": "/api/discord/scheduled/budget-alerts", "schedule": "0 13 * * *" },
+    { "path": "/api/discord/scheduled/market-alerts", "schedule": "0 14-21 * * 1-5" }
   ]
 }

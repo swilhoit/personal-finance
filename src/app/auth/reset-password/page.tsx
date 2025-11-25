@@ -33,9 +33,9 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md space-y-8">
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-6 py-4 rounded-lg">
+          <div className="bg-green-50 border border-green-200 text-green-600 px-6 py-4 rounded-lg">
             <h3 className="font-semibold mb-2">Check your email</h3>
             <p className="text-sm">
               We&apos;ve sent a password reset link to {email}
@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
           <div className="text-center">
             <Link
               href="/auth/sign-in"
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-sm text-blue-600 hover:underline"
             >
               Back to sign in
             </Link>
@@ -67,18 +67,18 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">Reset your password</h2>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+          <h2 className="text-3xl font-bold text-gray-900">Reset your password</h2>
+          <p className="mt-2 text-gray-600">
             Enter your email and we&apos;ll send you a reset link
           </p>
         </div>
 
         <form onSubmit={handleResetPassword} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-700">
               Email address
             </label>
             <input
@@ -89,13 +89,13 @@ export default function ResetPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-900"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               placeholder="you@example.com"
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
           <div className="text-center text-sm">
             <Link
               href="/auth/sign-in"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-blue-600 hover:underline"
             >
               Back to sign in
             </Link>
