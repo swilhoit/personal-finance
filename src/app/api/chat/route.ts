@@ -23,10 +23,10 @@ type SpendingRow = {
 
 type AccountBalanceRow = {
   name: string | null;
-  official_name: string | null;
+  institution_name: string | null;
   current_balance: number | null;
   available_balance: number | null;
-  iso_currency_code: string | null;
+  currency: string | null;
 };
 
 type BudgetRow = { category_id: string; month: string; amount: number; categories?: { name?: string } | null };

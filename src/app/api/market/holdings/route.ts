@@ -99,7 +99,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Holding ID required' }, { status: 400 });
     }
 
-    const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
+    const updateData: Record<string, string | number | undefined> = { updated_at: new Date().toISOString() };
     if (shares !== undefined) updateData.shares = shares;
     if (costBasis !== undefined) updateData.cost_basis = costBasis;
     if (purchaseDate !== undefined) updateData.purchase_date = purchaseDate;

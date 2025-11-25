@@ -29,7 +29,7 @@ interface Analysis {
   title: string;
   executive_summary: string;
   recommendations: string[];
-  key_metrics: any;
+  key_metrics: Record<string, unknown>;
 }
 
 interface Category {

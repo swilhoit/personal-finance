@@ -2,6 +2,19 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import MarketsClient from "./MarketsClient";
 
+interface MarketDataPoint {
+  symbol: string;
+  name: string;
+  price: number;
+  change_amount: number;
+  change_percent: number;
+  volume: number;
+  market_cap: number;
+  performance_30d: number | null;
+  performance_90d: number | null;
+  performance_365d: number | null;
+}
+
 export const metadata = {
   title: "Markets | Finance AI",
   description: "Track stocks and manage your watchlist",
@@ -31,7 +44,7 @@ export default async function MarketsPage() {
 
   // Fetch latest market data for watchlist symbols
   const symbols = watchlist?.map((w) => w.symbol) || [];
-  let marketData: Record<string, any> = {};
+  const marketData: Record<string, MarketDataPoint> = {};
 
   if (symbols.length > 0) {
     const { data: prices } = await supabase

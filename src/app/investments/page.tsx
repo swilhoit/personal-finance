@@ -2,6 +2,14 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import InvestmentsClient from "./InvestmentsClient";
 
+interface MarketDataPoint {
+  symbol: string;
+  name: string;
+  price: number;
+  change_percent: number;
+  performance_30d: number | null;
+}
+
 export const metadata = {
   title: "Investments | Finance AI",
   description: "Manage your investment portfolio",
@@ -26,7 +34,7 @@ export default async function InvestmentsPage() {
   const symbols = [...new Set(holdings?.map((h) => h.symbol) || [])];
 
   // Fetch current prices for holdings
-  let marketData: Record<string, any> = {};
+  const marketData: Record<string, MarketDataPoint> = {};
   if (symbols.length > 0) {
     const { data: prices } = await supabase
       .from("market_data")

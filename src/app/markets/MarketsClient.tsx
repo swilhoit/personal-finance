@@ -132,7 +132,7 @@ export default function MarketsClient({
       if (response.ok) {
         const data = await response.json();
         const newMarketData: Record<string, MarketDataPoint> = {};
-        data.quotes?.forEach((q: any) => {
+        data.quotes?.forEach((q: { symbol: string; name: string; price: number; change: number; changePercent: number; volume: number; marketCap: number; performance?: Record<string, number> }) => {
           newMarketData[q.symbol] = {
             symbol: q.symbol,
             name: q.name,
@@ -141,9 +141,9 @@ export default function MarketsClient({
             change_percent: q.changePercent,
             volume: q.volume,
             market_cap: q.marketCap,
-            performance_30d: q.performance?.["30d"],
-            performance_90d: q.performance?.["90d"],
-            performance_365d: q.performance?.["365d"],
+            performance_30d: q.performance?.["30d"] ?? null,
+            performance_90d: q.performance?.["90d"] ?? null,
+            performance_365d: q.performance?.["365d"] ?? null,
           };
         });
         setMarketData(newMarketData);
