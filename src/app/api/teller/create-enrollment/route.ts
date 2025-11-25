@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(_request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,9 +19,13 @@ export async function POST(_request: NextRequest) {
     const environment = process.env.TELLER_ENVIRONMENT || 'sandbox';
 
     if (!applicationId) {
+      console.error('Teller not configured: TELLER_APPLICATION_ID environment variable is missing');
       return NextResponse.json(
-        { error: 'Teller not configured' },
-        { status: 500 }
+        {
+          error: 'Teller banking integration is not configured. Please contact support or configure TELLER_APPLICATION_ID in your environment variables.',
+          details: 'TELLER_APPLICATION_ID is required'
+        },
+        { status: 503 }
       );
     }
 
@@ -34,8 +38,9 @@ export async function POST(_request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating Teller enrollment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create enrollment' },
+      { error: 'Failed to create enrollment', details: errorMessage },
       { status: 500 }
     );
   }
