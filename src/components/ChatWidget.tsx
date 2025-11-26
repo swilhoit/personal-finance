@@ -229,7 +229,7 @@ export default function ChatWidget() {
       {/* Floating Button - Circular Video */}
       <button
         onClick={() => setOpen(!open)}
-        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-14 h-14 rounded-full overflow-hidden shadow-lg hover:scale-105 transition-all border-2 border-emerald-500/50 ${
+        className={`hidden md:flex fixed bottom-6 right-6 z-[200] items-center justify-center w-14 h-14 rounded-full overflow-hidden shadow-lg hover:scale-105 transition-all border-2 border-emerald-500/50 ${
           open ? "scale-0 opacity-0" : "scale-100 opacity-100"
         }`}
         aria-label="Open AI chat"
@@ -250,9 +250,9 @@ export default function ChatWidget() {
 
       {/* Chat Window - RIGHT SIDE */}
       <div
-        className={`hidden md:block fixed z-50 transition-all duration-300 ease-out ${
+        className={`hidden md:block fixed z-[200] transition-all duration-300 ease-out ${
           open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
-        } top-0 right-0 bottom-0`}
+        } top-10 right-0 bottom-0`}
       >
         <div className={`bg-white shadow-2xl border-l border-gray-200 overflow-hidden transition-all duration-200 h-full flex flex-col ${
           minimized ? "w-72" : "w-80"
