@@ -16,7 +16,15 @@ export async function POST(_request: NextRequest) {
     }
 
     const applicationId = process.env.TELLER_APPLICATION_ID;
-    const environment = process.env.TELLER_ENVIRONMENT || 'sandbox';
+    const rawEnvironment = (process.env.TELLER_ENVIRONMENT || 'sandbox').trim().toLowerCase();
+
+    // Validate environment - Teller only accepts these specific values
+    const validEnvironments = ['sandbox', 'development', 'production'] as const;
+    const environment = validEnvironments.includes(rawEnvironment as typeof validEnvironments[number])
+      ? rawEnvironment as 'sandbox' | 'development' | 'production'
+      : 'sandbox';
+
+    console.log('[Teller] Environment config:', { rawEnvironment, environment, applicationId: applicationId ? 'set' : 'missing' });
 
     if (!applicationId) {
       console.error('Teller not configured: TELLER_APPLICATION_ID environment variable is missing');
@@ -45,5 +53,8 @@ export async function POST(_request: NextRequest) {
     );
   }
 }
+
+
+
 
 

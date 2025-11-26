@@ -348,3 +348,6 @@ async function handleComponent(_interaction: DiscordInteraction): Promise<NextRe
 }
 
 
+
+
+

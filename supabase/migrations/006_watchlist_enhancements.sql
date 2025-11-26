@@ -100,3 +100,6 @@ ADD COLUMN IF NOT EXISTS performance_90d DECIMAL(10,4);
 ALTER TABLE public.market_data 
 ADD COLUMN IF NOT EXISTS performance_365d DECIMAL(10,4);
 
+
+
+
