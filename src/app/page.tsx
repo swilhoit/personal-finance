@@ -5,6 +5,90 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
 
+// ASCII Art Components
+const AsciiLogo = () => (
+  <pre className="font-mono text-emerald-400/30 text-[10px] leading-tight select-none animate-fadeIn">
+{`
+    ╔══════════════════════════════╗
+    ║  ███╗   ███╗ █████╗ ███╗   ███╗ █████╗  ║
+    ║  ████╗ ████║██╔══██╗████╗ ████║██╔══██╗ ║
+    ║  ██╔████╔██║███████║██╔████╔██║███████║ ║
+    ║  ██║╚██╔╝██║██╔══██║██║╚██╔╝██║██╔══██║ ║
+    ║  ██║ ╚═╝ ██║██║  ██║██║ ╚═╝ ██║██║  ██║ ║
+    ║  ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ║
+    ╚══════════════════════════════╝
+`}
+  </pre>
+);
+
+const FloatingDollar = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
+  <div
+    className="absolute font-mono text-emerald-500/10 text-2xl animate-float select-none pointer-events-none"
+    style={{ top, left, animationDelay: `${delay}s` }}
+  >
+    $
+  </div>
+);
+
+const AsciiDivider = () => (
+  <div className="w-full flex justify-center py-8 overflow-hidden">
+    <pre className="font-mono text-emerald-500/20 text-xs select-none animate-slideIn">
+{`═══════════════════════════════════════════════════════════════════`}
+    </pre>
+  </div>
+);
+
+const AsciiChart = () => (
+  <pre className="font-mono text-emerald-400/20 text-[8px] leading-tight select-none animate-chartDraw">
+{`
+        ╭────────────────────────────╮
+        │                    ╱╲      │
+        │                   ╱  ╲     │
+        │          ╱╲      ╱    ╲╱╲  │
+        │    ╱╲   ╱  ╲    ╱         │
+        │   ╱  ╲ ╱    ╲  ╱          │
+        │  ╱    ╳      ╲╱           │
+        │ ╱                         │
+        ├────────────────────────────┤
+        │  Your Financial Journey ↗  │
+        ╰────────────────────────────╯
+`}
+  </pre>
+);
+
+const AsciiTerminal = () => (
+  <div className="relative">
+    <pre className="font-mono text-emerald-400/30 text-[10px] leading-tight select-none">
+{`
+  ┌─────────────────────────────────────┐
+  │  ~ MAMA Terminal                    │
+  ├─────────────────────────────────────┤
+  │  > Analyzing spending patterns...   │
+  │  > Budget optimization: COMPLETE    │
+  │  > AI insights generated ✓          │
+  │  > Discord alerts: ACTIVE           │
+  │                                     │
+  │  Status: All systems operational    │
+  └─────────────────────────────────────┘
+`}
+    </pre>
+    <div className="absolute bottom-6 left-6 w-2 h-3 bg-emerald-400/50 animate-blink" />
+  </div>
+);
+
+const AsciiWallet = () => (
+  <pre className="font-mono text-emerald-400/25 text-[10px] leading-tight select-none animate-pulse">
+{`
+    ╔═══════════════╗
+    ║  ┌─────────┐  ║
+    ║  │ $ $ $ $ │  ║
+    ║  │ $ $ $ $ │  ║
+    ║  └─────────┘  ║
+    ╚═══════════════╝
+`}
+  </pre>
+);
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
@@ -56,6 +140,14 @@ export default function Home() {
         <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
+
+        {/* Floating Dollar Signs */}
+        <FloatingDollar delay={0} top="15%" left="8%" />
+        <FloatingDollar delay={1.5} top="25%" left="92%" />
+        <FloatingDollar delay={3} top="60%" left="5%" />
+        <FloatingDollar delay={4.5} top="70%" left="95%" />
+        <FloatingDollar delay={2} top="40%" left="3%" />
+        <FloatingDollar delay={5} top="85%" left="88%" />
       </div>
 
       {/* Grid pattern overlay */}
@@ -67,9 +159,34 @@ export default function Home() {
         {/* Hero Section */}
         <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
           <div className="max-w-6xl mx-auto space-y-8 pt-20">
+            {/* ASCII Chart - Left Side */}
+            <div className="hidden lg:block absolute left-8 top-1/3 opacity-50 hover:opacity-80 transition-opacity">
+              <AsciiChart />
+            </div>
+
+            {/* ASCII Terminal - Right Side */}
+            <div className="hidden lg:block absolute right-8 top-1/3 opacity-50 hover:opacity-80 transition-opacity">
+              <AsciiTerminal />
+            </div>
+
             {/* Circular Video */}
             <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto mb-8">
               <div className="absolute inset-0 bg-emerald-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+
+              {/* ASCII Corner Decorations */}
+              <div className="absolute -top-8 -left-8 text-emerald-500/30 font-mono text-xs animate-fadeIn hidden sm:block">
+                ┌──┐
+              </div>
+              <div className="absolute -top-8 -right-8 text-emerald-500/30 font-mono text-xs animate-fadeIn hidden sm:block">
+                ┌──┐
+              </div>
+              <div className="absolute -bottom-8 -left-8 text-emerald-500/30 font-mono text-xs animate-fadeIn hidden sm:block">
+                └──┘
+              </div>
+              <div className="absolute -bottom-8 -right-8 text-emerald-500/30 font-mono text-xs animate-fadeIn hidden sm:block">
+                └──┘
+              </div>
+
               <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20">
                 <video
                   autoPlay
@@ -133,10 +250,19 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ASCII Divider */}
+        <AsciiDivider />
+
         {/* Features Section */}
         <div id="features" className="py-24 px-6 scroll-mt-20 bg-slate-900/50">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
+              {/* ASCII Section Header */}
+              <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-4 hidden sm:block animate-fadeIn">
+{`╔═════════════════════════════════╗
+║       FEATURES & TOOLS          ║
+╚═════════════════════════════════╝`}
+              </pre>
               <h2 className="text-3xl sm:text-4xl font-dm-mono font-bold mb-4 text-white">
                 Intelligent Financial Tools
               </h2>
@@ -242,11 +368,30 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ASCII Divider */}
+        <AsciiDivider />
+
         {/* Stats Section */}
-        <div id="how-it-works" className="py-24 px-6 scroll-mt-20 bg-slate-800/30">
-          <div className="max-w-6xl mx-auto">
+        <div id="how-it-works" className="py-24 px-6 scroll-mt-20 bg-slate-800/30 relative">
+          {/* ASCII Background Pattern */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
+            <pre className="font-mono text-emerald-400 text-[6px] whitespace-pre leading-tight">
+{`
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+`}
+            </pre>
+          </div>
+
+          <div className="max-w-6xl mx-auto relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center group">
+                <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-2 hidden sm:block">
+{`┌─────┐
+│ 100%│
+└─────┘`}
+                </pre>
                 <div className="text-4xl font-dm-mono font-bold text-emerald-400 group-hover:scale-110 transition-transform">
                   100%
                 </div>
@@ -255,6 +400,11 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center group">
+                <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-2 hidden sm:block">
+{`┌─────┐
+│ 24/7│
+└─────┘`}
+                </pre>
                 <div className="text-4xl font-dm-mono font-bold text-emerald-400 group-hover:scale-110 transition-transform">
                   24/7
                 </div>
@@ -263,6 +413,11 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center group">
+                <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-2 hidden sm:block">
+{`┌─────┐
+│SYNC │
+└─────┘`}
+                </pre>
                 <div className="text-4xl font-dm-mono font-bold text-emerald-400 group-hover:scale-110 transition-transform">
                   Real-time
                 </div>
@@ -271,6 +426,11 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center group">
+                <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-2 hidden sm:block">
+{`┌─────┐
+│FREE │
+└─────┘`}
+                </pre>
                 <div className="text-4xl font-dm-mono font-bold text-emerald-400 group-hover:scale-110 transition-transform">
                   Free
                 </div>
@@ -282,6 +442,9 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ASCII Divider */}
+        <AsciiDivider />
+
         {/* Pricing Section */}
         <div id="pricing" className="py-24 px-6 scroll-mt-20">
           <div className="max-w-4xl mx-auto text-center">
@@ -291,7 +454,15 @@ export default function Home() {
             <p className="text-lg text-slate-400 font-dm-mono mb-12">
               Start free, upgrade when you need more
             </p>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-8">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-8 relative overflow-hidden">
+              {/* ASCII Price Tag */}
+              <pre className="font-mono text-emerald-500/20 text-[10px] leading-tight absolute -top-2 -right-4 rotate-12 hidden sm:block">
+{`╭──────────╮
+│   $0     │
+│  ═══════ │
+│   FREE   │
+╰──────────╯`}
+              </pre>
               <div className="text-5xl font-dm-mono font-bold text-emerald-400 mb-4">
                 Free
               </div>
@@ -314,9 +485,30 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ASCII Divider */}
+        <AsciiDivider />
+
         {/* CTA Section */}
-        <div className="py-24 px-6 text-center scroll-mt-20">
+        <div className="py-24 px-6 text-center scroll-mt-20 relative">
+          {/* ASCII Decorations */}
+          <div className="hidden lg:block absolute left-20 top-1/2 -translate-y-1/2 opacity-30">
+            <AsciiWallet />
+          </div>
+          <div className="hidden lg:block absolute right-20 top-1/2 -translate-y-1/2 opacity-30">
+            <AsciiWallet />
+          </div>
+
           <div className="max-w-4xl mx-auto space-y-8">
+            {/* ASCII CTA Header */}
+            <pre className="font-mono text-emerald-500/30 text-[8px] leading-tight mb-4 hidden sm:block animate-fadeIn">
+{`
+    ╔══════════════════════════════════════════╗
+    ║                                          ║
+    ║      >>> START YOUR JOURNEY <<<          ║
+    ║                                          ║
+    ╚══════════════════════════════════════════╝
+`}
+            </pre>
             <h2 className="text-3xl sm:text-4xl font-dm-mono font-bold text-white">
               Ready to take control?
             </h2>
@@ -391,6 +583,94 @@ export default function Home() {
             linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
             linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
           background-size: 40px 40px;
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.1;
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+            opacity: 0.2;
+          }
+        }
+
+        :global(.animate-float) {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        :global(.animate-fadeIn) {
+          animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: scaleX(0);
+          }
+          to {
+            opacity: 1;
+            transform: scaleX(1);
+          }
+        }
+
+        :global(.animate-slideIn) {
+          animation: slideIn 1.5s ease-out forwards;
+        }
+
+        @keyframes chartDraw {
+          from {
+            opacity: 0;
+            clip-path: inset(100% 0 0 0);
+          }
+          to {
+            opacity: 1;
+            clip-path: inset(0 0 0 0);
+          }
+        }
+
+        :global(.animate-chartDraw) {
+          animation: chartDraw 2s ease-out forwards;
+        }
+
+        @keyframes blink {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
+          }
+        }
+
+        :global(.animate-blink) {
+          animation: blink 1s step-end infinite;
+        }
+
+        @keyframes typewriter {
+          from {
+            width: 0;
+          }
+          to {
+            width: 100%;
+          }
+        }
+
+        :global(.animate-typewriter) {
+          animation: typewriter 2s steps(40) forwards;
+          overflow: hidden;
+          white-space: nowrap;
         }
       `}</style>
     </div>
