@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import TellerConnect from "@/components/TellerConnect";
-import NotificationSettings from "@/components/NotificationSettings";
 
 interface DiscordConnection {
   discordUserId: string;
@@ -185,18 +184,29 @@ export default function IntegrationsClient({
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-4">
-            <Link href="/settings" className="text-gray-600 hover:text-gray-900">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Integrations</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Connect and manage your external services
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/settings" className="text-gray-600 hover:text-gray-900">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">Integrations</h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Connect and manage your external services
+                </p>
+              </div>
             </div>
+            <Link
+              href="/settings/notifications"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Notifications
+            </Link>
           </div>
         </div>
       </div>
@@ -422,11 +432,30 @@ export default function IntegrationsClient({
             )}
           </div>
 
-          {/* Discord Notification Settings */}
+          {/* Discord Notification Settings Link */}
           {discordConnection && guilds.length > 0 && (
-            <NotificationSettings 
-              guilds={guilds.map(g => ({ guild_id: g.guild_id, guild_name: g.guild_name }))} 
-            />
+            <Link href="/settings/notifications" className="block">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">Discord Notifications</h2>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Configure recurring reports and alerts sent to Discord
+                      </p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
           )}
 
           {/* Teller Banking */}

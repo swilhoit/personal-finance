@@ -239,7 +239,7 @@ export default function ChatWidget() {
           loop
           muted
           playsInline
-          className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+          className="w-[200%] h-[200%] object-cover -translate-y-[10%]"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
         </video>
@@ -267,7 +267,7 @@ export default function ChatWidget() {
                   loop
                   muted
                   playsInline
-                  className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+                  className="w-[200%] h-[200%] object-cover -translate-y-[10%]"
                 >
                   <source src="/hero-video.mp4" type="video/mp4" />
                 </video>
@@ -325,7 +325,7 @@ export default function ChatWidget() {
                         loop
                         muted
                         playsInline
-                        className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+                        className="w-[200%] h-[200%] object-cover -translate-y-[10%]"
                       >
                         <source src="/hero-video.mp4" type="video/mp4" />
                       </video>
