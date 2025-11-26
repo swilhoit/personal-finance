@@ -73,10 +73,16 @@ client.once(Events.ClientReady, (readyClient) => {
   startScheduler(client, supabase);
 });
 
-// Handle slash command interactions
+// Handle ALL interactions (for debugging)
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  console.log(`[Interaction] Type: ${interaction.type}, User: ${interaction.user.tag}, Guild: ${interaction.guildId}`);
 
+  if (!interaction.isChatInputCommand()) {
+    console.log(`[Interaction] Not a chat input command, skipping`);
+    return;
+  }
+
+  console.log(`[Command] Received: /${interaction.commandName}`);
   const command = commands.get(interaction.commandName);
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
