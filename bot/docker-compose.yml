@@ -1,0 +1,29 @@
+# MAMA Discord Bot - Docker Compose
+version: '3.8'
+
+services:
+  mama-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mama-discord-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - TZ=UTC
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
