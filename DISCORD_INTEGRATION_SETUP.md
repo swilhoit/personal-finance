@@ -194,7 +194,7 @@ node register-commands.js
 
 1. **Encrypt Sensitive Tokens**
    - Currently, `access_token` and `refresh_token` are stored as plain text
-   - In production, encrypt these using a service like AWS KMS or similar
+   - In production, encrypt these using environment-based encryption
    - Update the following files:
      - `src/app/api/discord/oauth/callback/route.ts`
      - `src/app/api/discord/guilds/route.ts`
