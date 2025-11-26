@@ -46,6 +46,23 @@ type RecurringRow = {
   last_seen: string | null;
 };
 
+type WatchlistRow = {
+  id: string;
+  symbol: string;
+  added_at: string;
+  target_price: number | null;
+  alerts_enabled: boolean;
+  notes: string | null;
+};
+
+type NotificationScheduleRow = {
+  id: string;
+  schedule_type: string;
+  is_enabled: boolean;
+  cron_expression: string;
+  discord_guild_id: string | null;
+};
+
 export async function POST(req: Request) {
   console.log("[Chat API] Request received");
   console.log("[Chat API] Headers:", Object.fromEntries(req.headers.entries()));
@@ -257,6 +274,302 @@ export async function POST(req: Request) {
     },
   });
 
+  // ==================== WATCHLIST TOOLS ====================
+
+  const getWatchlist = tool<Record<string, never>, WatchlistRow[]>({
+    description: "Get the user's stock watchlist with symbols, target prices, and alert settings",
+    inputSchema: z.object({}),
+    execute: async () => {
+      try {
+        const { data, error } = await supabase
+          .from("user_watchlists")
+          .select("id, symbol, added_at, target_price, alerts_enabled, notes")
+          .eq("user_id", user.id)
+          .order("added_at", { ascending: false });
+        if (error) {
+          console.error("[Chat API] getWatchlist error:", error);
+          return [];
+        }
+        return (data as WatchlistRow[]) ?? [];
+      } catch (e) {
+        console.error("[Chat API] getWatchlist unexpected error:", e);
+        return [];
+      }
+    },
+  });
+
+  const addToWatchlist = tool<{ symbol: string; targetPrice?: number; notes?: string }, { success: boolean; message: string; symbol?: string }>({
+    description: "Add a stock symbol to the user's watchlist. Can optionally set a target price and notes.",
+    inputSchema: z.object({
+      symbol: z.string().min(1).max(10).describe("Stock ticker symbol (e.g., AAPL, GOOGL, TSLA)"),
+      targetPrice: z.number().positive().optional().describe("Optional target price for alerts"),
+      notes: z.string().max(500).optional().describe("Optional notes about why they're watching this stock"),
+    }),
+    execute: async ({ symbol, targetPrice, notes }) => {
+      try {
+        const upperSymbol = symbol.toUpperCase().trim();
+        const { error } = await supabase
+          .from("user_watchlists")
+          .upsert({
+            user_id: user.id,
+            symbol: upperSymbol,
+            target_price: targetPrice || null,
+            notes: notes || null,
+            alerts_enabled: !!targetPrice,
+          }, { onConflict: "user_id,symbol" });
+        if (error) {
+          console.error("[Chat API] addToWatchlist error:", error);
+          return { success: false, message: `Failed to add ${upperSymbol} to watchlist` };
+        }
+        return { success: true, message: `Added ${upperSymbol} to your watchlist${targetPrice ? ` with target price $${targetPrice}` : ''}`, symbol: upperSymbol };
+      } catch (e) {
+        console.error("[Chat API] addToWatchlist unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  const removeFromWatchlist = tool<{ symbol: string }, { success: boolean; message: string }>({
+    description: "Remove a stock symbol from the user's watchlist",
+    inputSchema: z.object({
+      symbol: z.string().min(1).max(10).describe("Stock ticker symbol to remove"),
+    }),
+    execute: async ({ symbol }) => {
+      try {
+        const upperSymbol = symbol.toUpperCase().trim();
+        const { error } = await supabase
+          .from("user_watchlists")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("symbol", upperSymbol);
+        if (error) {
+          console.error("[Chat API] removeFromWatchlist error:", error);
+          return { success: false, message: `Failed to remove ${upperSymbol}` };
+        }
+        return { success: true, message: `Removed ${upperSymbol} from your watchlist` };
+      } catch (e) {
+        console.error("[Chat API] removeFromWatchlist unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  const setWatchlistAlert = tool<{ symbol: string; targetPrice: number | null; alertsEnabled: boolean }, { success: boolean; message: string }>({
+    description: "Set or update price alerts for a stock on the watchlist",
+    inputSchema: z.object({
+      symbol: z.string().min(1).max(10).describe("Stock ticker symbol"),
+      targetPrice: z.number().positive().nullable().describe("Target price for alerts, or null to clear"),
+      alertsEnabled: z.boolean().describe("Whether to enable price alerts"),
+    }),
+    execute: async ({ symbol, targetPrice, alertsEnabled }) => {
+      try {
+        const upperSymbol = symbol.toUpperCase().trim();
+        const { error } = await supabase
+          .from("user_watchlists")
+          .update({ target_price: targetPrice, alerts_enabled: alertsEnabled })
+          .eq("user_id", user.id)
+          .eq("symbol", upperSymbol);
+        if (error) {
+          console.error("[Chat API] setWatchlistAlert error:", error);
+          return { success: false, message: `Failed to update alerts for ${upperSymbol}` };
+        }
+        return { success: true, message: `Updated ${upperSymbol}: alerts ${alertsEnabled ? 'enabled' : 'disabled'}${targetPrice ? ` at $${targetPrice}` : ''}` };
+      } catch (e) {
+        console.error("[Chat API] setWatchlistAlert unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  // ==================== NOTIFICATION TOOLS ====================
+
+  const getNotificationSchedules = tool<Record<string, never>, NotificationScheduleRow[]>({
+    description: "Get all notification schedules for the user (weekly reports, budget alerts, market alerts, etc.)",
+    inputSchema: z.object({}),
+    execute: async () => {
+      try {
+        const { data, error } = await supabase
+          .from("notification_schedules")
+          .select("id, schedule_type, is_enabled, cron_expression, discord_guild_id")
+          .eq("user_id", user.id);
+        if (error) {
+          console.error("[Chat API] getNotificationSchedules error:", error);
+          return [];
+        }
+        return (data as NotificationScheduleRow[]) ?? [];
+      } catch (e) {
+        console.error("[Chat API] getNotificationSchedules unexpected error:", e);
+        return [];
+      }
+    },
+  });
+
+  const enableNotification = tool<{ scheduleType: string; cronExpression?: string }, { success: boolean; message: string }>({
+    description: "Enable a notification schedule. Types: weekly_report, daily_summary, budget_alert, market_alert",
+    inputSchema: z.object({
+      scheduleType: z.enum(["weekly_report", "daily_summary", "budget_alert", "market_alert"]).describe("Type of notification to enable"),
+      cronExpression: z.string().optional().describe("Optional cron expression for custom timing"),
+    }),
+    execute: async ({ scheduleType, cronExpression }) => {
+      try {
+        const defaultCrons: Record<string, string> = {
+          weekly_report: "0 10 * * 0",
+          daily_summary: "0 18 * * *",
+          budget_alert: "0 9 * * *",
+          market_alert: "0 14-21 * * 1-5",
+        };
+        const { error } = await supabase
+          .from("notification_schedules")
+          .upsert({
+            user_id: user.id,
+            schedule_type: scheduleType,
+            is_enabled: true,
+            cron_expression: cronExpression || defaultCrons[scheduleType],
+          }, { onConflict: "user_id,schedule_type" });
+        if (error) {
+          console.error("[Chat API] enableNotification error:", error);
+          return { success: false, message: `Failed to enable ${scheduleType}` };
+        }
+        const friendlyNames: Record<string, string> = {
+          weekly_report: "Weekly Financial Report",
+          daily_summary: "Daily Transaction Summary",
+          budget_alert: "Budget Alerts",
+          market_alert: "Market & Watchlist Alerts",
+        };
+        return { success: true, message: `Enabled ${friendlyNames[scheduleType]}` };
+      } catch (e) {
+        console.error("[Chat API] enableNotification unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  const disableNotification = tool<{ scheduleType: string }, { success: boolean; message: string }>({
+    description: "Disable a notification schedule",
+    inputSchema: z.object({
+      scheduleType: z.enum(["weekly_report", "daily_summary", "budget_alert", "market_alert"]).describe("Type of notification to disable"),
+    }),
+    execute: async ({ scheduleType }) => {
+      try {
+        const { error } = await supabase
+          .from("notification_schedules")
+          .update({ is_enabled: false })
+          .eq("user_id", user.id)
+          .eq("schedule_type", scheduleType);
+        if (error) {
+          console.error("[Chat API] disableNotification error:", error);
+          return { success: false, message: `Failed to disable ${scheduleType}` };
+        }
+        const friendlyNames: Record<string, string> = {
+          weekly_report: "Weekly Financial Report",
+          daily_summary: "Daily Transaction Summary",
+          budget_alert: "Budget Alerts",
+          market_alert: "Market & Watchlist Alerts",
+        };
+        return { success: true, message: `Disabled ${friendlyNames[scheduleType]}` };
+      } catch (e) {
+        console.error("[Chat API] disableNotification unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  // ==================== BUDGET TOOLS ====================
+
+  const createBudget = tool<{ categoryName: string; amount: number; month?: string }, { success: boolean; message: string }>({
+    description: "Create or update a budget for a spending category",
+    inputSchema: z.object({
+      categoryName: z.string().describe("Name of the category (e.g., Groceries, Entertainment, Dining)"),
+      amount: z.number().positive().describe("Monthly budget amount in dollars"),
+      month: z.string().optional().describe("Month in YYYY-MM format. Defaults to current month."),
+    }),
+    execute: async ({ categoryName, amount, month }) => {
+      try {
+        const monthKey = month || new Date().toISOString().slice(0, 7);
+        // First, find or create the category
+        let { data: category } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("user_id", user.id)
+          .ilike("name", categoryName)
+          .single();
+
+        if (!category) {
+          // Create the category
+          const { data: newCat, error: catError } = await supabase
+            .from("categories")
+            .insert({ user_id: user.id, name: categoryName, type: "expense" })
+            .select("id")
+            .single();
+          if (catError) {
+            console.error("[Chat API] createBudget category error:", catError);
+            return { success: false, message: `Failed to create category ${categoryName}` };
+          }
+          category = newCat;
+        }
+
+        // Upsert the budget
+        const { error } = await supabase
+          .from("budgets")
+          .upsert({
+            user_id: user.id,
+            category_id: category.id,
+            month: monthKey,
+            amount,
+          }, { onConflict: "user_id,category_id,month" });
+
+        if (error) {
+          console.error("[Chat API] createBudget error:", error);
+          return { success: false, message: "Failed to create budget" };
+        }
+        return { success: true, message: `Set $${amount} budget for ${categoryName} in ${monthKey}` };
+      } catch (e) {
+        console.error("[Chat API] createBudget unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
+  const deleteBudget = tool<{ categoryName: string; month?: string }, { success: boolean; message: string }>({
+    description: "Delete a budget for a category",
+    inputSchema: z.object({
+      categoryName: z.string().describe("Name of the category"),
+      month: z.string().optional().describe("Month in YYYY-MM format. Defaults to current month."),
+    }),
+    execute: async ({ categoryName, month }) => {
+      try {
+        const monthKey = month || new Date().toISOString().slice(0, 7);
+        // Find the category
+        const { data: category } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("user_id", user.id)
+          .ilike("name", categoryName)
+          .single();
+
+        if (!category) {
+          return { success: false, message: `Category ${categoryName} not found` };
+        }
+
+        const { error } = await supabase
+          .from("budgets")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("category_id", category.id)
+          .eq("month", monthKey);
+
+        if (error) {
+          console.error("[Chat API] deleteBudget error:", error);
+          return { success: false, message: "Failed to delete budget" };
+        }
+        return { success: true, message: `Removed budget for ${categoryName} in ${monthKey}` };
+      } catch (e) {
+        console.error("[Chat API] deleteBudget unexpected error:", e);
+        return { success: false, message: "An error occurred" };
+      }
+    },
+  });
+
   console.log("[Chat API] Parsing request body...");
   const { messages }: { messages: UIMessage[] } = await req.json();
   
@@ -313,11 +626,31 @@ export async function POST(req: Request) {
     const result = streamText({
       model: openai("gpt-4o-mini"),
       messages: modelMessages,
-      system: `You are a helpful personal finance analyst.
-Use the available tools to fetch the user's actual data (transactions, balances, budgets, recurring merchants, cached insights).
-Never output the words "undefined" or "null". If a value is missing, say "no data" or explain the next step.
-Prefer concise bullet points and totals; include currency codes when possible.`,
-      tools: { getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight },
+      system: `You are MAMA, a helpful personal finance assistant with full control over the user's account settings.
+
+CAPABILITIES:
+- View financial data: transactions, balances, budgets, spending by category
+- Manage watchlist: add/remove stocks, set price alerts and target prices
+- Control notifications: enable/disable weekly reports, budget alerts, market alerts, daily summaries
+- Manage budgets: create/update/delete monthly budgets for spending categories
+
+GUIDELINES:
+- Use tools to fetch real data before answering questions
+- When asked to "add", "watch", "track", "enable", "set up", etc., use the appropriate write tools
+- Confirm actions after completing them (e.g., "Done! I've added AAPL to your watchlist")
+- Never say "undefined" or "null" - say "no data" instead
+- Be concise with bullet points and totals
+- For write operations, always confirm what was done`,
+      tools: {
+        // Read tools
+        getRecentTransactions, getSpendingByCategory, getAccountBalances, getBudgetStatus, getRecurringMerchants, getCachedInsight,
+        // Watchlist tools
+        getWatchlist, addToWatchlist, removeFromWatchlist, setWatchlistAlert,
+        // Notification tools
+        getNotificationSchedules, enableNotification, disableNotification,
+        // Budget tools
+        createBudget, deleteBudget,
+      },
       toolChoice: 'auto',
       onFinish: async ({ text, usage, finishReason }) => {
         // Save assistant's response to chat history

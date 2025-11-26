@@ -40,7 +40,55 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
   return typeof maybe.type === "string" && (maybe.type as string).startsWith("tool-");
 }
 
+// Tool name to friendly name mapping
+const toolDisplayNames: Record<string, { name: string; icon: string; color: string }> = {
+  getRecentTransactions: { name: "Fetching transactions", icon: "↺", color: "text-blue-600" },
+  getSpendingByCategory: { name: "Analyzing spending", icon: "↗", color: "text-purple-600" },
+  getAccountBalances: { name: "Checking balances", icon: "◎", color: "text-green-600" },
+  getBudgetStatus: { name: "Checking budgets", icon: "▣", color: "text-orange-600" },
+  getRecurringMerchants: { name: "Finding subscriptions", icon: "↻", color: "text-cyan-600" },
+  getCachedInsight: { name: "Loading insights", icon: "◈", color: "text-indigo-600" },
+  getWatchlist: { name: "Loading watchlist", icon: "★", color: "text-yellow-600" },
+  addToWatchlist: { name: "Adding to watchlist", icon: "＋", color: "text-emerald-600" },
+  removeFromWatchlist: { name: "Removing from watchlist", icon: "－", color: "text-red-600" },
+  setWatchlistAlert: { name: "Setting price alert", icon: "⚡", color: "text-amber-600" },
+  getNotificationSchedules: { name: "Loading notifications", icon: "🔔", color: "text-blue-600" },
+  enableNotification: { name: "Enabling notification", icon: "✓", color: "text-emerald-600" },
+  disableNotification: { name: "Disabling notification", icon: "✗", color: "text-gray-600" },
+  createBudget: { name: "Creating budget", icon: "＋", color: "text-emerald-600" },
+  deleteBudget: { name: "Removing budget", icon: "－", color: "text-red-600" },
+};
+
+function ToolCallIndicator({ toolName }: { toolName: string }) {
+  const display = toolDisplayNames[toolName] || { name: toolName, icon: "⋯", color: "text-gray-600" };
+  return (
+    <div className="flex items-center gap-2 py-1.5 px-2 bg-gray-50 rounded-md border border-gray-200 mt-1">
+      <div className="w-4 h-4 border-2 border-gray-300 border-t-emerald-500 rounded-full animate-spin" />
+      <span className={`text-xs ${display.color}`}>{display.icon}</span>
+      <span className="text-xs text-gray-600">{display.name}...</span>
+    </div>
+  );
+}
+
 function renderToolResultByName(toolName: string, result: unknown) {
+  // Handle action results (write operations)
+  if (typeof result === "object" && result !== null && "success" in result) {
+    const actionResult = result as { success: boolean; message: string; symbol?: string };
+    const display = toolDisplayNames[toolName] || { icon: "•", color: "text-gray-600" };
+    return (
+      <div className={`mt-1 flex items-center gap-2 py-1.5 px-2 rounded-md text-xs ${
+        actionResult.success ? "bg-emerald-50 border border-emerald-200" : "bg-red-50 border border-red-200"
+      }`}>
+        <span className={actionResult.success ? "text-emerald-600" : "text-red-600"}>
+          {actionResult.success ? "✓" : "✗"}
+        </span>
+        <span className={actionResult.success ? "text-emerald-700" : "text-red-700"}>
+          {actionResult.message}
+        </span>
+      </div>
+    );
+  }
+
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
     const items = result as Array<{ category: string; total: number }>;
     if (items.length === 0) return <div className="text-xs text-gray-500">No data</div>;
@@ -88,14 +136,83 @@ function renderToolResultByName(toolName: string, result: unknown) {
       </div>
     );
   }
+  if (toolName === "getWatchlist" && Array.isArray(result)) {
+    const rows = result as Array<{ symbol: string; target_price: number | null; alerts_enabled: boolean }>;
+    if (rows.length === 0) return <div className="text-xs text-gray-500">No stocks in watchlist</div>;
+    return (
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Watchlist</div>
+        {rows.slice(0, 8).map((s, idx) => (
+          <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-100 last:border-0">
+            <span className="font-medium text-gray-900">{s.symbol}</span>
+            <div className="flex items-center gap-2">
+              {s.target_price && <span className="text-gray-500">${s.target_price}</span>}
+              {s.alerts_enabled && <span className="text-amber-500 text-[10px]">⚡</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (toolName === "getNotificationSchedules" && Array.isArray(result)) {
+    const rows = result as Array<{ schedule_type: string; is_enabled: boolean }>;
+    if (rows.length === 0) return <div className="text-xs text-gray-500">No notifications configured</div>;
+    const friendlyNames: Record<string, string> = {
+      weekly_report: "Weekly Report",
+      daily_summary: "Daily Summary",
+      budget_alert: "Budget Alerts",
+      market_alert: "Market Alerts",
+    };
+    return (
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Notifications</div>
+        {rows.map((n, idx) => (
+          <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-100 last:border-0">
+            <span className="text-gray-600">{friendlyNames[n.schedule_type] || n.schedule_type}</span>
+            <span className={n.is_enabled ? "text-emerald-600" : "text-gray-400"}>
+              {n.is_enabled ? "●" : "○"}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (toolName === "getBudgetStatus" && Array.isArray(result)) {
+    const rows = result as Array<{ category_name: string; budget_amount: number; spent_amount: number; remaining_amount: number }>;
+    if (rows.length === 0) return <div className="text-xs text-gray-500">No budgets set</div>;
+    return (
+      <div className="mt-2 bg-gray-50 rounded-lg p-3 text-xs border border-gray-200">
+        <div className="font-medium text-gray-700 mb-2 uppercase tracking-wide text-[10px]">Budgets</div>
+        {rows.map((b, idx) => {
+          const pct = b.budget_amount > 0 ? (b.spent_amount / b.budget_amount) * 100 : 0;
+          return (
+            <div key={idx} className="py-1.5 border-b border-gray-100 last:border-0">
+              <div className="flex justify-between mb-1">
+                <span className="text-gray-600">{b.category_name}</span>
+                <span className={pct > 90 ? "text-red-600" : pct > 70 ? "text-amber-600" : "text-gray-900"}>
+                  ${b.spent_amount.toFixed(0)} / ${b.budget_amount.toFixed(0)}
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${pct > 90 ? "bg-red-500" : pct > 70 ? "bg-amber-500" : "bg-emerald-500"}`}
+                  style={{ width: `${Math.min(pct, 100)}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
   return null;
 }
 
 const quickActions = [
   { text: "Balance", icon: "◎" },
   { text: "Spending", icon: "↗" },
-  { text: "Recent", icon: "↺" },
-  { text: "Budget", icon: "▣" },
+  { text: "Watchlist", icon: "★" },
+  { text: "Budgets", icon: "▣" },
 ];
 
 export default function ChatWidget() {
@@ -369,12 +486,7 @@ export default function ChatWidget() {
                                 return <span key={i} className="whitespace-pre-wrap block">{part.text}</span>;
                               }
                               if (isToolCallPart(part)) {
-                                return (
-                                  <div key={i} className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                                    <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-                                    <span>Loading...</span>
-                                  </div>
-                                );
+                                return <ToolCallIndicator key={i} toolName={part.toolName} />;
                               }
                               if (isToolResultPart(part)) {
                                 return <div key={i}>{renderToolResultByName(part.toolName, part.result)}</div>;
