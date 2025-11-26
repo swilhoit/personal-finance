@@ -4,18 +4,16 @@ FROM node:20-alpine
 # Create app directory
 WORKDIR /app
 
-# Install dependencies first (better caching)
-COPY package*.json ./
-RUN npm ci --only=production
+# Install dependencies
+COPY package.json ./
+RUN npm install
 
 # Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
 
-# Install dev dependencies for build, then remove
-RUN npm install typescript ts-node @types/node @types/node-cron && \
-    npm run build && \
-    npm prune --production
+# Build TypeScript
+RUN npm run build
 
 # Set environment
 ENV NODE_ENV=production
