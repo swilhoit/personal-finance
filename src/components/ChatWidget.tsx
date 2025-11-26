@@ -105,9 +105,9 @@ export default function ChatWidget() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  
-  const { 
-    messages, 
+
+  const {
+    messages,
     sendMessage,
     stop,
     status
@@ -152,7 +152,7 @@ export default function ChatWidget() {
     };
     checkAuth();
   }, []);
-  
+
   useEffect(() => {
     try {
       const key = "chat_session_id";
@@ -166,7 +166,7 @@ export default function ChatWidget() {
       }
     } catch {}
   }, []);
-  
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -226,38 +226,55 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Circular Video */}
       <button
         onClick={() => setOpen(!open)}
-        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-12 h-12 rounded-full bg-gray-900 text-white shadow-lg hover:scale-105 transition-all ${
+        className={`hidden md:flex fixed bottom-6 right-6 z-50 items-center justify-center w-14 h-14 rounded-full overflow-hidden shadow-lg hover:scale-105 transition-all border-2 border-emerald-500/50 ${
           open ? "scale-0 opacity-0" : "scale-100 opacity-100"
         }`}
         aria-label="Open AI chat"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+        >
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video>
         {messages.length > 0 && !open && (
-          <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gray-500 rounded-full" />
+          <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
         )}
       </button>
 
-      {/* Chat Window */}
+      {/* Chat Window - RIGHT SIDE */}
       <div
         className={`hidden md:block fixed z-50 transition-all duration-300 ease-out ${
-          open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 pointer-events-none"
-        } top-0 left-0 bottom-0`}
+          open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
+        } top-0 right-0 bottom-0`}
       >
-        <div className={`bg-white shadow-2xl border-r border-gray-200 overflow-hidden transition-all duration-200 h-full flex flex-col ${
+        <div className={`bg-white shadow-2xl border-l border-gray-200 overflow-hidden transition-all duration-200 h-full flex flex-col ${
           minimized ? "w-72" : "w-80"
         }`}>
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm font-medium text-gray-900">Assistant</span>
+              {/* Small circular video in header */}
+              <div className="w-8 h-8 rounded-full overflow-hidden border border-emerald-500/30">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+                >
+                  <source src="/hero-video.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <span className="text-sm font-medium text-gray-900">MAMA</span>
             </div>
-            
+
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setMinimized(!minimized)}
@@ -301,10 +318,17 @@ export default function ChatWidget() {
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 ? (
                   <div className="text-center py-6">
-                    <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
+                    {/* Circular video in empty state */}
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full overflow-hidden border border-emerald-500/30">
+                      <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-[200%] h-[200%] object-cover -translate-y-[25%]"
+                      >
+                        <source src="/hero-video.mp4" type="video/mp4" />
+                      </video>
                     </div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       How can I help?
@@ -336,7 +360,7 @@ export default function ChatWidget() {
                           <div
                             className={`rounded-lg px-3 py-2 text-sm ${
                               message.role === "user"
-                                ? "bg-gray-900 text-white"
+                                ? "bg-emerald-500 text-white"
                                 : "bg-gray-100 text-gray-900"
                             }`}
                           >
@@ -368,7 +392,7 @@ export default function ChatWidget() {
                         </div>
                       </div>
                     ))}
-                    
+
                     {status === "streaming" && (
                       <div className="flex justify-start">
                         <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
@@ -394,7 +418,7 @@ export default function ChatWidget() {
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={status === "streaming" ? "Typing..." : "Ask something..."}
                     disabled={status === "streaming"}
-                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:opacity-50 placeholder:text-gray-400"
+                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 placeholder:text-gray-400"
                   />
                   {status === "streaming" ? (
                     <button
@@ -408,7 +432,7 @@ export default function ChatWidget() {
                     <button
                       type="submit"
                       disabled={input.trim().length === 0}
-                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Send
                     </button>

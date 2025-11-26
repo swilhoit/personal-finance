@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const navItems = [
-  { label: "Features", href: "#features", emoji: "✨" },
-  { label: "How It Works", href: "#how-it-works", emoji: "🎮" },
-  { label: "Pricing", href: "#pricing", emoji: "💎" },
-  { label: "About", href: "#about", emoji: "🚀" },
+  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
 ];
 
 export default function LandingNav() {
@@ -34,16 +34,16 @@ export default function LandingNav() {
 
   return (
     <>
-      <nav className={`fixed top-12 left-0 right-0 z-[100] transition-all duration-300 ${
-        scrolled 
-          ? "bg-white/80 backdrop-blur-lg shadow-lg" 
+      <nav className={`fixed top-10 left-0 right-0 z-[100] transition-all duration-300 ${
+        scrolled
+          ? "bg-slate-900/90 backdrop-blur-lg shadow-lg border-b border-slate-700/50"
           : "bg-transparent"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="group">
-              <span className="font-dm-mono font-black text-3xl hover:scale-110 transition-transform inline-block text-white">
+              <span className="font-dm-mono font-bold text-2xl hover:text-emerald-400 transition-colors text-white">
                 MAMA
               </span>
             </Link>
@@ -55,9 +55,8 @@ export default function LandingNav() {
                   key={item.href}
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="px-3 py-2 rounded-lg font-dm-mono font-medium text-sm transition-all hover:scale-105 text-white hover:bg-gray-100 uppercase"
+                  className="px-4 py-2 rounded-lg font-dm-mono font-medium text-sm transition-all hover:bg-white/5 text-slate-300 hover:text-white"
                 >
-                  <span className="mr-1">{item.emoji}</span>
                   {item.label}
                 </a>
               ))}
@@ -67,13 +66,13 @@ export default function LandingNav() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/auth/sign-in"
-                className="px-4 py-2 rounded-lg font-dm-mono font-medium text-sm transition-all hover:scale-105 border-2 border-white text-white hover:bg-gray-100 uppercase"
+                className="px-4 py-2 rounded-lg font-dm-mono font-medium text-sm transition-all text-slate-300 hover:text-white"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/sign-up"
-                className="px-4 py-2 bg-cyan-500 text-white rounded-lg font-dm-mono font-bold text-sm hover:scale-105 transition-all shadow-lg hover:shadow-cyan-500/50 uppercase"
+                className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-dm-mono font-semibold text-sm hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20"
               >
                 Get Started
               </Link>
@@ -85,10 +84,10 @@ export default function LandingNav() {
               className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
               aria-label="Toggle menu"
             >
-              <svg 
-                className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 {mobileMenuOpen ? (
@@ -106,52 +105,51 @@ export default function LandingNav() {
       {mobileMenuOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/50 z-[100] md:hidden"
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] md:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
-          
+
           {/* Menu Panel */}
           <div className="fixed top-28 left-0 right-0 z-[150] md:hidden animate-slideDown">
-            <div className="mx-4 mt-2 bg-white rounded-2xl shadow-2xl border-2 border-cyan-400 overflow-hidden">
+            <div className="mx-4 mt-2 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden">
               {/* Navigation Items */}
-              <div className="p-4 space-y-2">
+              <div className="p-4 space-y-1">
                 {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-50 hover:bg-cyan-100 transition-all"
+                    className="flex items-center px-4 py-3 rounded-xl hover:bg-slate-700/50 transition-all"
                   >
-                    <span className="text-2xl">{item.emoji}</span>
-                    <span className="font-dm-mono font-medium text-gray-700">
+                    <span className="font-dm-mono font-medium text-slate-200">
                       {item.label}
                     </span>
                   </a>
                 ))}
               </div>
-              
+
               {/* Divider */}
-              <div className="border-t-2 border-cyan-200"></div>
-              
+              <div className="border-t border-slate-700/50"></div>
+
               {/* Actions */}
               <div className="p-4 space-y-3">
                 <Link
                   href="/auth/sign-in"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-3 rounded-xl border-2 border-cyan-400 text-cyan-700 font-dm-mono font-medium hover:bg-cyan-100 transition-all"
+                  className="block text-center px-4 py-3 rounded-xl border border-slate-600 text-slate-200 font-dm-mono font-medium hover:bg-slate-700/50 transition-all"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/sign-up"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-3 rounded-xl bg-cyan-500 text-white font-dm-mono font-bold hover:scale-[1.02] transition-all shadow-lg"
+                  className="block text-center px-4 py-3 rounded-xl bg-emerald-500 text-white font-dm-mono font-semibold hover:bg-emerald-400 transition-all shadow-lg"
                 >
-                  Get Started 🚀
+                  Get Started
                 </Link>
               </div>
-              
+
             </div>
           </div>
         </>
