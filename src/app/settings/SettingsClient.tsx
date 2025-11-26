@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createCategory, deleteCategory, createBudget, deleteBudget, createRule, deleteRule } from "./actions";
 
 type Category = {
@@ -38,11 +39,22 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage categories, budgets, and automation rules
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Manage categories, budgets, and automation rules
+              </p>
+            </div>
+            <Link
+              href="/settings/integrations"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              Integrations
+            </Link>
           </div>
         </div>
       </div>
@@ -60,7 +72,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
               </p>
             </div>
             
-            <form action={createCategory} className="space-y-3 mb-4 p-4 bg-white bg-zinc-800 rounded-lg">
+            <form action={createCategory} className="space-y-3 mb-4 p-4 bg-gray-50 rounded-lg">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-gray-600 block mb-1">
@@ -69,7 +81,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   <input 
                     name="name" 
                     placeholder="e.g., Groceries"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     required
                   />
                 </div>
@@ -79,7 +91,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   </label>
                   <select 
                     name="type" 
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="expense">Expense</option>
                     <option value="income">Income</option>
@@ -94,15 +106,15 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {categories.length === 0 ? (
-                <p className="text-sm text-gray-500 text-zinc-400 text-center py-4">
+                <p className="text-sm text-gray-500 text-center py-4">
                   No categories yet. Add one above.
                 </p>
               ) : (
                 categories.map((c) => (
-                  <div key={c.id} className="flex items-center justify-between p-3 bg-white bg-zinc-800 rounded-lg">
+                  <div key={c.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <div className="font-medium text-sm">{c.name}</div>
-                      <div className="text-xs text-gray-500 text-zinc-400 capitalize">{c.type}</div>
+                      <div className="text-xs text-gray-500 capitalize">{c.type}</div>
                     </div>
                     <form action={deleteCategory}>
                       <input type="hidden" name="id" value={c.id} />
@@ -120,12 +132,12 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
           <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Monthly Budgets</h2>
-              <p className="text-xs text-gray-500 text-zinc-400 mt-1">
+              <p className="text-xs text-gray-500 mt-1">
                 Set spending limits for each category
               </p>
             </div>
 
-            <form action={createBudget} className="space-y-3 mb-4 p-4 bg-white bg-zinc-800 rounded-lg">
+            <form action={createBudget} className="space-y-3 mb-4 p-4 bg-white rounded-lg border border-gray-200">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-gray-600 block mb-1">
@@ -133,7 +145,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   </label>
                   <select 
                     name="category_id" 
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     required
                   >
                     <option value="">Select category</option>
@@ -151,7 +163,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                     step="0.01" 
                     name="amount" 
                     placeholder="0.00"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     required
                   />
                 </div>
@@ -164,7 +176,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   type="month" 
                   name="month" 
                   defaultValue={currentMonth}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   required
                 />
               </div>
@@ -175,15 +187,15 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {budgets.length === 0 ? (
-                <p className="text-sm text-gray-500 text-zinc-400 text-center py-4">
+                <p className="text-sm text-gray-500 text-center py-4">
                   No budgets set. Add one above.
                 </p>
               ) : (
                 budgets.map((b) => (
-                  <div key={b.id} className="flex items-center justify-between p-3 bg-white bg-zinc-800 rounded-lg">
+                  <div key={b.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
                     <div>
                       <div className="font-medium text-sm">{b.categories?.name ?? "Category"}</div>
-                      <div className="text-xs text-gray-500 text-zinc-400">
+                      <div className="text-xs text-gray-500">
                         {new Date(b.month + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · ${Number(b.amount).toFixed(2)}
                       </div>
                     </div>
@@ -204,18 +216,18 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold">Auto-Categorization Rules</h2>
-                <p className="text-xs text-gray-500 text-zinc-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Automatically categorize transactions based on patterns
                 </p>
               </div>
               <form action="/api/rules/apply" method="POST">
-                <button className="px-4 py-2 text-sm font-dm-mono border border-gray-300 border-zinc-700 rounded-lg hover:bg-white hover:bg-zinc-800 transition-colors">
+                <button className="px-4 py-2 text-sm font-dm-mono border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
                   Apply Rules Now
                 </button>
               </form>
             </div>
 
-            <form action={createRule} className="mb-4 p-4 bg-white bg-zinc-800 rounded-lg">
+            <form action={createRule} className="mb-4 p-4 bg-white rounded-lg border border-gray-200">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
                 <div className="lg:col-span-2">
                   <label className="text-xs font-medium text-gray-600 block mb-1">
@@ -223,7 +235,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   </label>
                   <select 
                     name="category_id" 
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     required
                   >
                     <option value="">Select category</option>
@@ -238,7 +250,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   </label>
                   <select 
                     name="matcher_type" 
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="merchant">Merchant Name</option>
                     <option value="name">Transaction Name</option>
@@ -251,7 +263,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                   <input 
                     name="matcher_value" 
                     placeholder="e.g., Starbucks"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     required
                   />
                 </div>
@@ -263,7 +275,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                     type="number" 
                     name="priority" 
                     defaultValue={100}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 border-zinc-700 rounded-lg bg-white bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>
               </div>
@@ -274,17 +286,17 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {rules.length === 0 ? (
-                <p className="text-sm text-gray-500 text-zinc-400 text-center py-4">
+                <p className="text-sm text-gray-500 text-center py-4">
                   No rules configured. Add one above to automate categorization.
                 </p>
               ) : (
                 rules.map((r) => (
-                  <div key={r.id} className="flex items-center justify-between p-3 bg-white bg-zinc-800 rounded-lg">
+                  <div key={r.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
                     <div>
                       <div className="font-medium text-sm">
                         {r.categories?.name ?? "Category"}
                       </div>
-                      <div className="text-xs text-gray-500 text-zinc-400">
+                      <div className="text-xs text-gray-500">
                         When {r.matcher_type} contains &ldquo;{r.matcher_value}&rdquo; · Priority {r.priority}
                       </div>
                     </div>
