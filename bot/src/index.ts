@@ -47,6 +47,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent, // Required to read message content when tagged
   ],
 });
 
@@ -104,6 +105,152 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } else {
       await interaction.reply(errorMessage);
     }
+  }
+});
+
+// Handle messages when bot is mentioned
+client.on(Events.MessageCreate, async (message) => {
+  // Ignore bot messages
+  if (message.author.bot) return;
+
+  // Check if bot is mentioned
+  if (!message.mentions.has(client.user!)) return;
+
+  console.log(`[Message] Bot mentioned by ${message.author.tag}: ${message.content}`);
+
+  // Remove the bot mention from the message
+  const question = message.content
+    .replace(/<@!?\d+>/g, '')
+    .trim();
+
+  if (!question) {
+    await message.reply('Hi! Ask me about your finances. For example: "What\'s my balance?" or "How much did I spend this week?"');
+    return;
+  }
+
+  // Show typing indicator
+  await message.channel.sendTyping();
+
+  try {
+    // Resolve user from guild or Discord connection
+    const guildId = message.guildId;
+    let userId: string | null = null;
+
+    if (guildId) {
+      const { data: guildData } = await supabase
+        .from('discord_guilds')
+        .select('user_id')
+        .eq('guild_id', guildId)
+        .eq('is_active', true)
+        .single();
+
+      if (guildData?.user_id) {
+        userId = guildData.user_id;
+      }
+    }
+
+    // Fallback to Discord connection
+    if (!userId) {
+      const { data: connectionData } = await supabase
+        .from('discord_connections')
+        .select('user_id')
+        .eq('discord_user_id', message.author.id)
+        .eq('is_active', true)
+        .single();
+
+      userId = connectionData?.user_id || null;
+    }
+
+    if (!userId) {
+      await message.reply('I don\'t recognize you yet! Please connect your Discord account in the MAMA dashboard first.');
+      return;
+    }
+
+    // Get user's financial context
+    const [accountsRes, transactionsRes] = await Promise.all([
+      supabase
+        .from('teller_accounts')
+        .select('name, type, current_balance, institution_name')
+        .eq('user_id', userId)
+        .eq('is_active', true),
+      supabase
+        .from('transactions')
+        .select('date, merchant_name, amount, category')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+        .limit(20),
+    ]);
+
+    const accounts = accountsRes.data || [];
+    const transactions = transactionsRes.data || [];
+
+    // Build context for AI
+    const totalBalance = accounts.reduce((sum, a) => sum + (a.current_balance || 0), 0);
+    const recentSpending = transactions
+      .filter(t => t.amount < 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    // Simple response based on keywords (no external AI needed)
+    let response = '';
+    const lowerQuestion = question.toLowerCase();
+
+    if (lowerQuestion.includes('balance') || lowerQuestion.includes('how much do i have')) {
+      response = `💰 **Your Total Balance: $${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n\n`;
+      if (accounts.length > 0) {
+        response += accounts.map(a =>
+          `• ${a.name} (${a.institution_name}): $${(a.current_balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+        ).join('\n');
+      } else {
+        response += 'No accounts connected yet. Visit the MAMA dashboard to link your bank.';
+      }
+    } else if (lowerQuestion.includes('spend') || lowerQuestion.includes('spent')) {
+      const weekSpending = transactions
+        .filter(t => {
+          const txDate = new Date(t.date);
+          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          return t.amount < 0 && txDate >= weekAgo;
+        })
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+      response = `💳 **Recent Spending**\n\n`;
+      response += `• This week: **$${weekSpending.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n`;
+      response += `• Recent transactions: **$${recentSpending.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n\n`;
+
+      if (transactions.length > 0) {
+        response += '**Latest transactions:**\n';
+        response += transactions.slice(0, 5).map(t =>
+          `• ${t.merchant_name || 'Transaction'}: $${Math.abs(t.amount).toFixed(2)} (${t.category || 'Uncategorized'})`
+        ).join('\n');
+      }
+    } else if (lowerQuestion.includes('transaction') || lowerQuestion.includes('recent')) {
+      response = `📋 **Recent Transactions**\n\n`;
+      if (transactions.length > 0) {
+        response += transactions.slice(0, 10).map(t =>
+          `• ${t.date}: ${t.merchant_name || 'Transaction'} - $${Math.abs(t.amount).toFixed(2)}`
+        ).join('\n');
+      } else {
+        response += 'No recent transactions found.';
+      }
+    } else if (lowerQuestion.includes('help') || lowerQuestion.includes('what can you do')) {
+      response = `🤖 **I can help you with:**\n\n`;
+      response += `• Check your **balance** - "What's my balance?"\n`;
+      response += `• View **spending** - "How much did I spend this week?"\n`;
+      response += `• See **transactions** - "Show me recent transactions"\n\n`;
+      response += `You can also use slash commands: \`/balance\`, \`/spending\`, \`/watchlist\`, \`/quote\``;
+    } else {
+      // Default response with summary
+      response = `📊 **Quick Summary**\n\n`;
+      response += `• Total Balance: **$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n`;
+      response += `• Recent Spending: **$${recentSpending.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n`;
+      response += `• Connected Accounts: **${accounts.length}**\n\n`;
+      response += `Ask me about your balance, spending, or transactions! Or use \`/help\` for commands.`;
+    }
+
+    await message.reply(response);
+
+  } catch (error) {
+    console.error('[Message] Error handling message:', error);
+    await message.reply('Sorry, I encountered an error. Please try again or use `/help` for available commands.');
   }
 });
 
