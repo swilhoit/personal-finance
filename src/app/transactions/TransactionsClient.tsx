@@ -11,6 +11,7 @@ interface Transaction {
   amount: number;
   category: string | null;
   category_id: string | null;
+  account_type: string; // 'depository' or 'credit'
 }
 
 interface Category {
@@ -88,8 +89,10 @@ export default function TransactionsClient({ transactions, categories }: Transac
     const totalExpenses = filteredTransactions
       .filter(tx => tx.amount < 0)
       .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+    // Only count income from depository accounts (checking/savings)
+    // Credit card payments (positive amounts on credit accounts) are transfers, not income
     const totalIncome = filteredTransactions
-      .filter(tx => tx.amount > 0)
+      .filter(tx => tx.amount > 0 && tx.account_type === 'depository')
       .reduce((sum, tx) => sum + tx.amount, 0);
     return { totalExpenses, totalIncome, count: filteredTransactions.length };
   }, [filteredTransactions]);
@@ -235,6 +238,8 @@ export default function TransactionsClient({ transactions, categories }: Transac
                 <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   {txs.map((tx) => {
                     const isExpense = tx.amount < 0;
+                    const isIncome = tx.amount > 0 && tx.account_type === 'depository';
+                    const isCreditPayment = tx.amount > 0 && tx.account_type === 'credit';
                     const isPending = pendingCategories[tx.transaction_id];
 
                     return (
@@ -244,9 +249,11 @@ export default function TransactionsClient({ transactions, categories }: Transac
                       >
                         {/* Icon */}
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isExpense ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-600'
+                          isIncome ? 'bg-green-100 text-green-600' :
+                          isCreditPayment ? 'bg-blue-100 text-blue-600' :
+                          'bg-gray-100 text-gray-600'
                         }`}>
-                          <TransactionIcon name={getCategoryIcon(tx.category)} />
+                          <TransactionIcon name={isCreditPayment ? 'credit-card' : getCategoryIcon(tx.category)} />
                         </div>
 
                         {/* Details */}
@@ -276,9 +283,16 @@ export default function TransactionsClient({ transactions, categories }: Transac
 
                         {/* Amount */}
                         <div className="text-right flex-shrink-0">
-                          <p className={`font-semibold ${isExpense ? 'text-gray-900' : 'text-green-600'}`}>
-                            {isExpense ? '−' : '+'}${Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <p className={`font-semibold ${
+                            isIncome ? 'text-green-600' :
+                            isCreditPayment ? 'text-blue-600' :
+                            'text-gray-900'
+                          }`}>
+                            {isCreditPayment ? '' : (isExpense ? '−' : '+')}${Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
+                          {isCreditPayment && (
+                            <p className="text-xs text-blue-500">Payment</p>
+                          )}
                         </div>
                       </div>
                     );
@@ -295,6 +309,11 @@ export default function TransactionsClient({ transactions, categories }: Transac
 
 function TransactionIcon({ name }: { name: string }) {
   const icons: Record<string, React.ReactNode> = {
+    "credit-card": (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    ),
     "utensils": (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
