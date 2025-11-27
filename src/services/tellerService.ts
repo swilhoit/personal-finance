@@ -10,30 +10,52 @@ import path from 'path';
 
 const TELLER_API_BASE = 'https://api.teller.io';
 
-// Create HTTPS agent with mTLS certificates for production
+// Create HTTPS agent with mTLS certificates for development/production
 function createTellerAgent(): https.Agent | undefined {
+  // Support base64-encoded certs (for Vercel) or file paths (for local dev)
+  const certBase64 = process.env.TELLER_CERTIFICATE_BASE64;
+  const keyBase64 = process.env.TELLER_PRIVATE_KEY_BASE64;
   const certPath = process.env.TELLER_CERTIFICATE_PATH;
   const keyPath = process.env.TELLER_PRIVATE_KEY_PATH;
 
-  if (!certPath || !keyPath) {
-    console.warn('[Teller] No certificates configured - API calls may fail in production');
+  let cert: Buffer | undefined;
+  let key: Buffer | undefined;
+
+  // Try base64 env vars first (Vercel deployment)
+  if (certBase64 && keyBase64) {
+    try {
+      cert = Buffer.from(certBase64, 'base64');
+      key = Buffer.from(keyBase64, 'base64');
+      console.log('[Teller] Using base64-encoded certificates');
+    } catch (error) {
+      console.error('[Teller] Failed to decode base64 certificates:', error);
+    }
+  }
+
+  // Fall back to file paths (local development)
+  if (!cert || !key) {
+    if (certPath && keyPath) {
+      try {
+        const basePath = process.cwd();
+        cert = fs.readFileSync(path.resolve(basePath, certPath));
+        key = fs.readFileSync(path.resolve(basePath, keyPath));
+        console.log('[Teller] Using file-based certificates');
+      } catch (error) {
+        console.error('[Teller] Failed to load certificate files:', error);
+      }
+    }
+  }
+
+  if (!cert || !key) {
+    console.warn('[Teller] No certificates configured - API calls may fail');
     return undefined;
   }
 
-  try {
-    const basePath = process.cwd();
-    const cert = fs.readFileSync(path.resolve(basePath, certPath));
-    const key = fs.readFileSync(path.resolve(basePath, keyPath));
-
-    return new https.Agent({
-      cert,
-      key,
-      rejectUnauthorized: true,
-    });
-  } catch (error) {
-    console.error('[Teller] Failed to load certificates:', error);
-    return undefined;
-  }
+  return new https.Agent({
+    cert,
+    key,
+    rejectUnauthorized: true,
+  });
 }
 
 export interface TellerAccount {
