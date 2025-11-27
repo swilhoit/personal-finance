@@ -4,8 +4,37 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
 
 const TELLER_API_BASE = 'https://api.teller.io';
+
+// Create HTTPS agent with mTLS certificates for production
+function createTellerAgent(): https.Agent | undefined {
+  const certPath = process.env.TELLER_CERTIFICATE_PATH;
+  const keyPath = process.env.TELLER_PRIVATE_KEY_PATH;
+
+  if (!certPath || !keyPath) {
+    console.warn('[Teller] No certificates configured - API calls may fail in production');
+    return undefined;
+  }
+
+  try {
+    const basePath = process.cwd();
+    const cert = fs.readFileSync(path.resolve(basePath, certPath));
+    const key = fs.readFileSync(path.resolve(basePath, keyPath));
+
+    return new https.Agent({
+      cert,
+      key,
+      rejectUnauthorized: true,
+    });
+  } catch (error) {
+    console.error('[Teller] Failed to load certificates:', error);
+    return undefined;
+  }
+}
 
 export interface TellerAccount {
   id: string;
@@ -52,35 +81,52 @@ export interface TellerTransaction {
 
 export class TellerService {
   private accessToken: string;
-  private certificatePath?: string;
-  private privateKeyPath?: string;
+  private agent: https.Agent | undefined;
 
-  constructor(accessToken: string, options?: { certificatePath?: string; privateKeyPath?: string }) {
+  constructor(accessToken: string) {
     this.accessToken = accessToken;
-    this.certificatePath = options?.certificatePath;
-    this.privateKeyPath = options?.privateKeyPath;
+    this.agent = createTellerAgent();
   }
 
-  private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${TELLER_API_BASE}${endpoint}`;
+  private async makeRequest<T>(endpoint: string, options: { method?: string; body?: string } = {}): Promise<T> {
+    const url = new URL(`${TELLER_API_BASE}${endpoint}`);
 
-    const headers: HeadersInit = {
-      'Authorization': `Basic ${Buffer.from(`${this.accessToken}:`).toString('base64')}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    return new Promise((resolve, reject) => {
+      const req = https.request(
+        {
+          hostname: url.hostname,
+          path: url.pathname + url.search,
+          method: options.method || 'GET',
+          agent: this.agent,
+          headers: {
+            'Authorization': `Basic ${Buffer.from(`${this.accessToken}:`).toString('base64')}`,
+            'Content-Type': 'application/json',
+          },
+        },
+        (res) => {
+          let data = '';
+          res.on('data', (chunk) => (data += chunk));
+          res.on('end', () => {
+            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                resolve(JSON.parse(data));
+              } catch {
+                resolve(data as T);
+              }
+            } else {
+              reject(new Error(`Teller API error: ${res.statusCode} - ${data}`));
+            }
+          });
+        }
+      );
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
+      req.on('error', reject);
+
+      if (options.body) {
+        req.write(options.body);
+      }
+      req.end();
     });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Teller API error: ${response.status} - ${error}`);
-    }
-
-    return response.json();
   }
 
   /**
@@ -222,6 +268,7 @@ export function getTellerConnectConfig(options: {
     userId: options.userId,
   };
 }
+
 
 
 
