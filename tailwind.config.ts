@@ -38,7 +38,16 @@ const config: Config = {
       },
       fontFamily: {
         'dm-mono': ['var(--font-dm-mono)', 'monospace'],
-        'sans': ['var(--font-dm-mono)', 'monospace'],
+        'sans': [
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+        ],
         'mono': ['var(--font-dm-mono)', 'monospace'],
       },
     },

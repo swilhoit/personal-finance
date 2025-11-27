@@ -16,13 +16,6 @@ type Account = {
   enrollment_id: string | null;
 };
 
-type Enrollment = {
-  id: string;
-  enrollment_id: string;
-  institution_name: string | null;
-  created_at: string;
-};
-
 export default async function AccountsPage() {
   const supabase = await createSupabaseServerClient(true);
   const { data: { user } } = await supabase.auth.getUser();
@@ -31,18 +24,13 @@ export default async function AccountsPage() {
     redirect("/auth/sign-in");
   }
 
-  const [{ data: accounts }, { data: enrollments }] = await Promise.all([
+  const [{ data: accounts }] = await Promise.all([
     supabase
       .from("teller_accounts")
       .select("*")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .order("current_balance", { ascending: false }),
-    supabase
-      .from("teller_enrollments")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("status", "active"),
   ]);
 
   // Group accounts by institution

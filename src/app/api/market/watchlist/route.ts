@@ -3,57 +3,48 @@
  * Manage user's stock watchlist
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest } from 'next/server';
 import { MarketService } from '@/services/marketService';
+import { requireAuth, isAuthError, successResponse, errorResponse, ApiErrors } from '@/lib/api';
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAuth();
+    if (isAuthError(auth)) return auth.error;
+    const { user, supabase } = auth;
 
     const marketService = new MarketService(supabase);
     const watchlist = await marketService.getWatchlistWithPrices(user.id);
 
-    return NextResponse.json({
-      watchlist,
-      count: watchlist.length,
-    });
+    return successResponse(watchlist, { count: watchlist.length });
   } catch (error) {
     console.error('Error fetching watchlist:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch watchlist' },
-      { status: 500 }
-    );
+    return errorResponse('Failed to fetch watchlist');
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAuth();
+    if (isAuthError(auth)) return auth.error;
+    const { user, supabase } = auth;
 
     const body = await request.json();
     const { symbol, notes, targetPrice, alertAbove, alertBelow } = body;
 
     if (!symbol) {
-      return NextResponse.json(
-        { error: 'Symbol required' },
-        { status: 400 }
-      );
+      return ApiErrors.validationError('symbol');
+    }
+
+    // Validate symbol format (alphanumeric, 1-10 chars)
+    const cleanSymbol = symbol.toUpperCase().trim();
+    if (!/^[A-Z]{1,10}$/.test(cleanSymbol)) {
+      return ApiErrors.badRequest('Invalid symbol format');
     }
 
     const { error } = await supabase.from('user_watchlists').upsert({
       user_id: user.id,
-      symbol: symbol.toUpperCase(),
+      symbol: cleanSymbol,
       notes,
       target_price: targetPrice,
       alert_above: alertAbove,
@@ -62,42 +53,31 @@ export async function POST(request: NextRequest) {
     }, { onConflict: 'user_id,symbol' });
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to add to watchlist' },
-        { status: 500 }
-      );
+      return errorResponse('Failed to add to watchlist');
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `${symbol.toUpperCase()} added to watchlist`,
-    });
+    return successResponse(
+      { symbol: cleanSymbol },
+      undefined,
+      201
+    );
   } catch (error) {
     console.error('Error adding to watchlist:', error);
-    return NextResponse.json(
-      { error: 'Failed to add to watchlist' },
-      { status: 500 }
-    );
+    return errorResponse('Failed to add to watchlist');
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAuth();
+    if (isAuthError(auth)) return auth.error;
+    const { user, supabase } = auth;
 
     const body = await request.json();
     const { symbol } = body;
 
     if (!symbol) {
-      return NextResponse.json(
-        { error: 'Symbol required' },
-        { status: 400 }
-      );
+      return ApiErrors.validationError('symbol');
     }
 
     const { error } = await supabase
@@ -107,24 +87,16 @@ export async function DELETE(request: NextRequest) {
       .eq('symbol', symbol.toUpperCase());
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to remove from watchlist' },
-        { status: 500 }
-      );
+      return errorResponse('Failed to remove from watchlist');
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `${symbol.toUpperCase()} removed from watchlist`,
-    });
+    return successResponse({ removed: symbol.toUpperCase() });
   } catch (error) {
     console.error('Error removing from watchlist:', error);
-    return NextResponse.json(
-      { error: 'Failed to remove from watchlist' },
-      { status: 500 }
-    );
+    return errorResponse('Failed to remove from watchlist');
   }
 }
+
 
 
 

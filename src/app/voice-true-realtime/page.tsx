@@ -21,6 +21,7 @@ export default function TrueRealtimeVoicePage() {
     return () => {
       voiceChat.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!mounted) return null;

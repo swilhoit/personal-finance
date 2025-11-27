@@ -5,14 +5,18 @@
  * Triggered by Vercel Cron: 0 3 * * * (daily at 3am UTC)
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { syncTellerToSupabase } from '@/services/tellerService';
+import { verifyCronRequest } from '@/lib/api/cron-auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // 5 minutes max for Pro plan
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Verify cron authorization
+  const authError = verifyCronRequest(request);
+  if (authError) return authError;
   const startTime = Date.now();
   const admin = createSupabaseAdminClient();
   
@@ -135,10 +139,11 @@ export async function POST() {
   }
 }
 
-// Also support GET for manual testing (with auth check in production)
-export async function GET() {
-  return POST();
+// Also support GET for Vercel cron (uses same auth)
+export async function GET(request: NextRequest) {
+  return POST(request);
 }
+
 
 
 

@@ -5,9 +5,10 @@
  * Triggered by Vercel Cron: 0 10 * * 0 (Sundays at 10am UTC)
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { DiscordService } from '@/services/discordService';
+import { verifyCronRequest } from '@/lib/api/cron-auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
@@ -19,7 +20,11 @@ interface WeeklyData {
   transactionCount: number;
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Verify cron authorization
+  const authError = verifyCronRequest(request);
+  if (authError) return authError;
+
   const startTime = Date.now();
   const admin = createSupabaseAdminClient();
   
@@ -236,9 +241,10 @@ async function getWeeklyData(
   };
 }
 
-export async function GET() {
-  return POST();
+export async function GET(request: NextRequest) {
+  return POST(request);
 }
+
 
 
 

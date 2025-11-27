@@ -74,7 +74,6 @@ function renderToolResultByName(toolName: string, result: unknown) {
   // Handle action results (write operations)
   if (typeof result === "object" && result !== null && "success" in result) {
     const actionResult = result as { success: boolean; message: string; symbol?: string };
-    const display = toolDisplayNames[toolName] || { icon: "•", color: "text-gray-600" };
     return (
       <div className={`mt-1 flex items-center gap-2 py-1.5 px-2 rounded-md text-xs ${
         actionResult.success ? "bg-emerald-50 border border-emerald-200" : "bg-red-50 border border-red-200"

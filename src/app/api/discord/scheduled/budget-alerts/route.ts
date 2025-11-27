@@ -5,9 +5,10 @@
  * Triggered by Vercel Cron: 0 5 * * * (daily at 5am UTC)
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { DiscordService } from '@/services/discordService';
+import { verifyCronRequest } from '@/lib/api/cron-auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
@@ -20,7 +21,11 @@ interface BudgetStatus {
   percent_used: number;
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Verify cron authorization
+  const authError = verifyCronRequest(request);
+  if (authError) return authError;
+
   const startTime = Date.now();
   const admin = createSupabaseAdminClient();
   
@@ -91,8 +96,7 @@ export async function POST() {
           const sent = await discordService.sendBudgetAlert(
             budget.category_name,
             budget.spent_amount,
-            budget.budget_amount,
-            'USD'
+            budget.budget_amount
           );
 
           if (sent) {
@@ -234,7 +238,7 @@ async function getBudgetStatuses(
   });
 }
 
-export async function GET() {
-  return POST();
+export async function GET(request: NextRequest) {
+  return POST(request);
 }
 

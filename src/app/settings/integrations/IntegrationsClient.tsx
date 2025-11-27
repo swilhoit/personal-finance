@@ -96,7 +96,7 @@ export default function IntegrationsClient({
       } else {
         throw new Error('Failed to disconnect');
       }
-    } catch (error) {
+    } catch {
       setNotification({ type: 'error', message: 'Failed to disconnect Discord' });
     } finally {
       setIsDisconnecting(false);

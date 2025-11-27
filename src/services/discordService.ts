@@ -107,8 +107,7 @@ export class DiscordService {
   async sendBudgetAlert(
     category: string,
     spent: number,
-    limit: number,
-    _currency: string = 'USD'
+    limit: number
   ): Promise<boolean> {
     const percent = (spent / limit) * 100;
     const color = percent >= 100 ? DiscordColors.Red : 
@@ -382,6 +381,7 @@ export class DiscordBot {
     // client.login(this.token);
   }
 }
+
 
 
 

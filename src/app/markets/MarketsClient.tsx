@@ -116,7 +116,7 @@ export default function MarketsClient({
       } else {
         throw new Error("Failed to remove symbol");
       }
-    } catch (error) {
+    } catch {
       showNotification("error", "Failed to remove symbol");
     }
   };
@@ -149,7 +149,7 @@ export default function MarketsClient({
         setMarketData(newMarketData);
         showNotification("success", "Prices refreshed");
       }
-    } catch (error) {
+    } catch {
       showNotification("error", "Failed to refresh prices");
     } finally {
       setIsRefreshing(false);

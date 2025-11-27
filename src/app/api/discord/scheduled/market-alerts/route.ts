@@ -5,14 +5,18 @@
  * Triggered by Vercel Cron: 0 * * * 1-5 (hourly on weekdays during market hours)
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { DiscordService } from '@/services/discordService';
+import { verifyCronRequest } from '@/lib/api/cron-auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Verify cron authorization
+  const authError = verifyCronRequest(request);
+  if (authError) return authError;
   const startTime = Date.now();
   const admin = createSupabaseAdminClient();
   
@@ -198,9 +202,10 @@ export async function POST() {
   }
 }
 
-export async function GET() {
-  return POST();
+export async function GET(request: NextRequest) {
+  return POST(request);
 }
+
 
 
 

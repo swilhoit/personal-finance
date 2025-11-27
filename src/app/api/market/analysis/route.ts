@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   try {
     const supabase = await createClient();
     
@@ -85,6 +85,7 @@ export async function POST(_request: NextRequest) {
     );
   }
 }
+
 
 
 

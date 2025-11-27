@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { verifyDiscordSignature } from '@/lib/api/discord-verify';
 
 // Lazy-load Supabase client to avoid build-time errors
 let supabaseInstance: SupabaseClient | null = null;
@@ -22,15 +23,15 @@ function getSupabase(): SupabaseClient {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify Discord signature in production
-    // const signature = request.headers.get('X-Signature-Ed25519');
-    // const timestamp = request.headers.get('X-Signature-Timestamp');
+    // Get raw body for signature verification
+    const rawBody = await request.text();
 
-    if (!process.env.DISCORD_PUBLIC_KEY) {
-      console.warn('Discord public key not configured - skipping signature verification');
-    }
+    // Verify Discord signature
+    const signatureError = await verifyDiscordSignature(request, rawBody);
+    if (signatureError) return signatureError;
 
-    const body = await request.json();
+    // Parse the verified body
+    const body = JSON.parse(rawBody);
     const { type } = body;
 
     // Handle Discord interaction types
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
         return await handleCommand(body);
 
       case 3: // MESSAGE_COMPONENT
-        return await handleComponent(body);
+        return await handleComponent();
 
       default:
         return NextResponse.json({ type: 1 });
@@ -337,7 +338,7 @@ async function handleQuoteCommand(options?: Array<{ name: string; value: string 
   });
 }
 
-async function handleComponent(_interaction: DiscordInteraction): Promise<NextResponse> {
+async function handleComponent(): Promise<NextResponse> {
   return NextResponse.json({
     type: 4,
     data: {
@@ -346,6 +347,7 @@ async function handleComponent(_interaction: DiscordInteraction): Promise<NextRe
     },
   });
 }
+
 
 
 

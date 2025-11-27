@@ -1,0 +1,836 @@
+openapi: 3.1.0
+info:
+  title: Personal Finance API
+  description: |
+    API for the Personal Finance application. Provides endpoints for managing
+    bank accounts, transactions, investments, market data, and notifications.
+
+    ## Authentication
+    Most endpoints require authentication via Supabase Auth. Include the session
+    cookie or Authorization header with a valid JWT token.
+
+    ## Response Format
+    Successful responses follow this format:
+    ```json
+    {
+      "success": true,
+      "data": { ... },
+      "meta": { "count": 10 }
+    }
+    ```
+
+    Error responses follow this format:
+    ```json
+    {
+      "success": false,
+      "error": "Error message"
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: /api
+    description: API routes
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Accounts
+    description: Bank account management (via Teller)
+  - name: Market
+    description: Market data and watchlist
+  - name: Investments
+    description: Investment holdings and portfolio
+  - name: Discord
+    description: Discord integration and notifications
+  - name: Chat
+    description: AI chat assistant
+
+paths:
+  # ============ AUTH ============
+  /auth/session:
+    get:
+      tags: [Auth]
+      summary: Get current session
+      description: Returns the current authenticated user's session information
+      responses:
+        '200':
+          description: Session information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ HEALTH ============
+  /health:
+    get:
+      tags: [Auth]
+      summary: Health check
+      description: Simple health check endpoint
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  # ============ TELLER/ACCOUNTS ============
+  /teller/accounts:
+    get:
+      tags: [Accounts]
+      summary: List connected bank accounts
+      description: Returns all connected bank accounts for the authenticated user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankAccount'
+                  count:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Accounts]
+      summary: Disconnect a bank enrollment
+      description: Soft deletes a bank enrollment and its associated accounts
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enrollmentId]
+              properties:
+                enrollmentId:
+                  type: string
+                  description: The enrollment ID to disconnect
+      responses:
+        '200':
+          description: Successfully disconnected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teller/create-enrollment:
+    post:
+      tags: [Accounts]
+      summary: Create bank enrollment
+      description: Initiates a new Teller Connect enrollment
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Enrollment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enrollmentId:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teller/exchange-token:
+    post:
+      tags: [Accounts]
+      summary: Exchange Teller Connect token
+      description: Exchanges a Teller Connect token for account access
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [accessToken, enrollmentId]
+              properties:
+                accessToken:
+                  type: string
+                enrollmentId:
+                  type: string
+                institutionName:
+                  type: string
+      responses:
+        '200':
+          description: Token exchanged successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teller/sync:
+    post:
+      tags: [Accounts]
+      summary: Sync account transactions
+      description: Triggers a sync of transactions for a specific enrollment
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enrollmentId]
+              properties:
+                enrollmentId:
+                  type: string
+      responses:
+        '200':
+          description: Sync completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactionCount:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teller/sync-all:
+    post:
+      tags: [Accounts]
+      summary: Sync all accounts (cron)
+      description: |
+        Triggers a sync of all active enrollments.
+        Requires CRON_SECRET authorization for scheduled jobs.
+      security:
+        - cronAuth: []
+      responses:
+        '200':
+          description: Sync completed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ MARKET ============
+  /market/watchlist:
+    get:
+      tags: [Market]
+      summary: Get watchlist
+      description: Returns user's stock watchlist with current prices
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Watchlist with prices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Market]
+      summary: Add to watchlist
+      description: Adds a stock symbol to the user's watchlist
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [symbol]
+              properties:
+                symbol:
+                  type: string
+                  pattern: '^[A-Z]{1,10}$'
+                  example: "AAPL"
+                notes:
+                  type: string
+                targetPrice:
+                  type: number
+                alertAbove:
+                  type: number
+                alertBelow:
+                  type: number
+      responses:
+        '201':
+          description: Added to watchlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Market]
+      summary: Remove from watchlist
+      description: Removes a stock symbol from the user's watchlist
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [symbol]
+              properties:
+                symbol:
+                  type: string
+      responses:
+        '200':
+          description: Removed from watchlist
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /market/quote:
+    get:
+      tags: [Market]
+      summary: Get stock quote
+      description: Fetches current price and data for a stock symbol
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "AAPL"
+      responses:
+        '200':
+          description: Stock quote data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TickerData'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /market/analysis:
+    get:
+      tags: [Market]
+      summary: Get market analysis
+      description: Returns AI-generated market analysis
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Market analysis
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /market/insights:
+    get:
+      tags: [Market]
+      summary: Get market insights
+      description: Returns market insights and trends
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Market insights
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /market/holdings:
+    get:
+      tags: [Market]
+      summary: Get user holdings
+      description: Returns user's investment holdings with current values
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Holdings list
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ INVESTMENTS ============
+  /investments/holdings:
+    get:
+      tags: [Investments]
+      summary: Get investment holdings
+      description: Returns detailed investment holdings
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Investment holdings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  holdings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Holding'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ DISCORD ============
+  /discord/register:
+    post:
+      tags: [Discord]
+      summary: Register Discord user
+      description: Links a Discord user to their finance account
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discordUserId:
+                  type: string
+                guildId:
+                  type: string
+      responses:
+        '200':
+          description: Registration successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /discord/connection:
+    get:
+      tags: [Discord]
+      summary: Get Discord connection status
+      description: Returns the user's Discord connection status
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Connection status
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /discord/webhook:
+    post:
+      tags: [Discord]
+      summary: Discord webhook handler
+      description: |
+        Handles incoming Discord interactions (slash commands, button clicks).
+        Requires Discord signature verification.
+      security:
+        - discordSignature: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Interaction handled
+        '401':
+          description: Invalid signature
+
+  /discord/oauth/authorize:
+    get:
+      tags: [Discord]
+      summary: Start Discord OAuth flow
+      description: Redirects to Discord OAuth authorization
+      security:
+        - cookieAuth: []
+      responses:
+        '302':
+          description: Redirect to Discord
+
+  /discord/oauth/callback:
+    get:
+      tags: [Discord]
+      summary: Discord OAuth callback
+      description: Handles the OAuth callback from Discord
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to dashboard
+
+  /discord/guilds:
+    get:
+      tags: [Discord]
+      summary: List Discord guilds
+      description: Returns Discord guilds the bot is in
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of guilds
+
+  /discord/scheduled/market-alerts:
+    post:
+      tags: [Discord]
+      summary: Send market alerts (cron)
+      description: Sends scheduled market alerts to Discord
+      security:
+        - cronAuth: []
+      responses:
+        '200':
+          description: Alerts sent
+
+  /discord/scheduled/weekly-report:
+    post:
+      tags: [Discord]
+      summary: Send weekly report (cron)
+      description: Sends weekly financial report to Discord
+      security:
+        - cronAuth: []
+      responses:
+        '200':
+          description: Report sent
+
+  /discord/scheduled/budget-alerts:
+    post:
+      tags: [Discord]
+      summary: Send budget alerts (cron)
+      description: Sends budget alerts to Discord
+      security:
+        - cronAuth: []
+      responses:
+        '200':
+          description: Alerts sent
+
+  # ============ NOTIFICATIONS ============
+  /notification-schedules:
+    get:
+      tags: [Discord]
+      summary: Get notification schedules
+      description: Returns user's notification schedule preferences
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Notification schedules
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Discord]
+      summary: Update notification schedules
+      description: Updates notification schedule preferences
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schedules:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [daily_summary, weekly_report, market_alerts, budget_alerts]
+                      enabled:
+                        type: boolean
+                      time:
+                        type: string
+                      day:
+                        type: string
+      responses:
+        '200':
+          description: Schedules updated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ CHAT ============
+  /chat:
+    post:
+      tags: [Chat]
+      summary: Send chat message
+      description: Sends a message to the AI financial assistant
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                conversationId:
+                  type: string
+      responses:
+        '200':
+          description: AI response (streaming)
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /chat/history:
+    get:
+      tags: [Chat]
+      summary: Get chat history
+      description: Returns chat conversation history
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: conversationId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat history
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /chat/health:
+    get:
+      tags: [Chat]
+      summary: Chat service health
+      description: Checks if the chat service is operational
+      responses:
+        '200':
+          description: Service healthy
+
+  # ============ INSIGHTS ============
+  /insights/recompute:
+    post:
+      tags: [Investments]
+      summary: Recompute insights
+      description: Triggers recomputation of financial insights
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Insights recomputed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ VOICE ============
+  /voice/realtime-auth:
+    get:
+      tags: [Chat]
+      summary: Get realtime auth token
+      description: Returns authentication for voice realtime API
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Auth token
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /voice/realtime:
+    get:
+      tags: [Chat]
+      summary: Voice realtime endpoint
+      description: WebSocket endpoint for voice interactions
+      security:
+        - cookieAuth: []
+      responses:
+        '101':
+          description: WebSocket upgrade
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sb-access-token
+      description: Supabase session cookie
+    cronAuth:
+      type: http
+      scheme: bearer
+      description: CRON_SECRET bearer token for scheduled jobs
+    discordSignature:
+      type: apiKey
+      in: header
+      name: X-Signature-Ed25519
+      description: Discord interaction signature
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: "Unauthorized"
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: "Invalid request"
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+
+    BankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        accountId:
+          type: string
+        name:
+          type: string
+          example: "Checking Account"
+        type:
+          type: string
+          enum: [depository, credit, loan, investment]
+        subtype:
+          type: string
+          example: "checking"
+        institutionName:
+          type: string
+          example: "Chase"
+        lastFour:
+          type: string
+          example: "1234"
+        currentBalance:
+          type: number
+          example: 1500.00
+        availableBalance:
+          type: number
+          example: 1450.00
+        creditLimit:
+          type: number
+          nullable: true
+        currency:
+          type: string
+          example: "USD"
+        lastSynced:
+          type: string
+          format: date-time
+
+    TickerData:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: "AAPL"
+        name:
+          type: string
+          example: "Apple Inc"
+        price:
+          type: number
+          example: 175.50
+        change:
+          type: number
+          example: 2.35
+        changePercent:
+          type: number
+          example: 1.36
+        volume:
+          type: integer
+          example: 45000000
+        marketCap:
+          type: number
+          example: 2800000000000
+        performance30d:
+          type: number
+          example: 5.2
+        performance90d:
+          type: number
+          example: 12.8
+        performance365d:
+          type: number
+          example: 28.5
+        timestamp:
+          type: string
+          format: date-time
+
+    Holding:
+      type: object
+      properties:
+        symbol:
+          type: string
+        shares:
+          type: number
+        costBasis:
+          type: number
+        currentValue:
+          type: number
+        gain:
+          type: number
+        gainPercent:
+          type: number
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+        meta:
+          type: object
+          properties:
+            count:
+              type: integer

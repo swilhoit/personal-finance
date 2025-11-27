@@ -130,6 +130,7 @@ export function useTrueRealtimeVoice({
         error: error instanceof Error ? error.message : 'Failed to connect'
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isConnected]);
 
   const sendMessage = (message: Record<string, unknown>) => {

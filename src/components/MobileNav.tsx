@@ -2,13 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export default function MobileNav() {
   const pathname = usePathname();
   const [activeIndex, setActiveIndex] = useState(0);
-  
-  const navItems = [
+
+  const navItems = useMemo(() => [
     {
       href: "/dashboard",
       label: "HOME",
@@ -39,10 +39,10 @@ export default function MobileNav() {
       emoji: "⚙️",
       color: "from-gray-400 to-gray-600",
     }
-  ];
+  ], []);
 
   useEffect(() => {
-    const currentIndex = navItems.findIndex(item => 
+    const currentIndex = navItems.findIndex(item =>
       pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href))
     );
     if (currentIndex !== -1) setActiveIndex(currentIndex);

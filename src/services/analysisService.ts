@@ -120,7 +120,7 @@ export class AnalysisService {
     });
 
     const analysisText = response.content[0].type === 'text' ? response.content[0].text : '';
-    const analysis = this.parseAnalysis(analysisText, weekStart, weekEnd, transactions, marketData);
+    const analysis = this.parseAnalysis(analysisText, weekStart, weekEnd, transactions);
 
     // Save to database
     await this.saveAnalysis(userId, analysis);
@@ -236,8 +236,7 @@ Return ONLY valid JSON.`;
     responseText: string,
     weekStart: Date,
     weekEnd: Date,
-    transactions: Transaction[],
-    _marketData: MarketData[]
+    transactions: Transaction[]
   ): WeeklyAnalysis {
     try {
       // Extract JSON from response
@@ -439,6 +438,7 @@ Return ONLY valid JSON.`;
     return data || [];
   }
 }
+
 
 
 

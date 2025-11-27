@@ -110,8 +110,9 @@ export class TellerService {
     this.agent = createTellerAgent();
   }
 
-  private async makeRequest<T>(endpoint: string, options: { method?: string; body?: string } = {}): Promise<T> {
+  private async makeRequest<T>(endpoint: string, options: { method?: string; body?: string; timeout?: number } = {}): Promise<T> {
     const url = new URL(`${TELLER_API_BASE}${endpoint}`);
+    const timeout = options.timeout || 30000; // 30 second default timeout
 
     return new Promise((resolve, reject) => {
       const req = https.request(
@@ -120,6 +121,7 @@ export class TellerService {
           path: url.pathname + url.search,
           method: options.method || 'GET',
           agent: this.agent,
+          timeout,
           headers: {
             'Authorization': `Basic ${Buffer.from(`${this.accessToken}:`).toString('base64')}`,
             'Content-Type': 'application/json',
@@ -141,6 +143,11 @@ export class TellerService {
           });
         }
       );
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error(`Teller API timeout after ${timeout}ms`));
+      });
 
       req.on('error', reject);
 
@@ -194,6 +201,7 @@ export class TellerService {
 
 /**
  * Sync Teller data to Supabase
+ * Uses batch operations to avoid N+1 query issues
  */
 export async function syncTellerToSupabase(
   supabase: SupabaseClient,
@@ -210,6 +218,39 @@ export async function syncTellerToSupabase(
     // Fetch accounts
     const accounts = await teller.listAccounts();
 
+    // Collect all account data with balances
+    const accountRecords: Array<{
+      user_id: string;
+      enrollment_id: string;
+      account_id: string;
+      name: string;
+      type: string;
+      subtype: string;
+      institution_name: string;
+      last_four: string;
+      currency: string;
+      current_balance: number | null;
+      available_balance: number | null;
+      is_active: boolean;
+      last_synced_at: string;
+    }> = [];
+
+    // Collect all transactions
+    const transactionRecords: Array<{
+      user_id: string;
+      account_id: string;
+      transaction_id: string;
+      teller_account_id: string;
+      teller_transaction_id: string;
+      source: string;
+      name: string;
+      merchant_name: string | null;
+      amount: number;
+      category: string;
+      date: string;
+      pending: boolean;
+    }> = [];
+
     for (const account of accounts) {
       // Get balance
       let balance: TellerBalance | null = null;
@@ -219,8 +260,8 @@ export async function syncTellerToSupabase(
         console.warn(`Could not fetch balance for account ${account.id}`);
       }
 
-      // Upsert account
-      await supabase.from('teller_accounts').upsert({
+      // Add to batch
+      accountRecords.push({
         user_id: userId,
         enrollment_id: enrollmentId,
         account_id: account.id,
@@ -234,15 +275,16 @@ export async function syncTellerToSupabase(
         available_balance: balance ? parseFloat(balance.available) : null,
         is_active: account.status === 'open',
         last_synced_at: new Date().toISOString(),
-      }, { onConflict: 'account_id' });
-
-      accountsSynced++;
+      });
 
       // Fetch transactions
       const transactions = await teller.getTransactions(account.id, { count: 100 });
 
       for (const tx of transactions) {
-        await supabase.from('transactions').upsert({
+        // Teller returns positive amounts for debits (expenses) and negative for credits (income)
+        // Our app convention is opposite: negative = expense, positive = income
+        // So we negate the amount to match our convention
+        transactionRecords.push({
           user_id: userId,
           account_id: account.id,
           transaction_id: tx.id,
@@ -251,13 +293,39 @@ export async function syncTellerToSupabase(
           source: 'teller',
           name: tx.description,
           merchant_name: tx.details.counterparty?.name || null,
-          amount: parseFloat(tx.amount),
+          amount: -parseFloat(tx.amount),
           category: tx.details.category || 'uncategorized',
           date: tx.date,
           pending: tx.status === 'pending',
-        }, { onConflict: 'transaction_id' });
+        });
+      }
+    }
 
-        transactionsSynced++;
+    // Batch upsert accounts (single DB call)
+    if (accountRecords.length > 0) {
+      const { error: accountError } = await supabase
+        .from('teller_accounts')
+        .upsert(accountRecords, { onConflict: 'account_id' });
+
+      if (accountError) {
+        console.error('Error upserting accounts:', accountError);
+      } else {
+        accountsSynced = accountRecords.length;
+      }
+    }
+
+    // Batch upsert transactions in chunks of 500 (Supabase limit)
+    const BATCH_SIZE = 500;
+    for (let i = 0; i < transactionRecords.length; i += BATCH_SIZE) {
+      const batch = transactionRecords.slice(i, i + BATCH_SIZE);
+      const { error: txError } = await supabase
+        .from('transactions')
+        .upsert(batch, { onConflict: 'transaction_id' });
+
+      if (txError) {
+        console.error(`Error upserting transactions batch ${i / BATCH_SIZE + 1}:`, txError);
+      } else {
+        transactionsSynced += batch.length;
       }
     }
 

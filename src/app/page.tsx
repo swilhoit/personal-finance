@@ -6,21 +6,6 @@ import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
 
 // ASCII Art Components
-const AsciiLogo = () => (
-  <pre className="font-mono text-emerald-400/30 text-[10px] leading-tight select-none animate-fadeIn">
-{`
-    ╔══════════════════════════════╗
-    ║  ███╗   ███╗ █████╗ ███╗   ███╗ █████╗  ║
-    ║  ████╗ ████║██╔══██╗████╗ ████║██╔══██╗ ║
-    ║  ██╔████╔██║███████║██╔████╔██║███████║ ║
-    ║  ██║╚██╔╝██║██╔══██║██║╚██╔╝██║██╔══██║ ║
-    ║  ██║ ╚═╝ ██║██║  ██║██║ ╚═╝ ██║██║  ██║ ║
-    ║  ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ║
-    ╚══════════════════════════════╝
-`}
-  </pre>
-);
-
 const FloatingDollar = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
   <div
     className="absolute font-mono text-emerald-500/10 text-2xl animate-float select-none pointer-events-none"

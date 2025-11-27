@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { audio, session_config } = await req.json();
+    // Parse request body (audio and session_config will be used in future implementation)
+    await req.json();
 
     // For now, return a placeholder response
     // In a full implementation, you'd process the audio with OpenAI's API
