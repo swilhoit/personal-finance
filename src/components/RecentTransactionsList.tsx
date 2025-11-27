@@ -27,11 +27,12 @@ export default async function RecentTransactionsList() {
   }
 
   const formatAmount = (amount: number) => {
-    const isNegative = amount < 0;
+    // Negative = expense (red), Positive = income (green)
+    const isExpense = amount < 0;
     const absAmount = Math.abs(amount);
     return (
-      <span className={`font-medium ${isNegative ? "text-gray-900" : "text-gray-700"}`}>
-        {isNegative ? "-" : "+"}${absAmount.toFixed(2)}
+      <span className={`font-medium ${isExpense ? "text-red-600" : "text-green-600"}`}>
+        {isExpense ? "−" : "+"}${absAmount.toFixed(2)}
       </span>
     );
   };

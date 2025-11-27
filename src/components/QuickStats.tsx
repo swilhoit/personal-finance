@@ -34,12 +34,15 @@ export default async function QuickStats() {
   const totalBalance = (accountsResult.data ?? [])
     .reduce((sum, acc) => sum + (acc.current_balance ?? 0), 0);
 
+  // Only sum negative amounts (expenses) - positive amounts are income
   const monthSpend = (monthSpendResult.data ?? [])
+    .filter(t => (t.amount ?? 0) < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount ?? 0), 0);
 
   const avgDaily = monthSpend / new Date().getDate();
 
   const last30Days = (transactionsResult.data ?? [])
+    .filter(t => (t.amount ?? 0) < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount ?? 0), 0);
 
   const stats = [

@@ -90,42 +90,45 @@ export default async function InsightsPage() {
   }));
 
   // Prepare spending trend data (daily aggregation for last 30 days)
+  // Only include expenses (negative amounts) in spending metrics
   const dailySpending = new Map<string, number>();
   const last30Days = new Date();
   last30Days.setDate(last30Days.getDate() - 30);
-  
+
   (allTransactions as Transaction[] ?? []).forEach(tx => {
-    const date = tx.date.slice(0, 10);
-    dailySpending.set(date, (dailySpending.get(date) || 0) + tx.amount);
+    if (tx.amount < 0) {  // Only expenses
+      const date = tx.date.slice(0, 10);
+      dailySpending.set(date, (dailySpending.get(date) || 0) + Math.abs(tx.amount));
+    }
   });
   
   const trendData = Array.from(dailySpending.entries())
     .map(([date, amount]) => ({ date, amount }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  // Calculate week-over-week change
+  // Calculate week-over-week change (expenses only)
   const thisWeek = new Date();
   const lastWeek = new Date();
   thisWeek.setDate(thisWeek.getDate() - 7);
   lastWeek.setDate(lastWeek.getDate() - 14);
-  
+
   const thisWeekSpending = transactions
-    .filter(tx => new Date(tx.date) >= thisWeek)
-    .reduce((sum, tx) => sum + tx.amount, 0);
-  
+    .filter(tx => new Date(tx.date) >= thisWeek && tx.amount < 0)
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
   const lastWeekSpending = transactions
-    .filter(tx => new Date(tx.date) >= lastWeek && new Date(tx.date) < thisWeek)
-    .reduce((sum, tx) => sum + tx.amount, 0);
+    .filter(tx => new Date(tx.date) >= lastWeek && new Date(tx.date) < thisWeek && tx.amount < 0)
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
   
   const weekChange = lastWeekSpending > 0 
     ? ((thisWeekSpending - lastWeekSpending) / lastWeekSpending) * 100 
     : 0;
 
-  // Get top merchants
+  // Get top merchants (expenses only)
   const merchantSpending = new Map<string, number>();
   transactions.forEach(tx => {
-    if (tx.merchant_name) {
-      merchantSpending.set(tx.merchant_name, (merchantSpending.get(tx.merchant_name) || 0) + tx.amount);
+    if (tx.merchant_name && tx.amount < 0) {
+      merchantSpending.set(tx.merchant_name, (merchantSpending.get(tx.merchant_name) || 0) + Math.abs(tx.amount));
     }
   });
   

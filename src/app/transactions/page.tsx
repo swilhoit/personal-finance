@@ -33,8 +33,9 @@ export default async function TransactionsPage() {
     return acc;
   }, {} as Record<string, typeof txs>);
 
-  const totalSpent = (txs ?? []).reduce((sum, t) => sum + (t.amount > 0 ? t.amount : 0), 0);
-  const totalIncome = (txs ?? []).reduce((sum, t) => sum + (t.amount < 0 ? Math.abs(t.amount) : 0), 0);
+  // Negative amounts = expenses (money out), Positive amounts = income (money in)
+  const totalSpent = (txs ?? []).reduce((sum, t) => sum + (t.amount < 0 ? Math.abs(t.amount) : 0), 0);
+  const totalIncome = (txs ?? []).reduce((sum, t) => sum + (t.amount > 0 ? t.amount : 0), 0);
   const netFlow = totalIncome - totalSpent;
 
   // Get transaction stats
@@ -148,9 +149,10 @@ export default async function TransactionsPage() {
                 <div className="bg-white rounded-2xl border-4 border-cyan-400 overflow-hidden shadow-xl">
                   <div className="divide-y-2 divide-cyan-100 divide-cyan-900/30">
                     {transactions?.map((t) => {
-                      const isExpense = t.amount > 0;
-                      const emoji = isExpense ? 
-                        (t.amount > 100 ? '💸' : t.amount > 50 ? '💰' : '💵') : 
+                      const isExpense = t.amount < 0;
+                      const absAmount = Math.abs(t.amount);
+                      const emoji = isExpense ?
+                        (absAmount > 100 ? '💸' : absAmount > 50 ? '💰' : '💵') :
                         '💚';
                       
                       return (
