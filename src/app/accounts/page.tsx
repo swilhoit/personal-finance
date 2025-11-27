@@ -53,9 +53,24 @@ export default async function AccountsPage() {
     return acc;
   }, {} as Record<string, Account[]>);
 
-  // Calculate totals
-  const totalBalance = (accounts as Account[] ?? []).reduce((sum, a) => sum + (a.current_balance ?? 0), 0);
-  const totalAvailable = (accounts as Account[] ?? []).reduce((sum, a) => sum + (a.available_balance ?? 0), 0);
+  // Calculate totals by account type
+  // Depository accounts (checking, savings) = assets (positive)
+  // Credit accounts = debt/liabilities (should be subtracted)
+  const allAccounts = (accounts as Account[] ?? []);
+
+  const totalAssets = allAccounts
+    .filter(a => a.type === 'depository')
+    .reduce((sum, a) => sum + (a.current_balance ?? 0), 0);
+
+  const totalDebt = allAccounts
+    .filter(a => a.type === 'credit')
+    .reduce((sum, a) => sum + (a.current_balance ?? 0), 0);
+
+  const netWorth = totalAssets - totalDebt;
+
+  const totalAvailable = allAccounts
+    .filter(a => a.type === 'depository')
+    .reduce((sum, a) => sum + (a.available_balance ?? 0), 0);
 
   // Get account type icon
   const getAccountIcon = (type: string | null, subtype: string | null) => {
@@ -93,27 +108,31 @@ export default async function AccountsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Total Balance</p>
-            <p className="text-2xl font-semibold text-gray-900">${totalBalance.toFixed(2)}</p>
-            <p className="text-xs text-gray-500 mt-1">Across all accounts</p>
+            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Net Worth</p>
+            <p className={`text-2xl font-semibold ${netWorth >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+              {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Assets minus debt</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Available</p>
-            <p className="text-2xl font-semibold text-gray-900">${totalAvailable.toFixed(2)}</p>
-            <p className="text-xs text-gray-500 mt-1">Ready to spend</p>
+            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Cash & Savings</p>
+            <p className="text-2xl font-semibold text-green-600">${totalAssets.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">Available: ${totalAvailable.toFixed(2)}</p>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Credit Card Debt</p>
+            <p className="text-2xl font-semibold text-red-600">
+              {totalDebt > 0 ? '-' : ''}${totalDebt.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Amount owed</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Accounts</p>
             <p className="text-2xl font-semibold text-gray-900">{accounts?.length ?? 0}</p>
-            <p className="text-xs text-gray-500 mt-1">Connected</p>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Institutions</p>
-            <p className="text-2xl font-semibold text-gray-900">{Object.keys(accountsByInstitution).length}</p>
-            <p className="text-xs text-gray-500 mt-1">Linked banks</p>
+            <p className="text-xs text-gray-500 mt-1">{Object.keys(accountsByInstitution).length} institutions</p>
           </div>
         </div>
 
@@ -158,8 +177,8 @@ export default async function AccountsPage() {
                           </div>
 
                           <div className="text-right">
-                            <div className="font-semibold text-lg text-gray-900">
-                              ${(account.current_balance ?? 0).toFixed(2)}
+                            <div className={`font-semibold text-lg ${account.type === 'credit' ? 'text-red-600' : 'text-gray-900'}`}>
+                              {account.type === 'credit' && (account.current_balance ?? 0) > 0 ? '-' : ''}${(account.current_balance ?? 0).toFixed(2)}
                             </div>
                             {account.available_balance != null && account.available_balance !== account.current_balance && (
                               <div className="text-xs text-gray-500">

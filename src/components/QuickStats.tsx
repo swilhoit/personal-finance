@@ -15,7 +15,7 @@ export default async function QuickStats() {
   const [accountsResult, monthSpendResult, transactionsResult] = await Promise.all([
     supabase
       .from("teller_accounts")
-      .select("current_balance")
+      .select("current_balance, type")
       .eq("user_id", user.id)
       .eq("is_active", true),
     supabase
@@ -31,8 +31,15 @@ export default async function QuickStats() {
       .gte("date", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10))
   ]);
 
-  const totalBalance = (accountsResult.data ?? [])
+  // Calculate net worth: assets (depository) - debt (credit)
+  const accounts = accountsResult.data ?? [];
+  const totalAssets = accounts
+    .filter(acc => acc.type === 'depository')
     .reduce((sum, acc) => sum + (acc.current_balance ?? 0), 0);
+  const totalDebt = accounts
+    .filter(acc => acc.type === 'credit')
+    .reduce((sum, acc) => sum + (acc.current_balance ?? 0), 0);
+  const netWorth = totalAssets - totalDebt;
 
   // Only sum negative amounts (expenses) - positive amounts are income
   const monthSpend = (monthSpendResult.data ?? [])
@@ -47,8 +54,9 @@ export default async function QuickStats() {
 
   const stats = [
     {
-      label: "Total Balance",
-      value: totalBalance,
+      label: "Net Worth",
+      value: netWorth,
+      isNetWorth: true,
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -86,24 +94,27 @@ export default async function QuickStats() {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-colors"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-gray-100 rounded-lg text-gray-700">
-              {stat.icon}
+      {stats.map((stat) => {
+        const isNegative = stat.isNetWorth && stat.value < 0;
+        return (
+          <div
+            key={stat.label}
+            className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-gray-100 rounded-lg text-gray-700">
+                {stat.icon}
+              </div>
             </div>
+            <p className="text-sm text-gray-600 mb-1">
+              {stat.label}
+            </p>
+            <p className={`text-2xl font-semibold ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>
+              {isNegative ? '-' : ''}${Math.abs(stat.value).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </p>
           </div>
-          <p className="text-sm text-gray-600 mb-1">
-            {stat.label}
-          </p>
-          <p className="text-2xl font-semibold text-gray-900">
-            ${stat.value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-          </p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
