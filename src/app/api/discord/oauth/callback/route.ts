@@ -49,14 +49,19 @@ export async function GET(request: NextRequest) {
 
     // Verify state parameter using admin client (bypasses RLS for temporary CSRF tokens)
     const stateData = JSON.parse(Buffer.from(state, 'base64url').toString());
-    const { data: storedState } = await adminClient
+    const { data: storedState, error: stateError } = await adminClient
       .from('oauth_states')
       .select('*')
       .eq('state', state)
       .eq('provider', 'discord')
       .single();
 
+    if (stateError) {
+      console.error('Error fetching OAuth state:', stateError);
+    }
+
     if (!storedState || new Date(storedState.expires_at) < new Date()) {
+      console.error('Invalid state - storedState:', storedState, 'stateError:', stateError);
       return NextResponse.redirect(
         new URL('/settings/integrations?error=invalid_state', request.url)
       );
@@ -72,19 +77,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Exchange code for access token
+    // Exchange code for access token (trim env vars to remove any trailing newlines)
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.DISCORD_CLIENT_ID!,
-        client_secret: process.env.DISCORD_CLIENT_SECRET!,
+        client_id: process.env.DISCORD_CLIENT_ID?.trim() || '',
+        client_secret: process.env.DISCORD_CLIENT_SECRET?.trim() || '',
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.DISCORD_REDIRECT_URI ||
-          `${process.env.NEXT_PUBLIC_SITE_URL}/api/discord/oauth/callback`,
+        redirect_uri: (process.env.DISCORD_REDIRECT_URI ||
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/discord/oauth/callback`).trim(),
       }),
     });
 

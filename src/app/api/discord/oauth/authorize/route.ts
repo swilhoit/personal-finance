@@ -19,9 +19,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const clientId = process.env.DISCORD_CLIENT_ID;
-    const redirectUri = process.env.DISCORD_REDIRECT_URI ||
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/discord/oauth/callback`;
+    // Trim env vars to remove any trailing newlines
+    const clientId = process.env.DISCORD_CLIENT_ID?.trim();
+    const redirectUri = (process.env.DISCORD_REDIRECT_URI ||
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/discord/oauth/callback`).trim();
 
     if (!clientId) {
       return NextResponse.json(
@@ -40,12 +41,20 @@ export async function GET(request: NextRequest) {
     // Store state in session or database for validation
     // Use admin client to bypass RLS for temporary CSRF tokens
     const adminClient = createSupabaseAdminClient();
-    await adminClient.from('oauth_states').insert({
+    const { error: insertError } = await adminClient.from('oauth_states').insert({
       user_id: user.id,
       state,
       provider: 'discord',
       expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
     });
+
+    if (insertError) {
+      console.error('Error storing OAuth state:', insertError);
+      return NextResponse.json(
+        { error: 'Failed to store OAuth state', details: insertError.message },
+        { status: 500 }
+      );
+    }
 
     // Build Discord OAuth URL
     const scopes = ['identify', 'guilds'];
