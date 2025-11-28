@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 interface DiscordUser {
   id: string;
@@ -44,10 +45,11 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    const adminClient = createSupabaseAdminClient();
 
-    // Verify state parameter
+    // Verify state parameter using admin client (bypasses RLS for temporary CSRF tokens)
     const stateData = JSON.parse(Buffer.from(state, 'base64url').toString());
-    const { data: storedState } = await supabase
+    const { data: storedState } = await adminClient
       .from('oauth_states')
       .select('*')
       .eq('state', state)
@@ -61,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Delete used state
-    await supabase.from('oauth_states').delete().eq('state', state);
+    await adminClient.from('oauth_states').delete().eq('state', state);
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user || user.id !== stateData.userId) {

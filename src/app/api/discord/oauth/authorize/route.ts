@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,7 +38,9 @@ export async function GET(request: NextRequest) {
     })).toString('base64url');
 
     // Store state in session or database for validation
-    await supabase.from('oauth_states').insert({
+    // Use admin client to bypass RLS for temporary CSRF tokens
+    const adminClient = createSupabaseAdminClient();
+    await adminClient.from('oauth_states').insert({
       user_id: user.id,
       state,
       provider: 'discord',
