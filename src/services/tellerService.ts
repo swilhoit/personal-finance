@@ -314,6 +314,29 @@ export async function syncTellerToSupabase(
       }
     }
 
+    // Fetch the UUID mapping for accounts (teller_account_id -> internal UUID)
+    const tellerAccountIds = accountRecords.map(a => a.account_id);
+    const { data: accountMapping } = await supabase
+      .from('teller_accounts')
+      .select('id, account_id')
+      .in('account_id', tellerAccountIds);
+
+    // Create a lookup map: Teller account ID -> internal UUID
+    const accountIdToUuid: Record<string, string> = {};
+    if (accountMapping) {
+      for (const acc of accountMapping) {
+        accountIdToUuid[acc.account_id] = acc.id;
+      }
+    }
+
+    // Update transaction records with the correct UUID references
+    for (const tx of transactionRecords) {
+      const uuid = accountIdToUuid[tx.teller_account_id];
+      if (uuid) {
+        tx.account_id = uuid;
+      }
+    }
+
     // Batch upsert transactions in chunks of 500 (Supabase limit)
     const BATCH_SIZE = 500;
     for (let i = 0; i < transactionRecords.length; i += BATCH_SIZE) {
@@ -358,9 +381,3 @@ export function getTellerConnectConfig(options: {
     userId: options.userId,
   };
 }
-
-
-
-
-
-
