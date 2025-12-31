@@ -371,7 +371,7 @@ export default function ChatWidget() {
         } top-10 right-0 bottom-0`}
       >
         <div className={`bg-white shadow-2xl border-l border-gray-200 overflow-hidden transition-all duration-200 h-full flex flex-col ${
-          minimized ? "w-72" : "w-80"
+          minimized ? "w-80" : "w-96"
         }`}>
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
