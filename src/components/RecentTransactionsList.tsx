@@ -28,27 +28,40 @@ export default async function RecentTransactionsList() {
 
   if (!user) return null;
 
-  const { data: transactions } = await supabase
-    .from("transactions")
-    .select(`
-      transaction_id, date, name, merchant_name, amount, category, pending, account_id, manual_account_id,
-      teller_accounts:account_id (type),
-      manual_accounts:manual_account_id (type)
-    `)
-    .eq("user_id", user.id)
-    .order("date", { ascending: false })
-    .limit(5);
+  // Fetch transactions and accounts in parallel
+  const [{ data: transactions }, { data: tellerAccounts }, { data: manualAccounts }] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select("transaction_id, date, name, merchant_name, amount, category, pending, account_id, manual_account_id")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false })
+      .limit(5),
+    supabase
+      .from("teller_accounts")
+      .select("id, type")
+      .eq("user_id", user.id),
+    supabase
+      .from("manual_accounts")
+      .select("id, type")
+      .eq("user_id", user.id),
+  ]);
 
   if (!transactions || transactions.length === 0) {
     return <TransactionsEmptyState />;
   }
 
+  // Build account type lookup maps
+  const tellerTypeMap = new Map((tellerAccounts ?? []).map(a => [a.id, a.type]));
+  const manualTypeMap = new Map((manualAccounts ?? []).map(a => [a.id, a.type === 'credit' ? 'credit' : 'depository']));
+
   // Helper to get account type from transaction
   const getAccountType = (tx: typeof transactions[0]): string => {
-    const tellerAccount = tx.teller_accounts as unknown as { type: string } | null;
-    const manualAccount = tx.manual_accounts as unknown as { type: string } | null;
-    if (tellerAccount?.type) return tellerAccount.type;
-    if (manualAccount?.type) return manualAccount.type === 'credit' ? 'credit' : 'depository';
+    if (tx.account_id && tellerTypeMap.has(tx.account_id)) {
+      return tellerTypeMap.get(tx.account_id)!;
+    }
+    if (tx.manual_account_id && manualTypeMap.has(tx.manual_account_id)) {
+      return manualTypeMap.get(tx.manual_account_id)!;
+    }
     return 'depository';
   };
 
