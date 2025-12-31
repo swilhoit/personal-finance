@@ -14,8 +14,9 @@ export default async function TransactionsPage() {
     supabase
       .from("transactions")
       .select(`
-        transaction_id, date, name, merchant_name, amount, category, category_id, account_id,
-        teller_accounts!account_id (type)
+        transaction_id, date, name, merchant_name, amount, category, category_id, account_id, manual_account_id,
+        teller_accounts:account_id (type),
+        manual_accounts:manual_account_id (type)
       `)
       .eq("user_id", user.id)
       .order("date", { ascending: false })
@@ -29,8 +30,17 @@ export default async function TransactionsPage() {
 
   // Map transactions to include account_type
   const mappedTransactions = (transactions ?? []).map(tx => {
-    // teller_accounts is joined data - could be object or null
+    // Handle both teller and manual accounts
     const tellerAccount = tx.teller_accounts as unknown as { type: string } | null;
+    const manualAccount = tx.manual_accounts as unknown as { type: string } | null;
+    // Determine account type: use teller, then manual, then default to depository
+    let accountType = 'depository';
+    if (tellerAccount?.type) {
+      accountType = tellerAccount.type;
+    } else if (manualAccount?.type) {
+      // Map manual account types to match teller types
+      accountType = manualAccount.type === 'credit' ? 'credit' : 'depository';
+    }
     return {
       transaction_id: tx.transaction_id,
       date: tx.date,
@@ -39,7 +49,7 @@ export default async function TransactionsPage() {
       amount: tx.amount,
       category: tx.category,
       category_id: tx.category_id,
-      account_type: tellerAccount?.type || 'depository',
+      account_type: accountType,
     };
   });
 
