@@ -121,8 +121,8 @@ export async function POST(req: Request) {
     },
   });
 
-  const getSpendingByCategory = tool<{ days?: number }, { category: string; total: number }[]>({
-    description: "Aggregate total spending by category over a recent time window",
+  const getSpendingByCategory = tool<{ days?: number }, { category: string; total: number; grandTotal: number }[]>({
+    description: "Aggregate total spending by category over a recent time window. Returns spending as positive numbers.",
     inputSchema: z.object({ days: z.number().min(1).max(365) }).partial(),
     execute: async ({ days = 30 }) => {
       try {
@@ -139,10 +139,18 @@ export async function POST(req: Request) {
         }
         const totals = new Map<string, number>();
         for (const t of (data as SpendingRow[]) ?? []) {
-          const key = t.category ?? "Uncategorized";
-          totals.set(key, (totals.get(key) ?? 0) + Number(t.amount));
+          // Only count expenses (negative amounts)
+          if (t.amount < 0) {
+            const key = t.category ?? "Uncategorized";
+            totals.set(key, (totals.get(key) ?? 0) + Math.abs(Number(t.amount)));
+          }
         }
-        return Array.from(totals.entries()).map(([category, total]) => ({ category, total }));
+        // Calculate grand total
+        const grandTotal = Array.from(totals.values()).reduce((sum, val) => sum + val, 0);
+        // Sort by total descending and return with grand total
+        return Array.from(totals.entries())
+          .sort((a, b) => b[1] - a[1])
+          .map(([category, total]) => ({ category, total, grandTotal }));
       } catch (e) {
         console.error("[Chat API] getSpendingByCategory unexpected error:", e);
         return [];

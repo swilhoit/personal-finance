@@ -43,18 +43,24 @@ function isDynamicToolUIPart(part: unknown): part is DynamicToolUIPart {
 
 function renderToolResultByName(toolName: string, result: unknown) {
   if (toolName === "getSpendingByCategory" && Array.isArray(result)) {
-    const items = result as Array<{ category: string; total: number }>;
+    const items = result as Array<{ category: string; total: number; grandTotal?: number }>;
     if (items.length === 0) return <div className="text-sm text-gray-500">No spending data found</div>;
+    const grandTotal = items[0]?.grandTotal ?? items.reduce((sum, it) => sum + it.total, 0);
     return (
       <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
-          Spending by Category
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Spending</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
         </div>
         <div className="space-y-2">
           {items.map((it, idx) => (
             <div key={idx} className="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-700 last:border-0">
               <span className="text-sm text-gray-700 dark:text-gray-300">{it.category || "Uncategorized"}</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${it.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                ${it.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
             </div>
           ))}
         </div>
