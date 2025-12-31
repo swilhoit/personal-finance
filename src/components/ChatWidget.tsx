@@ -97,7 +97,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
         {items.slice(0, 5).map((it, idx) => (
           <div key={idx} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
             <span className="text-gray-600">{it.category || "Other"}</span>
-            <span className="font-medium text-gray-900">${it.total.toFixed(0)}</span>
+            <span className="font-medium text-gray-900">${it.total.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
           </div>
         ))}
       </div>
@@ -112,7 +112,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
         {rows.slice(0, 5).map((t, idx) => (
           <div key={idx} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
             <span className="text-gray-600 truncate flex-1">{t.merchant_name || "Transaction"}</span>
-            <span className="font-medium text-gray-900">${Number(t.amount).toFixed(0)}</span>
+            <span className="font-medium text-gray-900">${Number(t.amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
           </div>
         ))}
       </div>
@@ -128,7 +128,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
           <div key={idx} className="py-1 border-b border-gray-100 last:border-0">
             <div className="text-gray-500 text-[10px]">{a.name || "Account"}</div>
             <div className="font-medium text-gray-900 text-sm">
-              ${Number(a.current_balance ?? 0).toFixed(0)}
+              ${Number(a.current_balance ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
             </div>
           </div>
         ))}
@@ -189,7 +189,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
               <div className="flex justify-between mb-1">
                 <span className="text-gray-600">{b.category_name}</span>
                 <span className={pct > 90 ? "text-red-600" : pct > 70 ? "text-amber-600" : "text-gray-900"}>
-                  ${b.spent_amount.toFixed(0)} / ${b.budget_amount.toFixed(0)}
+                  ${b.spent_amount.toLocaleString('en-US', { maximumFractionDigits: 0 })} / ${b.budget_amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </span>
               </div>
               <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">

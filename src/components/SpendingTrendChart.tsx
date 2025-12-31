@@ -139,7 +139,7 @@ export default function SpendingTrendChart({ data, height = 200 }: SpendingTrend
     for (let i = 0; i <= 4; i++) {
       const value = minAmount + (range / 4) * (4 - i);
       const y = padding + (chartHeight / 4) * i;
-      ctx.fillText(`$${value.toFixed(0)}`, padding - 10, y + 4);
+      ctx.fillText(`$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, padding - 10, y + 4);
     }
   }, [data, height]);
 

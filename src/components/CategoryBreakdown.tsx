@@ -70,7 +70,7 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold">${category.amount.toFixed(2)}</p>
+              <p className="font-semibold">${category.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               <div className="flex items-center gap-1 justify-end">
                 <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div 

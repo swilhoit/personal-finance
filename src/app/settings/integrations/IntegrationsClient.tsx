@@ -490,7 +490,7 @@ export default function IntegrationsClient({
                         </div>
                         <div className="text-right">
                           <div className="font-semibold">
-                            ${account.current_balance?.toFixed(2) || '0.00'}
+                            ${account.current_balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                           </div>
                           {account.last_synced_at && (
                             <div className="text-xs text-gray-500 mt-1">

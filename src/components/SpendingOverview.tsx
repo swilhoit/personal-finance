@@ -1,4 +1,26 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { formatCurrency } from "@/lib/format";
+
+// Pre-built empty state for spending overview (server component compatible)
+function SpendingEmptyState() {
+  return (
+    <div
+      role="status"
+      aria-label="No spending data"
+      className="flex flex-col items-center justify-center py-8 px-4 text-center"
+    >
+      <div className="mb-4" aria-hidden="true">
+        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">No spending data yet</h3>
+      <p className="text-sm text-gray-500 max-w-sm">
+        Transactions will appear here once your accounts are synced.
+      </p>
+    </div>
+  );
+}
 
 export default async function SpendingOverview() {
   const supabase = await createSupabaseServerClient(true);
@@ -14,15 +36,7 @@ export default async function SpendingOverview() {
     .limit(5);
 
   if (!monthSpending || monthSpending.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <p className="text-sm text-gray-600">No spending data yet</p>
-        <p className="text-xs text-gray-500 mt-1">Transactions will appear here once synced</p>
-      </div>
-    );
+    return <SpendingEmptyState />;
   }
 
   const total = monthSpending.reduce((sum, cat) => sum + Number(cat.total_amount ?? 0), 0);
@@ -31,7 +45,7 @@ export default async function SpendingOverview() {
   return (
     <div className="space-y-4">
       <div className="flex items-baseline justify-between">
-        <p className="text-2xl font-semibold text-gray-900">${total.toFixed(2)}</p>
+        <p className="text-2xl font-semibold text-gray-900">{formatCurrency(total)}</p>
         <p className="text-sm text-gray-600">This month</p>
       </div>
 
@@ -48,7 +62,7 @@ export default async function SpendingOverview() {
                   {cat.category_name ?? "Uncategorized"}
                 </span>
                 <span className="text-gray-600 ml-2">
-                  ${amount.toFixed(2)}
+                  {formatCurrency(amount)}
                 </span>
               </div>
               <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">

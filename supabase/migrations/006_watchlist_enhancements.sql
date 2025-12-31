@@ -104,3 +104,6 @@ ADD COLUMN IF NOT EXISTS performance_365d DECIMAL(10,4);
 
 
 
+
+
+

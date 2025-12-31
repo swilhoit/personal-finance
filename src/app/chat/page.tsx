@@ -54,7 +54,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
           {items.map((it, idx) => (
             <div key={idx} className="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-700 last:border-0">
               <span className="text-sm text-gray-700 dark:text-gray-300">{it.category || "Uncategorized"}</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${it.total.toFixed(2)}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${it.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           ))}
         </div>
@@ -77,7 +77,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
                 <span className="text-sm text-gray-900 dark:text-gray-100 block truncate">{t.merchant_name || t.name || "Transaction"}</span>
                 <span className="text-xs text-gray-500">{t.category} · {t.date}</span>
               </div>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">${Number(t.amount).toFixed(2)}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">${Number(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ function renderToolResultByName(toolName: string, result: unknown) {
             <div key={idx} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
               <div className="text-sm text-gray-600 dark:text-gray-400">{a.name || a.official_name || "Account"}</div>
               <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                ${Number(a.current_balance ?? 0).toFixed(2)}
+                ${Number(a.current_balance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           ))}
@@ -136,8 +136,8 @@ function renderToolResultByName(toolName: string, result: unknown) {
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>${b.spent_amount.toFixed(0)} spent</span>
-                  <span>${b.budget_amount.toFixed(0)} budget</span>
+                  <span>${b.spent_amount.toLocaleString('en-US', { maximumFractionDigits: 0 })} spent</span>
+                  <span>${b.budget_amount.toLocaleString('en-US', { maximumFractionDigits: 0 })} budget</span>
                 </div>
               </div>
             );

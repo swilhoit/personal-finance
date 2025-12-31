@@ -1,0 +1,48 @@
+Posted Date,Transaction Date,Transaction Type,Check/Serial #,Full description,Merchant name,Category name,Sub-category name,Amount,Daily Posted Balance
+03/03/2025,03/03/2025,Debit,,INST XFER PAYPAL PATREON MEMBER INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($9.09),$1644.92
+03/03/2025,03/03/2025,Debit,,INST XFER PAYPAL SWIFTMEDIAE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$1644.92
+03/03/2025,03/03/2025,Credit,,CASHOUT VENMO 6088 SAM WILHOIT ACH CREDIT,Venmo,Transfers & Payments,P2P,$124.50,$1644.92
+03/05/2025,03/05/2025,Debit,,WEB PMTS Statewide Enterp XFBMKC INTERNET PAYMENT,Statewide Enterp,Business,Photography publishing & printing,($1302.78),$342.14
+03/06/2025,03/06/2025,Debit,,PAYMENT VENMO *********1457 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($20.00),$415.14
+03/06/2025,03/06/2025,Credit,,BANK XFER APPLE CASH Sam Wilhoit PERSON-TO-PERSON PAYMENT,Apple Cash,Transfers & Payments,P2P,$93.00,$415.14
+03/07/2025,03/07/2025,Debit,,INST XFER PAYPAL P34AF08055 INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$403.15
+03/10/2025,03/10/2025,Credit,,ODP ADVANCE FROM CREDIT CARD CREDIT CARD 4513360009500158 CREDIT CARD ADVANCE,,Transfers & Payments,Credit card payments,$32.05,$0.00
+03/10/2025,03/10/2025,Debit,,ACH PMT AMEX EPAYMENT A4294 RECURRING INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($435.20),$0.00
+03/11/2025,03/11/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$140.01
+03/11/2025,03/11/2025,Credit,,BANK XFER APPLE CASH Sam Wilhoit PERSON-TO-PERSON PAYMENT,Apple Cash,Transfers & Payments,P2P,$145.00,$140.01
+03/17/2025,03/17/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($12.99),$140.02
+03/17/2025,03/17/2025,Debit,,PAYMENT VENMO *********1565 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($12.00),$140.02
+03/17/2025,03/17/2025,Credit,,BANK XFER APPLE CASH Sam Wilhoit PERSON-TO-PERSON PAYMENT,Apple Cash,Transfers & Payments,P2P,$25.00,$140.02
+03/20/2025,03/20/2025,Credit,,TRANSFER Tetrahedron Sam Wilhoit ACH CREDIT,Tetrahedron,Deposits,Other deposits,$500.00,$640.02
+03/21/2025,03/21/2025,Debit,,INST XFER PAYPAL GOOGLE GOOGLE O INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($1.99),$638.03
+03/24/2025,03/24/2025,Debit,,INST XFER PAYPAL DROPBOX INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$651.04
+03/24/2025,03/24/2025,Credit,,TRANSFER APPLE GS SAVINGS 910140859379 PERSON-TO-PERSON PAYMENT,Apple Savings,Savings & Investments,Savings,$25.00,$651.04
+03/27/2025,03/27/2025,Debit,,ACH PMT AMEX EPAYMENT A1000 RECURRING INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($291.13),$359.91
+03/31/2025,03/31/2025,Debit,,INST XFER PAYPAL GODADDY.COM INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($25.17),$329.75
+03/31/2025,03/31/2025,Debit,,INST XFER PAYPAL SWIFTMEDIAE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$329.75
+04/01/2025,04/01/2025,Credit,,MOBILE DEPOSIT,,Deposits,Other deposits,$9000.00,$9329.75
+04/02/2025,04/02/2025,Debit,,INST XFER PAYPAL PATREON MEMBER INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($9.09),$9320.66
+04/07/2025,04/07/2025,Debit,,PAYMENT APPLECARD GSBANK *****0892 INTERNET PAYMENT,Apple Card,Transfers & Payments,Credit card payments,($1638.67),$5650.00
+04/07/2025,04/07/2025,Debit,,INST XFER PAYPAL P35A06FF60 INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$5650.00
+04/07/2025,04/07/2025,Debit,,WEB PMTS Statewide Enterp RR4WQC INTERNET PAYMENT,Statewide Enterp,Business,Photography publishing & printing,($1300.00),$5650.00
+04/07/2025,04/07/2025,Debit,,ACH PMT AMEX EPAYMENT W1932 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($1000.00),$5650.00
+04/07/2025,04/07/2025,Credit,,CASHOUT VENMO 6233 SAM WILHOIT ACH CREDIT,Venmo,Transfers & Payments,P2P,$280.00,$5650.00
+04/08/2025,04/08/2025,Debit,,ACH PMT AMEX EPAYMENT A2626 RECURRING INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($117.73),$5532.27
+04/11/2025,04/11/2025,Debit,,PAYMENT APPLECARD GSBANK *****0892 INTERNET PAYMENT,Apple Card,Transfers & Payments,Credit card payments,($1050.00),$3477.28
+04/11/2025,04/11/2025,Debit,,ACH PMT AMEX EPAYMENT W7340 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($1000.00),$3477.28
+04/11/2025,04/11/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$3477.28
+04/14/2025,04/14/2025,Debit,,IAT PAYPAL NINTENDO INTERNATIONAL ACH DEBIT,Nintendo,Dining & Entertainment,Games,($59.98),$3487.96
+04/14/2025,04/14/2025,Credit,,DOMWR ROYL ASCAP 4945 Sam Wilhoit ACH CREDIT,Ascap,Deposits,Other deposits,$70.66,$3487.96
+04/15/2025,04/15/2025,Debit,,ACH PMT AMEX EPAYMENT W6960 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($1000.00),$2437.96
+04/15/2025,04/15/2025,Debit,,USATAXPYMT IRS ***********5555 INTERNET PAYMENT,IRS,Taxes & Fees,Taxes fines & bail bonds,($50.00),$2437.96
+04/16/2025,04/16/2025,Debit,,AUTOPAY CHASE CREDIT CRD 7507 WILHOIT SAM ACH DEBIT,Chase Credit Card,Transfers & Payments,Credit card payments,($50.00),$2374.97
+04/16/2025,04/16/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($12.99),$2374.97
+04/21/2025,04/21/2025,Debit,,PURCHASE PRIZEPICKS ***********0448 INTERNET PAYMENT,PrizePicks,Dining & Entertainment,Gambling,($10.00),$2309.37
+04/21/2025,04/21/2025,Debit,,PAYMENT VENMO *********2222 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($53.61),$2309.37
+04/21/2025,04/21/2025,Debit,,INST XFER PAYPAL GOOGLE GOOGLE O INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($1.99),$2309.37
+04/22/2025,04/22/2025,Debit,,ACH PMT AMEX EPAYMENT W7262 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($112.88),$2184.50
+04/22/2025,04/22/2025,Debit,,INST XFER PAYPAL DROPBOX INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$2184.50
+04/28/2025,04/28/2025,Debit,,PAYMENT APPLECARD GSBANK *****0892 INTERNET PAYMENT,Apple Card,Transfers & Payments,Credit card payments,($6.50),$2160.01
+04/28/2025,04/28/2025,Debit,,INST XFER PAYPAL FASTSPRING INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($17.99),$2160.01
+04/30/2025,04/30/2025,Debit,,INST XFER PAYPAL SWIFTMEDIAE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$2155.02
+05/01/2025,05/01/2025,Debit,,INST XFER PAYPAL GODADDY.COM INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$2150.03

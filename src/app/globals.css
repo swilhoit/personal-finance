@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Monochromatic color system - Light mode only */
+  /* Color system - Light mode only */
   --background: #ffffff;
   --foreground: #171717;
 
@@ -17,9 +17,10 @@
   --gray-800: #262626;
   --gray-900: #171717;
 
-  /* Accent - subtle gray-blue for interactive elements */
-  --accent: #3f3f46;
-  --accent-hover: #27272a;
+  /* Accent colors */
+  --accent: #0f172a;
+  --accent-hover: #1e293b;
+  --focus-ring: #2563eb;
 }
 
 @theme inline {
@@ -33,21 +34,23 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
-/* Typography */
+/* Typography - use system font for headers */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   letter-spacing: -0.025em;
+  line-height: 1.25;
 }
 
-/* Clean, minimal button styles */
+/* Clean button styles */
 .btn-primary {
-  @apply px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors;
+  @apply px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 bg-gray-100 text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors;
+  @apply px-4 py-2 bg-gray-100 text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500;
 }
 
 /* Card styles */
@@ -55,14 +58,54 @@ h1, h2, h3, h4, h5, h6 {
   @apply bg-white border border-gray-200 rounded-lg p-6;
 }
 
-/* Input styles */
+/* Input styles with better contrast */
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="number"],
+input[type="search"],
 select,
 textarea {
-  @apply w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent;
+  @apply w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500 focus:border-blue-500;
+  @apply disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed;
+}
+
+/* Fix placeholder contrast - gray-500 passes WCAG AA */
+input::placeholder,
+textarea::placeholder {
+  color: #737373;
+}
+
+/* Error state for inputs */
+input.error,
+select.error,
+textarea.error {
+  @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Remove default focus ring on mouse click */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Links */
+a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Buttons focus state */
+button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Professional fade-in */
@@ -71,7 +114,30 @@ textarea {
   to { opacity: 1; }
 }
 
-/* Smooth transitions only */
+/* Smooth transitions */
 * {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ensure minimum tap target size on mobile */
+@media (max-width: 640px) {
+  button,
+  a,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

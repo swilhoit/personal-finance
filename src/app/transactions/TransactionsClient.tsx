@@ -2,6 +2,9 @@
 
 import React, { useState, useMemo } from "react";
 import { setTransactionCategory } from "./actions";
+import { Pagination } from "@/components/ui/Pagination";
+
+const ITEMS_PER_PAGE = 50;
 
 interface Transaction {
   transaction_id: string;
@@ -30,6 +33,7 @@ export default function TransactionsClient({ transactions, categories }: Transac
   const [filterType, setFilterType] = useState<"all" | "expense" | "income">("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [pendingCategories, setPendingCategories] = useState<Record<string, boolean>>({});
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Filter and search transactions
   const filteredTransactions = useMemo(() => {
@@ -56,11 +60,31 @@ export default function TransactionsClient({ transactions, categories }: Transac
     });
   }, [transactions, searchQuery, filterType, filterCategory]);
 
-  // Group by date
+  // Stats (computed on all filtered transactions)
+  const stats = useMemo(() => {
+    const totalExpenses = filteredTransactions
+      .filter(tx => tx.amount < 0)
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+    // Only count income from depository accounts (checking/savings)
+    // Credit card payments (positive amounts on credit accounts) are transfers, not income
+    const totalIncome = filteredTransactions
+      .filter(tx => tx.amount > 0 && tx.account_type === 'depository')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    return { totalExpenses, totalIncome, count: filteredTransactions.length };
+  }, [filteredTransactions]);
+
+  // Pagination (must be declared before groupedByDate)
+  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredTransactions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredTransactions, currentPage]);
+
+  // Group by date (uses paginated transactions)
   const groupedByDate = useMemo(() => {
     const groups: Record<string, Transaction[]> = {};
 
-    filteredTransactions.forEach((tx) => {
+    paginatedTransactions.forEach((tx) => {
       const date = new Date(tx.date);
       const today = new Date();
       const yesterday = new Date(today);
@@ -82,20 +106,15 @@ export default function TransactionsClient({ transactions, categories }: Transac
     });
 
     return groups;
-  }, [filteredTransactions]);
+  }, [paginatedTransactions]);
 
-  // Stats
-  const stats = useMemo(() => {
-    const totalExpenses = filteredTransactions
-      .filter(tx => tx.amount < 0)
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
-    // Only count income from depository accounts (checking/savings)
-    // Credit card payments (positive amounts on credit accounts) are transfers, not income
-    const totalIncome = filteredTransactions
-      .filter(tx => tx.amount > 0 && tx.account_type === 'depository')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-    return { totalExpenses, totalIncome, count: filteredTransactions.length };
-  }, [filteredTransactions]);
+  // Reset to page 1 when filters change
+  const handleFilterChange = (type: "search" | "type" | "category", value: string) => {
+    setCurrentPage(1);
+    if (type === "search") setSearchQuery(value);
+    else if (type === "type") setFilterType(value as typeof filterType);
+    else if (type === "category") setFilterCategory(value);
+  };
 
   const handleCategoryChange = async (transactionId: string, categoryId: string) => {
     setPendingCategories(prev => ({ ...prev, [transactionId]: true }));
@@ -167,7 +186,7 @@ export default function TransactionsClient({ transactions, categories }: Transac
                 type="text"
                 placeholder="Search transactions..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleFilterChange("search", e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
             </div>
@@ -181,7 +200,7 @@ export default function TransactionsClient({ transactions, categories }: Transac
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setFilterType(option.value as typeof filterType)}
+                  onClick={() => handleFilterChange("type", option.value)}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     filterType === option.value
                       ? "bg-gray-900 text-white"
@@ -196,7 +215,7 @@ export default function TransactionsClient({ transactions, categories }: Transac
             {/* Category Filter */}
             <select
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
+              onChange={(e) => handleFilterChange("category", e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white"
             >
               <option value="all">All Categories</option>
@@ -300,6 +319,20 @@ export default function TransactionsClient({ transactions, categories }: Transac
                 </div>
               </div>
             ))}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex flex-col items-center gap-4">
+                <p className="text-sm text-gray-500">
+                  Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, stats.count)} of {stats.count} transactions
+                </p>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -207,7 +207,7 @@ export default function SettingsClient({ categories, budgets, rules, currentMont
                     <div>
                       <div className="font-medium text-sm">{b.categories?.name ?? "Category"}</div>
                       <div className="text-xs text-gray-500">
-                        {new Date(b.month + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · ${Number(b.amount).toFixed(2)}
+                        {new Date(b.month + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · ${Number(b.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
                     <form action={deleteBudget}>

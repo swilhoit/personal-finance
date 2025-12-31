@@ -2,128 +2,100 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect, useMemo } from "react";
+
+const navItems = [
+  {
+    href: "/dashboard",
+    label: "Home",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+    ),
+  },
+  {
+    href: "/transactions",
+    label: "Transactions",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+    ),
+  },
+  {
+    href: "/investments",
+    label: "Invest",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    ),
+  },
+  {
+    href: "/insights",
+    label: "Insights",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+];
 
 export default function MobileNav() {
   const pathname = usePathname();
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const navItems = useMemo(() => [
-    {
-      href: "/dashboard",
-      label: "HOME",
-      emoji: "🏠",
-      color: "from-cyan-400 to-cyan-600",
-    },
-    {
-      href: "/transactions",
-      label: "TRANS",
-      emoji: "💸",
-      color: "from-green-400 to-green-600",
-    },
-    {
-      href: "/investments",
-      label: "INVEST",
-      emoji: "📈",
-      color: "from-indigo-400 to-purple-600",
-    },
-    {
-      href: "/insights",
-      label: "STATS",
-      emoji: "📊",
-      color: "from-purple-400 to-purple-600",
-    },
-    {
-      href: "/settings",
-      label: "MORE",
-      emoji: "⚙️",
-      color: "from-gray-400 to-gray-600",
-    }
-  ], []);
-
-  useEffect(() => {
-    const currentIndex = navItems.findIndex(item =>
-      pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href))
-    );
-    if (currentIndex !== -1) setActiveIndex(currentIndex);
-  }, [pathname, navItems]);
 
   // Don't show nav on auth pages or landing page
   if (pathname === "/" || pathname?.startsWith("/auth")) return null;
 
   return (
-    <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-500 lg:hidden z-50 pb-safe shadow-2xl">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-        </div>
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 lg:hidden z-50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      role="navigation"
+      aria-label="Main navigation"
+    >
+      <div className="grid grid-cols-5 max-w-lg mx-auto">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href ||
+            (item.href !== "/dashboard" && pathname?.startsWith(item.href));
 
-        <div className="relative grid grid-cols-5">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href));
-            
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex flex-col items-center justify-center py-3 transition-all transform ${
-                  isActive ? "scale-110 -translate-y-1" : "hover:scale-105"
-                }`}
-              >
-                {isActive && (
-                  <>
-                    {/* Active indicator */}
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"></div>
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 bg-white/20 blur-xl"></div>
-                  </>
-                )}
-                
-                <div className={`relative transition-all ${isActive ? "animate-bounce-slow" : ""}`}>
-                  <span className="text-2xl filter drop-shadow-lg">{item.emoji}</span>
-                  {isActive && (
-                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                    </span>
-                  )}
-                </div>
-                
-                <span className={`text-[10px] mt-1 font-['Rubik_Mono_One'] ${
-                  isActive ? "text-white font-bold" : "text-white/80"
-                }`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Sliding indicator */}
-        <div 
-          className="absolute bottom-0 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-300 shadow-lg"
-          style={{
-            width: `${100 / navItems.length}%`,
-            left: `${(activeIndex * 100) / navItems.length}%`,
-          }}
-        />
-      </nav>
-
-      <style jsx>{`
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-4px);
-          }
-        }
-
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
-        }
-      `}</style>
-    </>
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
+              className={`flex flex-col items-center justify-center py-3 px-1 transition-colors ${
+                isActive
+                  ? "text-gray-900"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <div className={`p-1.5 rounded-lg transition-colors ${
+                isActive ? "bg-gray-100" : ""
+              }`}>
+                {item.icon}
+              </div>
+              <span className={`text-[10px] mt-1 ${
+                isActive ? "font-semibold" : "font-medium"
+              }`}>
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

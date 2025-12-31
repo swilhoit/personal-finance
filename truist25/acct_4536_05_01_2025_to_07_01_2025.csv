@@ -1,0 +1,46 @@
+Posted Date,Transaction Date,Transaction Type,Check/Serial #,Full description,Merchant name,Category name,Sub-category name,Amount,Daily Posted Balance
+05/01/2025,05/01/2025,Debit,,INST XFER PAYPAL GODADDY.COM INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$2150.03
+05/05/2025,05/05/2025,Debit,,WEB PMTS Statewide Enterp JN8CWC INTERNET PAYMENT,Statewide Enterp,Business,Photography publishing & printing,($1302.78),$447.25
+05/05/2025,05/05/2025,Debit,,PAYMENT VENMO *********4738 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($400.00),$447.25
+05/06/2025,05/06/2025,Debit,,PAYMENT VENMO *********4859 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($15.00),$432.25
+05/07/2025,05/07/2025,Debit,,INST XFER PAYPAL P368B37D8B INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$420.26
+05/09/2025,05/09/2025,Debit,,PAYMENT VENMO *********0436 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($80.00),$340.26
+05/12/2025,05/12/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$385.27
+05/12/2025,05/12/2025,Credit,,CASHOUT VENMO 3822 SAM WILHOIT ACH CREDIT,Venmo,Transfers & Payments,P2P,$50.00,$385.27
+05/14/2025,05/14/2025,Debit,,PAYMENT VENMO *********2145 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($22.00),$363.27
+05/16/2025,05/16/2025,Debit,,AUTOPAY CHASE CREDIT CRD 8996 WILHOIT SAM ACH DEBIT,Chase Credit Card,Transfers & Payments,Credit card payments,($50.00),$300.28
+05/16/2025,05/16/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($12.99),$300.28
+05/19/2025,05/19/2025,Debit,,PAYMENT VENMO *********1009 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($50.00),$245.61
+05/19/2025,05/19/2025,Debit,,PAYMENT VENMO *********5505 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($15.00),$245.61
+05/19/2025,05/19/2025,Credit,,INTWR ROYL ASCAP 4945 Sam Wilhoit ACH CREDIT,Ascap,Deposits,Other deposits,$10.33,$245.61
+05/20/2025,05/20/2025,Credit,,TRANSFER Tetrahedron Sam Wilhoit ACH CREDIT,Tetrahedron,Deposits,Other deposits,$1000.00,$1245.61
+05/21/2025,05/21/2025,Debit,,PAYMENT VENMO *********8447 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($44.00),$1199.62
+05/21/2025,05/21/2025,Debit,,INST XFER PAYPAL GOOGLE GOOGLE O INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($1.99),$1199.62
+05/22/2025,05/22/2025,Debit,,INST XFER PAYPAL DROPBOX INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$1187.63
+05/27/2025,05/27/2025,Debit,,ACH PMT AMEX EPAYMENT A8392 RECURRING INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($229.86),$2957.77
+05/27/2025,05/27/2025,Credit,,TRANSFER Tetrahedron Sam Wilhoit ACH CREDIT,Tetrahedron,Deposits,Other deposits,$2000.00,$2957.77
+05/28/2025,05/28/2025,Debit,,ACH PMT AMEX EPAYMENT W5278 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($2000.00),$1057.77
+05/28/2025,05/28/2025,Credit,,MOBILE DEPOSIT,,Deposits,Other deposits,$100.00,$1057.77
+05/30/2025,05/30/2025,Debit,,INST XFER PAYPAL SWIFTMEDIAE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$1052.78
+06/02/2025,06/02/2025,Debit,,PAYMENT VENMO *********3260 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($20.00),$1698.78
+06/02/2025,06/02/2025,Debit,,PAYMENT VENMO *********9517 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($72.00),$1698.78
+06/02/2025,06/02/2025,Debit,,PAYMENT VENMO *********1975 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($62.00),$1698.78
+06/02/2025,06/02/2025,Credit,,TRANSFER Tetrahedron Sam Wilhoit ACH CREDIT,Tetrahedron,Deposits,Other deposits,$800.00,$1698.78
+06/04/2025,06/04/2025,Credit,,TRANSFER Tetrahedron Sam Wilhoit ACH CREDIT,Tetrahedron,Deposits,Other deposits,$500.00,$2198.78
+06/05/2025,06/05/2025,Debit,,INST XFER PAYPAL PATREON MEMBER INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($5.45),$890.55
+06/05/2025,06/05/2025,Debit,,WEB PMTS Statewide Enterp MQ471D INTERNET PAYMENT,Statewide Enterp,Business,Photography publishing & printing,($1302.78),$890.55
+06/06/2025,06/06/2025,Deposit,,ONLINE FROM ****4601 - TRUIST ONLINE TRANSFER,,Transfers & Payments,Transfers between own accounts,$500.00,$1390.55
+06/09/2025,06/09/2025,Debit,,PAYMENT APPLECARD GSBANK *****0892 INTERNET PAYMENT,Apple Card,Transfers & Payments,Credit card payments,($56.20),$1322.36
+06/09/2025,06/09/2025,Debit,,INST XFER PAYPAL SPOTIFY*P37764C INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$1322.36
+06/11/2025,06/11/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$1317.37
+06/13/2025,06/13/2025,Deposit,,ONLINE FROM ****4601 - TRUIST ONLINE TRANSFER,,Transfers & Payments,Transfers between own accounts,$500.00,$1827.37
+06/13/2025,06/13/2025,Credit,,NEGASHI HARVEY PAYMENT ID JPM99bbyk4r9 ZELLE PAYMENT FROM,Zelle,Transfers & Payments,Digital wallet,$10.00,$1827.37
+06/16/2025,06/16/2025,Debit,,AUTOPAY CHASE CREDIT CRD 9122 WILHOIT SAM ACH DEBIT,Chase Credit Card,Transfers & Payments,Credit card payments,($49.00),$1685.38
+06/16/2025,06/16/2025,Debit,,PAYMENT VENMO *********1771 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($80.00),$1685.38
+06/16/2025,06/16/2025,Debit,,INST XFER PAYPAL SPLICE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($12.99),$1685.38
+06/18/2025,06/18/2025,Credit,,MOBILE DEPOSIT,,Deposits,Other deposits,$600.00,$2285.38
+06/23/2025,06/23/2025,Debit,,ACH PMT AMEX EPAYMENT W4552 INTERNET PAYMENT,American Express,Transfers & Payments,Credit card payments,($1000.00),$1271.40
+06/23/2025,06/23/2025,Debit,,INST XFER PAYPAL DROPBOX INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($11.99),$1271.40
+06/23/2025,06/23/2025,Debit,,INST XFER PAYPAL GOOGLE GOOGLE O INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($1.99),$1271.40
+06/24/2025,06/24/2025,Debit,,PAYMENT VENMO *********1274 INTERNET PAYMENT,Venmo,Transfers & Payments,P2P,($44.00),$1227.40
+06/30/2025,06/30/2025,Debit,,INST XFER PAYPAL SWIFTMEDIAE INTERNET PAYMENT,Paypal,Transfers & Payments,Digital wallet,($4.99),$1222.41
